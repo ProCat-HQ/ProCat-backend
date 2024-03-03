@@ -6,11 +6,11 @@ type Authorization interface {
 type Items interface {
 }
 
-type Service struct {
+type Repository struct {
 	Authorization
 	Items
 }
 
-func NewService() *Service {
-	return &Service{}
+func NewRepository() *Repository {
+	return &Repository{}
 }
