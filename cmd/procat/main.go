@@ -13,12 +13,15 @@ func main() {
 	if err := initConfig(); err != nil {
 		log.Fatalf("Error while reading configs %s", err.Error())
 	}
+
 	repos := repository.NewRepository()
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
 	srv := new(server.Server)
 
-	if err := srv.Run(viper.GetString("bind_addr"), handlers.InitRoutes()); err != nil {
+	bindAddr := viper.GetString("bind_addr")
+
+	if err := srv.Run(bindAddr, handlers.InitRoutes()); err != nil {
 		log.Fatalf("Error while running server %s", err.Error())
 	}
 }

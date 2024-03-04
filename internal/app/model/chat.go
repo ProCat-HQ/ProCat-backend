@@ -8,3 +8,16 @@ type Chat struct {
 	SecondUserId int
 	OrderId      int
 }
+
+type Message struct {
+	Id     int    `json:"id"`
+	Text   string `json:"text"`
+	UserId int
+	ChatId int
+}
+
+type MessageImage struct {
+	Id        int    `json:"id"`
+	Image     string `json:"image"`
+	MessageId int
+}
