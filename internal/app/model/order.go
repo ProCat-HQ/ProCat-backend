@@ -10,8 +10,8 @@ type Order struct {
 	RentalPeriodEnd   time.Time `json:"rentalPeriodEnd"`
 	Address           string    `json:"address"`
 	CompanyName       string    `json:"companyName"`
-	Contact           string    `json:"contact"`
-	UserId            int
+	//Contract          string    `json:"contact"`
+	UserId int
 }
 
 type Delivery struct {

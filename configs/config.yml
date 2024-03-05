@@ -3,7 +3,7 @@ log_level: "debug"
 
 db:
   username: "postgres"
-  password: "31032003"
   host: "localhost"
-  port: "5432"
-  name: "ProCat"
+  port: "5436"
+  name: "procat"
+  sslmode: "disable"

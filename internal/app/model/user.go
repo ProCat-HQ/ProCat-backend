@@ -14,10 +14,10 @@ type User struct {
 }
 
 type DeliveryMan struct {
-	Id                int           `json:"id"`
-	CarCapacity       string        `json:"carCapacity"`
-	WorkingHoursStart time.Duration `json:"workingHoursStart"`
-	WorkingHoursEnd   time.Duration `json:"workingHoursEnd"`
-	CarId             string        `json:"carId"`
+	Id                int       `json:"id"`
+	CarCapacity       string    `json:"carCapacity"`
+	WorkingHoursStart time.Time `json:"workingHoursStart"`
+	WorkingHoursEnd   time.Time `json:"workingHoursEnd"`
+	CarId             string    `json:"carId"`
 	UserId            int
 }
