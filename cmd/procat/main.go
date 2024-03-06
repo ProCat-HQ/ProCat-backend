@@ -12,10 +12,6 @@ import (
 	"os"
 )
 
-func init() {
-
-}
-
 func main() {
 	if err := initConfig(); err != nil {
 		log.Fatalf("Error while reading configs %s", err.Error())
