@@ -5,5 +5,5 @@ db:
   username: "postgres"
   host: "localhost"
   port: "5436"
-  name: "procat"
+  name: "postgres"
   sslmode: "disable"

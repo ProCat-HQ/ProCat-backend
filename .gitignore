@@ -2,3 +2,4 @@ procat.exe
 .idea/
 tmp/
 .env
+/.cache/

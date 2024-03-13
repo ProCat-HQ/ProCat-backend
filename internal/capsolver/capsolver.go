@@ -13,7 +13,7 @@ package capsolver
 
 import (
 	capsolvergo "github.com/capsolver/capsolver-go"
-	"log"
+	"github.com/sirupsen/logrus"
 	"os"
 )
 
@@ -53,14 +53,14 @@ func writeCaptchaToFile(captcha, filename, path string) error {
 	if err != nil {
 		f, err = os.Open(path + "/" + filename)
 		if err != nil {
-			log.Fatalf("Can't create or open file: %s", err.Error())
+			logrus.Fatalf("Can't create or open file: %s", err.Error())
 		}
 	}
 
 	defer func(f *os.File) {
 		err := f.Close()
 		if err != nil {
-			log.Fatalf("Can't close file: %s", err.Error())
+			logrus.Fatalf("Can't close file: %s", err.Error())
 		}
 	}(f)
 

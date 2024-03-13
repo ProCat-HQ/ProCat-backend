@@ -7,20 +7,30 @@ import (
 	"github.com/procat-hq/procat-backend/internal/app/repository"
 	"github.com/procat-hq/procat-backend/internal/app/server"
 	"github.com/procat-hq/procat-backend/internal/app/service"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"log"
 	"os"
 )
 
-func main() {
+func initConfig() error {
+	viper.AddConfigPath("cmd/procat/config")
+	viper.SetConfigName("config")
+	return viper.ReadInConfig()
+}
+
+func init() {
+	logrus.SetFormatter(new(logrus.JSONFormatter))
+
 	if err := initConfig(); err != nil {
-		log.Fatalf("Error while reading configs %s", err.Error())
+		logrus.Fatalf("Error while reading configs %s", err.Error())
 	}
 
 	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Error while loading .env file: %s", err.Error())
+		logrus.Fatalf("Error while loading .env file: %s", err.Error())
 	}
+}
 
+func main() {
 	db, err := repository.NewPostgresDB(repository.Config{
 		Host:     viper.GetString("db.host"),
 		Port:     viper.GetString("db.port"),
@@ -31,7 +41,7 @@ func main() {
 	})
 
 	if err != nil {
-		log.Fatalf("Error occured while init DB: %s", err.Error())
+		logrus.Fatalf("Error occured while init DB: %s", err.Error())
 	}
 
 	repos := repository.NewRepository(db)
@@ -42,12 +52,6 @@ func main() {
 	bindAddr := viper.GetString("bind_addr")
 
 	if err := srv.Run(bindAddr, handlers.InitRoutes()); err != nil {
-		log.Fatalf("Error while running server %s", err.Error())
+		logrus.Fatalf("Error while running server %s", err.Error())
 	}
-}
-
-func initConfig() error {
-	viper.AddConfigPath("configs")
-	viper.SetConfigName("config")
-	return viper.ReadInConfig()
 }
