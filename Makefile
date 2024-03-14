@@ -5,7 +5,7 @@ endif
 
 .PHONY: build
 build:
-	GOCACHE=`pwd`/.cache && go env GOCACHE; go build -v ./cmd/procat
+	export GOCACHE=`pwd`/.cache && go env GOCACHE; go build -v ./cmd/procat
 
 .PHONY: test
 test:
