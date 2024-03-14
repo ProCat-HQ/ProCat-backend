@@ -12,13 +12,7 @@ import (
 	"os"
 )
 
-func initConfig() error {
-	viper.AddConfigPath("cmd/procat/config")
-	viper.SetConfigName("config")
-	return viper.ReadInConfig()
-}
-
-func init() {
+func main() {
 	logrus.SetFormatter(new(logrus.JSONFormatter))
 
 	if err := initConfig(); err != nil {
@@ -28,9 +22,7 @@ func init() {
 	if err := godotenv.Load(); err != nil {
 		logrus.Fatalf("Error while loading .env file: %s", err.Error())
 	}
-}
 
-func main() {
 	db, err := repository.NewPostgresDB(repository.Config{
 		Host:     viper.GetString("db.host"),
 		Port:     viper.GetString("db.port"),
@@ -54,4 +46,10 @@ func main() {
 	if err := srv.Run(bindAddr, handlers.InitRoutes()); err != nil {
 		logrus.Fatalf("Error while running server %s", err.Error())
 	}
+}
+
+func initConfig() error {
+	viper.AddConfigPath("cmd/procat/config")
+	viper.SetConfigName("config")
+	return viper.ReadInConfig()
 }
