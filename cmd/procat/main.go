@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/procat-hq/procat-backend/internal/app/handler"
@@ -9,7 +11,10 @@ import (
 	"github.com/procat-hq/procat-backend/internal/app/service"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
@@ -43,8 +48,25 @@ func main() {
 	srv := new(server.Server)
 	bindAddr := viper.GetString("bind_addr")
 
-	if err := srv.Run(bindAddr, handlers.InitRoutes()); err != nil {
-		logrus.Fatalf("Error while running server %s", err.Error())
+	go func() {
+		if err := srv.Run(bindAddr, handlers.InitRoutes()); !errors.Is(err, http.ErrServerClosed) {
+			logrus.Fatalf("Error while running server %s", err.Error())
+		}
+	}()
+
+	logrus.Printf("Server started on port %s", bindAddr)
+
+	quitSignal := make(chan os.Signal, 1)
+	signal.Notify(quitSignal, syscall.SIGINT, syscall.SIGTERM)
+	<-quitSignal
+
+	logrus.Printf("Server shuts down")
+
+	if err := srv.Shutdown(context.Background()); err != nil {
+		logrus.Errorf("Can't terminate server: %s", err.Error())
+	}
+	if err := db.Close(); err != nil {
+		logrus.Errorf("Can't close DB connection: %s", err.Error())
 	}
 }
 

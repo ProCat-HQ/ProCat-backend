@@ -82,6 +82,7 @@ CREATE TABLE item_statuses
     id              SERIAL PRIMARY KEY,
     is_in_stock     BOOLEAN NOT NULL,
     in_stock_number INTEGER NOT NULL,
+    address         VARCHAR NOT NULL,
     item_id         INTEGER NOT NULL,
     FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE
 );

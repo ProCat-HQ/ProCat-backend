@@ -10,9 +10,10 @@ type Item struct {
 }
 
 type ItemStatus struct {
-	Id            int  `json:"id"`
-	IsInStock     bool `json:"isInStock"`
-	InStockNumber int  `json:"inStockNumber"`
+	Id            int    `json:"id"`
+	IsInStock     bool   `json:"isInStock"`
+	InStockNumber int    `json:"inStockNumber"`
+	Address       string `json:"address"`
 	ItemId        int
 }
 
