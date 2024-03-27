@@ -1,8 +1,7 @@
-package main
+package routing
 
 import (
 	"encoding/json"
-	"fmt"
 	"math"
 )
 
@@ -105,108 +104,4 @@ func solveTSP(distanceMatrix [][]int, durationMatrix [][]int) Result {
 	}
 	result.Duration = duration
 	return result
-}
-
-func main() {
-	//∞  5  16 14
-	//13 ∞  26 9
-	//10 12 ∞  11
-	//8  15 7  ∞
-	jsonStr := `{
-    "generation_time": 3349,
-    "routes": [
-        {
-            "distance": 5,
-            "duration": 1319,
-            "source_id": 0,
-            "status": "OK",
-            "target_id": 1
-        },
-		{
-            "distance": 16,
-            "duration": 1319,
-            "source_id": 0,
-            "status": "OK",
-            "target_id": 2
-        },
-        {
-            "distance": 14,
-            "duration": 603,
-            "source_id": 0,
-            "status": "OK",
-            "target_id": 3
-        },
-        {
-            "distance": 13,
-            "duration": 1094,
-            "source_id": 1,
-            "status": "OK",
-            "target_id": 0
-        },
-        {
-            "distance": 26,
-            "duration": 1094,
-            "source_id": 1,
-            "status": "OK",
-            "target_id": 2
-        },
-		{
-            "distance": 9,
-            "duration": 1094,
-            "source_id": 1,
-            "status": "OK",
-            "target_id": 3
-        },
-		{
-            "distance": 10,
-            "duration": 1094,
-            "source_id": 2,
-            "status": "OK",
-            "target_id": 0
-        },
-		{
-            "distance": 12,
-            "duration": 1094,
-            "source_id": 2,
-            "status": "OK",
-            "target_id": 1
-        },
-		{
-            "distance": 11,
-            "duration": 1094,
-            "source_id": 2,
-            "status": "OK",
-            "target_id": 3
-        },
-		{
-            "distance": 8,
-            "duration": 1094,
-            "source_id": 3,
-            "status": "OK",
-            "target_id": 0
-        },
-		{
-            "distance": 15,
-            "duration": 1094,
-            "source_id": 3,
-            "status": "OK",
-            "target_id": 1
-        },
-		{
-            "distance": 7,
-            "duration": 1094,
-            "source_id": 3,
-            "status": "OK",
-            "target_id": 2
-        }
-    ]
-}`
-
-	answer, err := GetRoute(jsonStr)
-	if err != nil {
-		fmt.Print("error in GetRoute")
-		return
-	}
-
-	print(answer) //{"optimal_route":[0,1,3,2],"distance":31,"duration":3732}
 }
