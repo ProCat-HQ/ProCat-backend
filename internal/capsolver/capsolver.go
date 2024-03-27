@@ -1,4 +1,5 @@
 // Package capsolver example:
+//
 // capSolver := capsolver.NewInstance(os.Getenv("CAP_SOLVER_API_KEY"),
 //
 //	"https://kgd.gov.kz/ru/app/culs-taxarrear-search-web",

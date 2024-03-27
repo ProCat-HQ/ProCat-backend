@@ -1,5 +1,7 @@
 package model
 
+import "time"
+
 type Chat struct {
 	Id           int    `json:"id"`
 	Name         string `json:"name"`
@@ -10,10 +12,11 @@ type Chat struct {
 }
 
 type Message struct {
-	Id     int    `json:"id"`
-	Text   string `json:"text"`
-	UserId int
-	ChatId int
+	Id        int       `json:"id"`
+	Text      string    `json:"text"`
+	CreatedAt time.Time `json:"createdAt"`
+	UserId    int
+	ChatId    int
 }
 
 type MessageImage struct {

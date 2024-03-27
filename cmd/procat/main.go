@@ -52,6 +52,7 @@ func main() {
 		if err := srv.Run(bindAddr, handlers.InitRoutes()); !errors.Is(err, http.ErrServerClosed) {
 			logrus.Fatalf("Error while running server %s", err.Error())
 		}
+		logrus.Printf("Server shuts down")
 	}()
 
 	logrus.Printf("Server started on port %s", bindAddr)
@@ -59,8 +60,6 @@ func main() {
 	quitSignal := make(chan os.Signal, 1)
 	signal.Notify(quitSignal, syscall.SIGINT, syscall.SIGTERM)
 	<-quitSignal
-
-	logrus.Printf("Server shuts down")
 
 	if err := srv.Shutdown(context.Background()); err != nil {
 		logrus.Errorf("Can't terminate server: %s", err.Error())

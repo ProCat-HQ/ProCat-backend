@@ -8,7 +8,7 @@ CREATE TABLE users
     password_hash         VARCHAR            NOT NULL,
     is_confirmed          BOOLEAN            NOT NULL DEFAULT FALSE,
     role                  VARCHAR(30)        NOT NULL DEFAULT 'user',
-    created_at            TIMESTAMP          NOT NULL
+    created_at            TIMESTAMP                   DEFAULT now()
 );
 
 CREATE TABLE delivery_men
@@ -22,16 +22,30 @@ CREATE TABLE delivery_men
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
+CREATE TABLE verifications
+(
+    id        SERIAL PRIMARY KEY,
+    code      VARCHAR   NOT NULL,
+    type      VARCHAR   NOT NULL,
+    value     VARCHAR   NOT NULL,
+    life_time TIMESTAMP NOT NULL DEFAULT now() + interval '5' MINUTE,
+    user_id   INTEGER   NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
 CREATE TABLE orders
 (
     id                  SERIAL PRIMARY KEY,
     status              VARCHAR(40) NOT NULL,
     total_price         INTEGER     NOT NULL,
+    deposit             INTEGER,
     rental_period_start TIMESTAMP   NOT NULL,
-    rental_period_end   TIMESTAMP,                                 -- NOT NULL?
+    rental_period_end   TIMESTAMP   NOT NULL,
     address             VARCHAR     NOT NULL,
+    latitude            VARCHAR,
+    longitude           VARCHAR,
     company_name        VARCHAR(255),
---     contract            TEXT,
+    created_at          TIMESTAMP DEFAULT now(),
     user_id             INTEGER     NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL -- OR DELETE?
 );
@@ -39,7 +53,8 @@ CREATE TABLE orders
 CREATE TABLE deliveries
 (
     id              SERIAL PRIMARY KEY,
-    time            TIMESTAMP   NOT NULL,
+    time_start      TIMESTAMP   NOT NULL,
+    time_end        TIMESTAMP   NOT NULL,
     method          VARCHAR(50) NOT NULL,
     order_id        INTEGER     NOT NULL,
     delivery_man_id INTEGER,
@@ -49,11 +64,12 @@ CREATE TABLE deliveries
 
 CREATE TABLE payments
 (
-    id       SERIAL PRIMARY KEY,
-    is_paid  BOOLEAN     NOT NULL DEFAULT FALSE,
-    method   VARCHAR(50) NOT NULL,
-    price    INTEGER     NOT NULL,
-    order_id INTEGER     NOT NULL,
+    id         SERIAL PRIMARY KEY,
+    is_paid    BOOLEAN     NOT NULL DEFAULT FALSE,
+    method     VARCHAR(50) NOT NULL,
+    price      INTEGER     NOT NULL,
+    created_at TIMESTAMP            DEFAULT now(),
+    order_id   INTEGER     NOT NULL,
     FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE
 );
 
@@ -71,20 +87,32 @@ CREATE TABLE items
     name        VARCHAR(255) NOT NULL,
     description VARCHAR,
     price       INTEGER      NOT NULL,
+    is_in_stock BOOLEAN      NOT NULL DEFAULT FALSE,
     category_id INTEGER,
     FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE SET NULL
 --     similar_to INTEGER[],
 --     FOREIGN KEY (EACH ELEMENT OF similar_to) REFERENCES items
 );
 
-CREATE TABLE item_statuses
+CREATE TABLE stores
+(
+    id                  SERIAL PRIMARY KEY,
+    name                VARCHAR NOT NULL,
+    address             VARCHAR NOT NULL,
+    latitude            VARCHAR,
+    longitude           VARCHAR,
+    working_hours_start TIME    NOT NULL,
+    working_hours_end   TIME    NOT NULL
+);
+
+CREATE TABLE item_stocks
 (
     id              SERIAL PRIMARY KEY,
-    is_in_stock     BOOLEAN NOT NULL,
     in_stock_number INTEGER NOT NULL,
-    address         VARCHAR NOT NULL,
+    store_id        INTEGER,
     item_id         INTEGER NOT NULL,
-    FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE
+    FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE,
+    FOREIGN KEY (store_id) REFERENCES stores (id) ON DELETE SET NULL
 );
 
 CREATE TABLE item_images
@@ -128,7 +156,7 @@ CREATE TABLE carts_items
     cart_id      INTEGER NOT NULL,
     item_id      INTEGER,
     FOREIGN KEY (cart_id) REFERENCES carts (id) ON DELETE CASCADE,
-    FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE SET NULL
+    FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE
 );
 
 CREATE TABLE subscriptions
@@ -153,6 +181,7 @@ CREATE TABLE notifications
     title       VARCHAR(255) NOT NULL,
     description VARCHAR      NOT NULL,
     is_viewed   BOOLEAN      NOT NULL DEFAULT FALSE,
+    created_at  TIMESTAMP             DEFAULT now(),
     user_id     INTEGER      NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
@@ -172,10 +201,11 @@ CREATE TABLE chats
 
 CREATE TABLE messages
 (
-    id      SERIAL PRIMARY KEY,
-    text    VARCHAR NOT NULL,
-    user_id INTEGER NOT NULL, -- ЧТО ДЕЛАТЬ ДЛЯ АНОНИМНОГО ПОЛЬЗОВАТЕЛЯ
-    chat_id INTEGER NOT NULL,
+    id         SERIAL PRIMARY KEY,
+    text       VARCHAR NOT NULL,
+    created_at TIMESTAMP DEFAULT now(),
+    user_id    INTEGER NOT NULL, -- ЧТО ДЕЛАТЬ ДЛЯ АНОНИМНОГО ПОЛЬЗОВАТЕЛЯ
+    chat_id    INTEGER NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (chat_id) REFERENCES chats (id) ON DELETE CASCADE
 );

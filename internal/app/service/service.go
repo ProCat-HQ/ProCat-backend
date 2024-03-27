@@ -1,20 +1,58 @@
 package service
 
 import (
-	"github.com/procat-hq/procat-backend/internal/app/model"
 	"github.com/procat-hq/procat-backend/internal/app/repository"
 )
 
-type Authorization interface {
+type User interface {
 }
 
-type Routes interface {
-	SortPoints(points model.RouteList) (model.RouteList, error)
+type Verification interface {
+}
+
+type Deliveryman interface {
+}
+
+type Delivery interface {
+}
+
+type Admin interface {
+}
+
+type Cart interface {
+}
+
+type Order interface {
+}
+
+type Subscription interface {
+}
+
+type Notification interface {
+}
+
+type Category interface {
+}
+
+type Item interface {
+}
+
+type Store interface {
 }
 
 type Service struct {
-	Authorization
-	Routes
+	User
+	Verification
+	Deliveryman
+	Delivery
+	Admin
+	Cart
+	Order
+	Subscription
+	Notification
+	Category
+	Item
+	Store
 }
 
 func NewService(repos *repository.Repository) *Service {

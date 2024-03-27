@@ -1,0 +1,87 @@
+localhost/
+         /users
+              / (GET - to get all)
+              /{userId} (GET - for simple user only for his page, DELETE - only for admin)
+              /sign-in (POST phoneNumber + password)
+              /sign-up (POST fullname + phoneNumber + password)
+              /verification
+                           /send (PUT - creates new verification code for certain user and his new info with {type} and {value})
+                           /check (POST - checks whether code matches or not + check on lifetime of code
+                                   if all is well then update user info, otherwise - user can try again
+                                   if code lifetime is still available)
+
+                           /iin (POST - additional endpoint, because this functionality will be used in {makeOrder} handler)
+              /change
+                     /iin-bin (POST check on iin correctness and matching with fullname)
+                     /fullname (POST if success, then iin-bin := null, and it's needed to be filled)
+                     /password (POST - check if old passwords match, then send confirmation code on current number)
+                     /phone (POST - check password and send confirmation code on new number)
+                     /email (POST - check password and send confirmation code on new email)
+                     /role/{userId} (PATCH - only for admin)
+              /deliverymen (through middleware to check if user is deliveryman (or admin))
+                          / (GET - to get all deliverymen)
+                          /{deliveryId} (GET - for simple user to get his deliveryman page)
+                          /{userId} (POST - to create new deliveryman)
+                          /{deliveryId} (PATCH - to change data)
+                          /{deliveryId} (DELETE - to delete deliveryman (ADMIN RIGHTS))
+                          /deliveries
+                                     / (GET - to get list of all his deliveries)
+                                     /{deliveryId} (GET)
+                                     /{deliveryId} (PATCH - to change status)
+                                     /create-route (POST - to build a route from deliveryman's deliveries)
+              /admin
+                    /deliveries-to-sort (GET all deliveries that are needed to be sorted)
+                    /change-delivery (PATCH - to change status of corresponding order of the delivery and maybe change deliveryman to it)
+              /cart
+                   / (GET - to get items from the cart)
+                   / (POST - adds item with {itemId} with probably {count} to authorized user with {usedId})
+                   / (DELETE - decreases item (with {itemId}) number in cart by one or totally deletes item from the cart)
+              /orders
+                     / (GET - get all orders for current user, maybe should add filter by status like query param ?status=)
+                     /{orderId} (GET)
+                     / (POST - creates new order and transfer all items from cart to this order)
+                     /cancel/{orderId} (POST - set status to "pending rejected", waits till admin do some stuff and then set status of order to rejected)
+                     /status/{orderId} (PATCH - for ADMIN to change status)
+                     /{orderId}/payment (GET, PATCH)
+              /subscriptions
+                            / (GET)
+                            / (POST - add {itemId} to subs)
+                            /{subscriptionId} (DELETE)
+              /notifications
+                            / (GET - get all)
+                            /{userId} (POST - to send notification to user (ADMIN))
+                            /{notificationId} (PATCH - ("patch" is because this will change "isViewed" DB field) to open notification body)
+                            /{notificationId} (DELETE - (for ADMIN))
+
+         /categories
+                  /{categoryId} (POST - create category with {parentId})
+                  /route/{categoryId} (GET - get category route)
+                  /{categoryId} (GET)
+                  /{categoryId} (PATCH - edit name)
+                  /{categoryId} (DELETE - delete all route if it's not a leaf in the category tree)
+
+         /infos (Probably this functionality must be in handlers of "item" routes)
+
+         /items
+               / (GET - get all items {query params: limit, page, categoryId, stock})
+               /{itemId} (GET - with ItemStocks and ItemImages)
+               /{itemId} (DELETE)
+               /{itemId} (PATCH)
+               / (POST)
+               /stock
+                     /{itemId} (POST - to create stock in some {storeId})
+                     /{itemId} (PATCH - to update stock in some {storeId} (when updating here, "inStock" field of item updates))
+               /infos
+                    /{itemId} (POST - add array of characteristics)
+                    /{itemId} (DELETE - delete infos with ids in array (array provided in body))
+                    /{itemId} (PUT - array with new data and ids which will be changed)
+               /images
+                    /{itemId} (POST)
+                    /{itemId} (DELETE)
+                    /{itemId} (PATCH)
+
+         /stores
+                / (GET - to get all stores)
+                / (POST - creates new store and finds it's coordinates according to the address)
+                /{storeId} (DELETE)
+                /{storeId} (PATCH)
