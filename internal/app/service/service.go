@@ -1,10 +1,12 @@
 package service
 
 import (
+	"github.com/procat-hq/procat-backend/internal/app/model"
 	"github.com/procat-hq/procat-backend/internal/app/repository"
 )
 
 type User interface {
+	CreateUser(user model.User) (int, error)
 }
 
 type Verification interface {
