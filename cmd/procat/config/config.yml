@@ -1,0 +1,9 @@
+bind_addr: "8080"
+log_level: "debug"
+
+db:
+  username: "postgres"
+  host: "localhost"
+  port: "5436"
+  name: "postgres"
+  sslmode: "disable"
