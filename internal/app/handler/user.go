@@ -23,12 +23,16 @@ func (h *Handler) SignIn(c *gin.Context) {
 
 func (h *Handler) SignUp(c *gin.Context) {
 	var input model.User
-	if err := c.BindJSON(&input); err != nil {
+	if err := c.BindJSON(&input); err != nil ||
+		input.FullName == "" || input.PhoneNumber == "" || input.Password == "" {
 		errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-
 	logrus.Info(fmt.Sprintf("%+v", input))
+	logrus.Info(input.FullName == "" || input.PhoneNumber == "" || input.Password == "")
+	//c.JSON(http.StatusOK, map[string]interface{}{
+	//	"DATA": fmt.Sprintf("%s %s %s", input.FullName, input.PhoneNumber, input.Password),
+	//})
 }
 
 func (h *Handler) ChangeIIN(c *gin.Context) {
