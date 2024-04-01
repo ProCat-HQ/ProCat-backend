@@ -1,4 +1,4 @@
-package errors
+package custom_errors
 
 import (
 	"github.com/gin-gonic/gin"

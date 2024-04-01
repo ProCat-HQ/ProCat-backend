@@ -13,7 +13,7 @@ DROP TABLE carts;
 DROP TABLE infos;
 DROP TABLE orders_items;
 DROP TABLE item_images;
-DROP TABLE item_stocks;
+DROP TABLE item_stores;
 DROP TABLE stores;
 
 DROP TABLE items;

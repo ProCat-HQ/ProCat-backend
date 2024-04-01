@@ -6,7 +6,8 @@ import (
 )
 
 type User interface {
-	CreateUser(user model.User) (int, error)
+	CreateUser(user model.SignUpInput) (int, error)
+	GenerateToken(phoneNumber, password string) (string, error)
 }
 
 type Verification interface {

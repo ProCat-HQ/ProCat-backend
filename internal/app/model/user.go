@@ -22,3 +22,9 @@ type DeliveryMan struct {
 	CarId             string    `json:"carId"`
 	UserId            int
 }
+
+type SignUpInput struct {
+	FullName    string `json:"fullName" binding:"required"`
+	PhoneNumber string `json:"phoneNumber" binding:"required"`
+	Password    string `json:"password" binding:"required"`
+}

@@ -7,6 +7,7 @@ import (
 
 type User interface {
 	CreateUser(user model.User) (int, error)
+	GetUser(phoneNumber, password string) (model.User, error)
 }
 
 type Verification interface {
