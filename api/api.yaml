@@ -21,7 +21,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/User'
-
   /users/{userId}:
     get:
       tags:
@@ -48,7 +47,7 @@ paths:
           description: Order not found
     delete:
       tags:
-        - user
+        - admin
       summary: only for admin
       parameters:
         - name: userId
@@ -123,37 +122,478 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-
-  /users/verification/send:
-  /users//verification/check:
+#  /users/verification/send:
+#  /users//verification/check:
   /users/verification/iin:
+    post:
+      tags:
+        - verification
+      parameters:
+        - name: code
+          in: query
+          required: true
+          description: code for verification
+          schema:
+            type: string
+      responses:
+        default:
+          description: successful operation
   /users/change/iin-bin:
-  /users/change/fullname:
-  /users/change/password:
-  /users/change/phone:
-  /users/change/email:
-  /users/change/role/{userId}:
-  /users/deliverymen:
-  /users/deliverymen/{deliveryId}:
-  /users/deliverymen/{userId}:
-  /users/deliverymen/deliveries:
-  /users/deliverymen/deliveries/{deliveryId}:
-  /users/deliverymen/deliveries/create-route:
-  /users/admin/deliveries-to-sort:
-  /users/admin/change-delivery:
-  /users/cart:
-  /users/orders:
-  /users/orders/{orderId}:
-  /users/orders/cancel/{orderId}:
-  /users/orders/payment{orderId}:
-  /users/subscriptions:
-  /users/subscriptions/{subscriptionId}:
-  /users/notifications:
-  /users/notifications/{userId}:
-  /users/notifications/{notificationId}:
+    post:
+      tags:
+        - userSettings
+      summary: check on iin correctness and matching with full name
+      parameters:
+        - name: iin-bin
+          in: query
+          required: true
+          description: new iin-bin
+          schema:
+            type: string
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "iin-bin changed"
 
-  /categories/{categoryId}:
-  /categories/route/{categoryId}:
+  /users/change/fullname:
+    post:
+      tags:
+        - userSettings
+      summary: if success, then iin-bin := null, and it's needed to be filled
+      parameters:
+        - name: fullName
+          in: query
+          required: true
+          description: new full name
+          schema:
+            type: string
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "name changed"
+
+  /users/change/password:
+    post:
+      tags:
+        - userSettings
+      summary: check if old passwords match, then send confirmation code on current number
+      parameters:
+        - name: oldPassword
+          in: query
+          required: true
+          description: old password
+          schema:
+            type: string
+        - name: newPassword
+          in: query
+          required: true
+          description: new password
+          schema:
+            type: string
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "password changed"
+
+  /users/change/phone:
+    post:
+      tags:
+        - userSettings
+      summary: check password and send confirmation code on new number
+      parameters:
+        - name: phone
+          in: query
+          required: true
+          description: new phone
+          schema:
+            type: string
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "phone changed"
+  /users/change/email:
+    post:
+      tags:
+        - userSettings
+      summary: check password and send confirmation code on new email
+      parameters:
+        - name: email
+          in: query
+          required: true
+          description: new email
+          schema:
+            type: string
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "email changed"
+  /users/change/role/{userId}:
+    patch:
+      tags:
+        - admin
+      summary: change role
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: role
+          in: query
+          required: true
+          description: new role
+          schema:
+            type: string
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: "role changed"
+  /users/deliverymen:
+    get:
+      tags:
+        - delivery
+      summary: get all deliverymen
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeliveryMan'
+  /users/deliverymen/{deliveryId}:
+    get:
+      tags:
+        - delivery
+      summary: for simple user to get his deliveryman page
+      parameters:
+        - name: deliveryId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryMan'
+    patch:
+      tags:
+        - delivery
+      summary: change data
+      parameters:
+        - name: deliveryId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: newDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Delivery'
+    delete:
+      tags:
+        - admin
+      summary: to delete deliveryman
+      parameters:
+        - name: deliveryId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        default:
+          description: successful operation
+  /users/deliverymen/{userId}:
+    post:
+      tags:
+        - admin
+      summary: create new deliveryman
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        default:
+          description: successful operation
+  /users/deliverymen/deliveries:
+    get:
+      tags:
+        - delivery
+      summary: get list of all his deliveries
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Delivery'
+  /users/deliverymen/deliveries/{deliveryId}:
+    get:
+      tags:
+        - delivery
+      summary: get list of all his deliveries
+      parameters:
+        - name: deliveryId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Delivery'
+    patch:
+      tags:
+        - delivery
+      summary: change status
+      parameters:
+        - name: deliveryId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: newStatus
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Delivery'
+  /users/deliverymen/deliveries/create-route:
+    post:
+      tags:
+        - delivery
+      summary: build a route from deliveryman's deliveries
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Delivery'
+  /users/admin/deliveries-to-sort:
+    get:
+      tags:
+        - admin
+      summary: GET all deliveries that are needed to be sorted
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Delivery'
+  /users/admin/change-delivery:
+    patch:
+      tags:
+        - admin
+      summary: change status of corresponding order of the delivery and maybe change deliveryman to it
+      parameters:
+        - name: orderId
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: newStatus
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: newDeliveryMen
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Delivery'
+  /users/cart:
+    get:
+      tags:
+        - cart
+      summary: get items from the cart
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+    post:
+      tags:
+        - cart
+      summary: adds item with {itemId} with probably {count} to authorized user with {usedId}
+      parameters:
+        - name: item
+          in: query
+          required: true
+          description: new item
+          schema:
+            type: integer
+        - name: count
+          in: query
+          required: false
+          description: count
+          schema:
+            type: integer
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "item added"
+    delete:
+      tags:
+        - cart
+      summary: decreases item (with {itemId}) number in cart by one or totally deletes item from the cart
+      parameters:
+        - name: Item id
+          in: query
+          required: true
+          description: item id
+          schema:
+            type: integer
+      responses:
+        default:
+          description: successful operation
+  /users/orders:
+    get:
+      tags:
+        - order
+      summary: get all orders for current user
+      parameters:
+        - name: status
+          in: query
+          required: false
+          description: filter by status
+          schema:
+            type: string
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+    post:
+      tags:
+        - order
+      summary: creates new order and transfer all items from cart to this order
+      responses:
+        default:
+          description: successful operation
+  /users/orders/{orderId}:
+    get:
+      tags:
+        - order
+      summary: get current order
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          description: order id
+          schema:
+            type: integer
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+
+#  /users/orders/cancel/{orderId}:
+#  /users/orders/payment{orderId}:
+#  /users/subscriptions:
+#  /users/subscriptions/{subscriptionId}:
+#  /users/notifications:
+#  /users/notifications/{userId}:
+#  /users/notifications/{notificationId}:
+#
+#  /categories/{categoryId}:
+#  /categories/route/{categoryId}:
 
   /items:
     get:
@@ -209,12 +649,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Item'
-  /items/stock/{itemId}:
-  /items/infos/{itemId}:
-  /items/images/{itemId}:
 
-  /stores:
-  /stores/{storeId}:
+#  /items/stock/{itemId}:
+#  /items/infos/{itemId}:
+#  /items/images/{itemId}:
+#
+#  /stores:
+#  /stores/{storeId}:
 
 components:
   schemas:
@@ -365,6 +806,8 @@ components:
           type: integer
           format: int64
           example: 125
+        order:
+          $ref: '#/components/schemas/Order'
 
     Payment:
       type: object
