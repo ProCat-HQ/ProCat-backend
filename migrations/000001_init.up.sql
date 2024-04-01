@@ -186,6 +186,7 @@ CREATE TABLE notifications
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
+--Нужно created_at
 CREATE TABLE chats
 (
     id             SERIAL PRIMARY KEY,

@@ -7,8 +7,215 @@ info:
 servers:
   - url: 'localhost:8080'
 paths:
+  /users:
+    get:
+      tags:
+        - user
+      summary: to get all users
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
 
-#TODO: переписать компоненты, так как схема поменялась
+  /users/{userId}:
+    get:
+      tags:
+        - user
+      summary: for simple user only for his page
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: ID of user that needs to be fetched
+          schema:
+            type: integer
+            format: int64
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Order not found
+    delete:
+      tags:
+        - user
+      summary: only for admin
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: ID of user that needs to be fetched
+          schema:
+            type: integer
+            format: int64
+      responses:
+        default:
+          description: successful operation
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Order not found
+
+  /users/sign-in:
+    post:
+      tags:
+        - user
+      summary: phoneNumber + password
+      parameters:
+        - name: phoneNumber
+          in: query
+          description: The user phone number for login
+          required: false
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password for login in clear text
+          required: false
+          schema:
+            type: string
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /users/sign-up:
+    post:
+      tags:
+        - user
+      summary: fullName + phoneNumber + password
+      parameters:
+        - name: fullName
+          in: query
+          description: The user name for login
+          required: false
+          schema:
+            type: string
+        - name: phoneNumber
+          in: query
+          description: The user phone number for login
+          required: false
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password for login in clear text
+          required: false
+          schema:
+            type: string
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /users/verification/send:
+  /users//verification/check:
+  /users/verification/iin:
+  /users/change/iin-bin:
+  /users/change/fullname:
+  /users/change/password:
+  /users/change/phone:
+  /users/change/email:
+  /users/change/role/{userId}:
+  /users/deliverymen:
+  /users/deliverymen/{deliveryId}:
+  /users/deliverymen/{userId}:
+  /users/deliverymen/deliveries:
+  /users/deliverymen/deliveries/{deliveryId}:
+  /users/deliverymen/deliveries/create-route:
+  /users/admin/deliveries-to-sort:
+  /users/admin/change-delivery:
+  /users/cart:
+  /users/orders:
+  /users/orders/{orderId}:
+  /users/orders/cancel/{orderId}:
+  /users/orders/payment{orderId}:
+  /users/subscriptions:
+  /users/subscriptions/{subscriptionId}:
+  /users/notifications:
+  /users/notifications/{userId}:
+  /users/notifications/{notificationId}:
+
+  /categories/{categoryId}:
+  /categories/route/{categoryId}:
+
+  /items:
+    get:
+      tags:
+        - items
+      summary: get all items
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: categoryId
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: stock
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+
+  /items/{itemId}:
+    get:
+      tags:
+        - items
+      summary: get one item
+      parameters:
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+  /items/stock/{itemId}:
+  /items/infos/{itemId}:
+  /items/images/{itemId}:
+
+  /stores:
+  /stores/{storeId}:
+
 components:
   schemas:
     User:
@@ -17,23 +224,32 @@ components:
         id:
           type: integer
           format: int64
+          example: 848
         fullName:
           type: string
+          example: Вадимов Вадим Вадимович
         email:
           type: string
+          example: vadim@mail.ru
         phone_number:
           type: string
+          example: +79856523652
         identification_number:
           type: string
+          example: 3256328745698
         password_hash:
           type: string
+          example: pAsSwOrDhAsH
         is_confirmed:
           type: boolean
+          example: true
         role:
           type: string
+          example: user
         created_at:
           type: string
           format: date-time
+          example: 2023-10-19 10:23:54+03
 
     DeliveryMan:
       type: object
@@ -41,19 +257,25 @@ components:
         id:
           type: integer
           format: int64
+          example: 125
         car_capacity:
           type: string
+          example: 4?
         working_hours_start:
           type: string
           format: time
+          example: 08:00
         working_hours_end:
           type: string
           format: time
+          example: 16:00
         car_id:
           type: string
+          example: P425YB154
         user_id:
           type: integer
           format: int64
+          example: 848
 
     Order:
       type: object
@@ -61,23 +283,61 @@ components:
         id:
           type: integer
           format: int64
+          example: 526
         status:
           type: string
+          example: delivering
         total_price:
           type: integer
+          example: 5000
         rental_period_start:
           type: string
           format: date-time
+          example: 2023-10-19
         rental_period_end:
           type: string
           format: date-time
+          example: 2023-11-04
         address:
           type: string
+          example: ул. Пушкина д. 7 кв. 587
+        latitude:
+          type: string
+          example: 55.042779
+        longitude:
+          type: string
+          example: 82.994966
         company_name:
           type: string
+          example: Строим с радостью
         user_id:
           type: integer
           format: int64
+          example: 848
+
+    Verification:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 985
+        code:
+          type: string
+          example: 586ed5
+        type:
+          type: string
+          example: password
+        value:
+          type: string
+          example: 2358694
+        life_time:
+          type: string
+          format: time
+          example: 00:05:00
+        user_id:
+          type: string
+          example: 848
 
     Delivery:
       type: object
@@ -85,17 +345,26 @@ components:
         id:
           type: integer
           format: int64
-        time:
+          example: 523
+        time_start:
           type: string
           format: date-time
+          example: 2023-10-19 10:00:00+03
+        time_end:
+          type: string
+          format: date-time
+          example: 2023-10-19 12:00:00+03
         method:
           type: string
+          example: car
         order_id:
           type: integer
           format: int64
+          example: 526
         delivery_man_id:
           type: integer
           format: int64
+          example: 125
 
     Payment:
       type: object
@@ -103,15 +372,24 @@ components:
         id:
           type: integer
           format: int64
+          example: 5686
         is_paid:
           type: boolean
+          example: true
         method:
           type: string
+          example: cash?
         price:
           type: integer
+          example: 5000
+        created_at:
+          type: string
+          format: date-time
+          example: 2023-10-19 10:00:00+03
         order_id:
           type: integer
           format: int64
+          example: 268
 
     Category:
       type: object
@@ -119,11 +397,14 @@ components:
         id:
           type: integer
           format: int64
+          example: 85
         name:
           type: string
+          example: Категория
         parent_id:
           type: integer
           format: int64
+          example: 52
 
     Item:
       type: object
@@ -131,31 +412,82 @@ components:
         id:
           type: integer
           format: int64
+          example: 852
         name:
           type: string
+          example: Молток
         description:
           type: string
+          example: Качественный, крепкий, удобный очень
         price:
           type: integer
+          example: 3000
+        is_in_stock:
+          type: boolean
+          example: true
         category_id:
           type: integer
           format: int64
+          example: 58
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemImage'
+        infos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Info'
+        stocks:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemStock'
 
-    ItemStatus:
+
+    Store:
       type: object
       properties:
         id:
           type: integer
           format: int64
-        is_in_stock:
-          type: boolean
-        in_stock_number:
-          type: integer
+          example: 852
+        name:
+          type: string
         address:
           type: string
+          example: ул. Пушкина д. 7 кв. 587
+        latitude:
+          type: string
+          example: 55.042779
+        longitude:
+          type: string
+          example: 82.994966
+        working_hours_start:
+          type: string
+          format: time
+          example: 08:00
+        working_hours_end:
+          type: string
+          format: time
+          example: 16:00
+
+    ItemStock:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 259
+        in_stock_number:
+          type: integer
+          example: 5
+        store_id:
+          type: integer
+          format: int64
+          example: 2
         item_id:
           type: integer
           format: int64
+          example: 863
 
     ItemImage:
       type: object
@@ -163,11 +495,14 @@ components:
         id:
           type: integer
           format: int64
+          example: 248
         image:
           type: string
+          example: tool.jpg?
         item_id:
           type: integer
           format: int64
+          example: 255
 
     OrderItem:
       type: object
@@ -175,14 +510,18 @@ components:
         id:
           type: integer
           format: int64
+          example: 752
         items_number:
           type: integer
+          example: 1
         order_id:
           type: integer
           format: int64
+          example: 52
         item_id:
           type: integer
           format: int64
+          example: 271
 
     Info:
       type: object
@@ -190,13 +529,17 @@ components:
         id:
           type: integer
           format: int64
+          example: 785
         name:
           type: string
+          example: Вес
         description:
           type: string
+          example: 12 кг
         item_id:
           type: integer
           format: int64
+          example: 856
 
     Cart:
       type: object
@@ -204,9 +547,15 @@ components:
         id:
           type: integer
           format: int64
+          example: 852
         user_id:
           type: integer
           format: int64
+          example: 848
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartItem'
 
     CartItem:
       type: object
@@ -214,14 +563,18 @@ components:
         id:
           type: integer
           format: int64
+          example: 963
         items_number:
           type: integer
+          example: 4
         cart_id:
           type: integer
           format: int64
+          example: 863
         item_id:
           type: integer
           format: int64
+          example: 852
 
     Subscription:
       type: object
@@ -229,9 +582,11 @@ components:
         id:
           type: integer
           format: int64
+          example: 822
         user_id:
           type: integer
           format: int64
+          example: 856
 
     SubscriptionItem:
       type: object
@@ -239,12 +594,15 @@ components:
         id:
           type: integer
           format: int64
+          example: 7889
         subscription_id:
           type: integer
           format: int64
+          example: 698
         item_id:
           type: integer
           format: int64
+          example: 852
 
     Notification:
       type: object
@@ -252,15 +610,23 @@ components:
         id:
           type: integer
           format: int64
+          example: 536
         title:
           type: string
+          example: Новое сообщение
         description:
           type: string
+          example: Заходите скорее почитайте
         is_viewed:
           type: boolean
+          example: false
+        created_at:
+          format: date-time
+          example: 2023-10-19 12:00:00+03
         user_id:
           type: integer
           format: int64
+          example: 869
 
     Chat:
       type: object
@@ -272,6 +638,9 @@ components:
           type: string
         is_solved:
           type: boolean
+        created_at:
+          format: date-time
+          example: 2023-10-19 12:00:00+03
         first_user_id:
           type: integer
           format: int64
@@ -288,14 +657,22 @@ components:
         id:
           type: integer
           format: int64
+          example: 852
         text:
           type: string
+          example: Инструменты продаете?
+        created_at:
+          type: string
+          format: date-time
+          example: 2023-10-19 12:00:00+03
         user_id:
           type: integer
           format: int64
+          example: 848
         chat_id:
           type: integer
           format: int64
+          example: 456
 
     MessageImage:
       type: object
@@ -303,10 +680,13 @@ components:
         id:
           type: integer
           format: int64
+          example: 74885
         image:
           type: string
+          example: pic.jpg?
         message_id:
           type: integer
           format: int64
+          example: 7556
 
   
