@@ -18,9 +18,18 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/User'
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: ""
+                  payload:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
   /users/{userId}:
     get:
       tags:
@@ -40,7 +49,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: ""
+                  payload:
+                    $ref: '#/components/schemas/User'
         '400':
           description: Invalid ID supplied
         '404':
@@ -60,6 +78,20 @@ paths:
       responses:
         default:
           description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: ""
+                  payload:
+                    type: string
+                    example: ""
         '400':
           description: Invalid ID supplied
         '404':
@@ -89,7 +121,16 @@ paths:
           content:
             application/json:
               schema:
-                type: string
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: ""
+                  payload:
+                    $ref: '#/components/schemas/User'
 
   /users/sign-up:
     post:
@@ -121,7 +162,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: ""
+                  payload:
+                    $ref: '#/components/schemas/User'
+
 #  /users/verification/send:
 #  /users//verification/check:
   /users/verification/iin:
@@ -138,6 +189,20 @@ paths:
       responses:
         default:
           description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: ""
+                  payload:
+                    type: string
+                    example: ""
   /users/change/iin-bin:
     post:
       tags:
@@ -158,9 +223,14 @@ paths:
               schema:
                 type: object
                 properties:
+                  status:
+                    type: string
+                    example: "200"
                   message:
                     type: string
-                    example: "iin-bin changed"
+                    example: ""
+                  payload:
+                    $ref: '#/components/schemas/User'
 
   /users/change/fullname:
     post:
@@ -182,10 +252,14 @@ paths:
               schema:
                 type: object
                 properties:
+                  status:
+                    type: string
+                    example: "200"
                   message:
                     type: string
-                    example: "name changed"
-
+                    example: ""
+                  payload:
+                    $ref: '#/components/schemas/User'
   /users/change/password:
     post:
       tags:
@@ -212,9 +286,14 @@ paths:
               schema:
                 type: object
                 properties:
+                  status:
+                    type: string
+                    example: "200"
                   message:
                     type: string
-                    example: "password changed"
+                    example: ""
+                  payload:
+                    $ref: '#/components/schemas/User'
 
   /users/change/phone:
     post:
@@ -236,9 +315,14 @@ paths:
               schema:
                 type: object
                 properties:
+                  status:
+                    type: string
+                    example: "200"
                   message:
                     type: string
-                    example: "phone changed"
+                    example: ""
+                  payload:
+                    $ref: '#/components/schemas/User'
   /users/change/email:
     post:
       tags:
@@ -259,9 +343,14 @@ paths:
               schema:
                 type: object
                 properties:
+                  status:
+                    type: string
+                    example: "200"
                   message:
                     type: string
-                    example: "email changed"
+                    example: ""
+                  payload:
+                    $ref: '#/components/schemas/User'
   /users/change/role/{userId}:
     patch:
       tags:
@@ -285,11 +374,16 @@ paths:
           content:
             application/json:
               schema:
-                  type: object
-                  properties:
-                    message:
-                      type: string
-                      example: "role changed"
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: ""
+                  payload:
+                    $ref: '#/components/schemas/User'
   /users/deliverymen:
     get:
       tags:
@@ -301,9 +395,18 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/DeliveryMan'
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: ""
+                  payload:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DeliveryMan'
   /users/deliverymen/{deliveryId}:
     get:
       tags:
@@ -321,7 +424,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DeliveryMan'
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: ""
+                  payload:
+                    $ref: '#/components/schemas/DeliveryMan'
     patch:
       tags:
         - delivery
@@ -344,7 +456,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Delivery'
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: ""
+                  payload:
+                    $ref: '#/components/schemas/Delivery'
     delete:
       tags:
         - admin
@@ -358,6 +479,20 @@ paths:
       responses:
         default:
           description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: ""
+                  payload:
+                    type: string
+                    example: ""
   /users/deliverymen/{userId}:
     post:
       tags:
@@ -372,6 +507,20 @@ paths:
       responses:
         default:
           description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: ""
+                  payload:
+                    type: string
+                    example: ""
   /users/deliverymen/deliveries:
     get:
       tags:
@@ -383,14 +532,23 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Delivery'
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: ""
+                  payload:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Delivery'
   /users/deliverymen/deliveries/{deliveryId}:
     get:
       tags:
         - delivery
-      summary: get list of all his deliveries
+      summary: get delivery
       parameters:
         - name: deliveryId
           in: path
@@ -403,7 +561,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Delivery'
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: ""
+                  payload:
+                    $ref: '#/components/schemas/Delivery'
     patch:
       tags:
         - delivery
@@ -425,7 +592,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Delivery'
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: ""
+                  payload:
+                    $ref: '#/components/schemas/Delivery'
   /users/deliverymen/deliveries/create-route:
     post:
       tags:
@@ -437,9 +613,18 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Delivery'
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: ""
+                  payload:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Delivery'
   /users/admin/deliveries-to-sort:
     get:
       tags:
@@ -451,9 +636,18 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Delivery'
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: ""
+                  payload:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Delivery'
   /users/admin/change-delivery:
     patch:
       tags:
@@ -481,7 +675,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Delivery'
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: ""
+                  payload:
+                    $ref: '#/components/schemas/Delivery'
   /users/cart:
     get:
       tags:
@@ -493,7 +696,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Cart'
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: ""
+                  payload:
+                    $ref: '#/components/schemas/Cart'
     post:
       tags:
         - cart
@@ -519,15 +731,21 @@ paths:
               schema:
                 type: object
                 properties:
+                  status:
+                    type: string
+                    example: "200"
                   message:
                     type: string
-                    example: "item added"
+                    example: ""
+                  payload:
+                    type: string
+                    example: ""
     delete:
       tags:
         - cart
       summary: decreases item (with {itemId}) number in cart by one or totally deletes item from the cart
       parameters:
-        - name: Item id
+        - name: itemId
           in: query
           required: true
           description: item id
@@ -536,6 +754,20 @@ paths:
       responses:
         default:
           description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: ""
+                  payload:
+                    type: string
+                    example: ""
   /users/orders:
     get:
       tags:
@@ -554,9 +786,18 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Order'
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: ""
+                  payload:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order'
     post:
       tags:
         - order
@@ -564,6 +805,20 @@ paths:
       responses:
         default:
           description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: ""
+                  payload:
+                    type: string
+                    example: ""
   /users/orders/{orderId}:
     get:
       tags:
@@ -582,7 +837,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: ""
+                  payload:
+                    $ref: '#/components/schemas/Order'
 
 #  /users/orders/cancel/{orderId}:
 #  /users/orders/payment{orderId}:
@@ -627,9 +891,18 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Item'
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: ""
+                  payload:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Item'
 
   /items/{itemId}:
     get:
@@ -648,7 +921,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Item'
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: ""
+                  payload:
+                    $ref: '#/components/schemas/Item'
 
 #  /items/stock/{itemId}:
 #  /items/infos/{itemId}:
