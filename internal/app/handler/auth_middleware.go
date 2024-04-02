@@ -28,4 +28,13 @@ func (h *Handler) UserIdentify(c *gin.Context) {
 		custom_errors.NewErrorResponse(c, http.StatusUnauthorized, "Empty token")
 		return
 	}
+
+	userData, err := h.services.User.ParseToken(headerParts[1])
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	c.Set("userId", userData.UserId)
+	c.Set("userRole", userData.UserRole)
 }

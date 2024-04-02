@@ -2,6 +2,7 @@ package service
 
 import (
 	"crypto/sha1"
+	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt"
 	"github.com/procat-hq/procat-backend/internal/app/model"
@@ -61,12 +62,25 @@ func (s *UserService) GenerateToken(phoneNumber, password string) (string, error
 	return token.SignedString([]byte(signingKey))
 }
 
-func (s *UserService) ParseToken(accessToken string) (model.TokenClaimsExtension, error) {
+func (s *UserService) ParseToken(accessToken string) (*model.TokenClaimsExtension, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-
+			return nil, errors.New("invalid signing method")
 		}
+
+		return []byte(os.Getenv("SIGNING_KEY")), nil
 	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if claims, ok := token.Claims.(*tokenClaims); !ok {
+		return nil, errors.New("invalid token claims type")
+	} else {
+		return &claims.TokenClaimsExtension, nil
+	}
+
 }
 
 func generatePasswordHash(phoneNumber, password string) string {
