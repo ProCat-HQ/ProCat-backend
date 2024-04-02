@@ -20,7 +20,7 @@ const (
 
 type tokenClaims struct {
 	jwt.StandardClaims
-	UserId int `json:"user_id"`
+	model.TokenClaimsExtension
 }
 
 func NewUserService(repo repository.User) *UserService {
@@ -51,10 +51,22 @@ func (s *UserService) GenerateToken(phoneNumber, password string) (string, error
 			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
 			IssuedAt:  time.Now().Unix(),
 		},
-		UserId: user.Id,
+		TokenClaimsExtension: model.TokenClaimsExtension{
+			UserId:   user.Id,
+			UserRole: user.Role,
+		},
 	})
 
-	return token.SignedString([]byte(os.Getenv("SIGNING_KEY")))
+	signingKey := os.Getenv("SIGNING_KEY")
+	return token.SignedString([]byte(signingKey))
+}
+
+func (s *UserService) ParseToken(accessToken string) (model.TokenClaimsExtension, error) {
+	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+
+		}
+	})
 }
 
 func generatePasswordHash(phoneNumber, password string) string {

@@ -33,6 +33,20 @@ func (h *Handler) SignIn(c *gin.Context) {
 		return
 	}
 
+	if matched, _ := regexp.MatchString(phoneRegex, input.PhoneNumber); !matched {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "Invalid phoneNumber field")
+		return
+	}
+
+	token, err := h.services.User.GenerateToken(input.PhoneNumber, input.Password)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"token": token,
+	})
 }
 
 func (h *Handler) SignUp(c *gin.Context) {

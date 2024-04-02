@@ -11,7 +11,6 @@ build:
 test:
 	go test -v -race -timeout 30s ./...
 
-# command below needs to add -v parameter
 .PHONY: dockerRun
 dockerRun:
 	docker run --name=procat-backend -e POSTGRES_PASSWORD=$(DB_PASSWORD) -v /tmp:/var/lib/postgresql/data -p 5436:5432 -d --rm postgres

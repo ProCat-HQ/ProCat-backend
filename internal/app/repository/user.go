@@ -12,7 +12,7 @@ type UserPostgres struct {
 
 func (r *UserPostgres) GetUser(phoneNumber, password string) (model.User, error) {
 	var user model.User
-	query := fmt.Sprintf("SELECT id FROM %s WHERE phoneNumber=$1 AND password=$2", usersTable)
+	query := fmt.Sprintf("SELECT id, role FROM %s WHERE phone_number=$1 AND password_hash=$2", usersTable)
 	err := r.db.Get(&user, query, phoneNumber, password)
 	return user, err
 }
