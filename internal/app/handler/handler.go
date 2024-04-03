@@ -112,7 +112,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		categories.DELETE("/:id", h.DeleteCategory)
 	}
 
-	items := router.Group("/items")
+	items := router.Group("/items", h.UserIdentify)
 	{
 		items.GET("/", h.GetAllItems)
 		items.GET("/:id", h.GetItem)

@@ -5,6 +5,30 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+const (
+	usersTable              = "users"
+	deliverymanTable        = "delivery_men"
+	verificationsTable      = "verifications"
+	ordersTable             = "orders"
+	deliveriesTable         = "deliveries"
+	paymentsTable           = "payments"
+	categoriesTable         = "categories"
+	itemsTable              = "items"
+	storesTable             = "stores"
+	itemsStoresTable        = "item_stores"
+	itemsImagesTable        = "item_images"
+	ordersItemsTable        = "orders_items"
+	infosTable              = "infos"
+	cartsTable              = "carts"
+	cartsItemsTable         = "carts_items"
+	subscriptionsTable      = "subscriptions"
+	subscriptionsItemsTable = "subscriptions_items"
+	notificationsTable      = "notifications"
+	chatsTable              = "chats"
+	messagesTable           = "messages"
+	messageImagesTable      = "message_images"
+)
+
 type Config struct {
 	Host     string
 	Port     string

@@ -12,7 +12,7 @@ type Item struct {
 	//TODO: SimilarToItems
 }
 
-type ItemStock struct {
+type ItemStores struct {
 	Id            int `json:"id"`
 	InStockNumber int `json:"inStockNumber"`
 	StoreId       int

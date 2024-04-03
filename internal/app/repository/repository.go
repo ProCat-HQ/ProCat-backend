@@ -6,6 +6,8 @@ import (
 )
 
 type User interface {
+	CreateUser(user model.User) (int, error)
+	GetUser(phoneNumber, password string) (model.User, error)
 }
 
 type Verification interface {
@@ -60,5 +62,6 @@ type Repository struct {
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
 		Admin: NewAdminPostgres(db),
+		User:  NewUserPostgres(db),
 	}
 }
