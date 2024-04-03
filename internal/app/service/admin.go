@@ -11,5 +11,6 @@ func NewAdminService(repo repository.Admin) *AdminService {
 }
 
 func (s *AdminService) MakeClustering() error {
+	// логика вся
 	return nil
 }

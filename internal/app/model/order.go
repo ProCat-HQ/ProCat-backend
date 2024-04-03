@@ -26,6 +26,18 @@ type Delivery struct {
 	DeliveryManId int
 }
 
+type DeliveryAndOrder struct {
+	Id            int       `json:"id"`
+	TimeStart     time.Time `json:"timeStart"`
+	TimeEnd       time.Time `json:"timeEnd"`
+	Method        string    `json:"method"`
+	Address       string    `json:"address"`
+	Latitude      string    `json:"latitude"`
+	Longitude     string    `json:"longitude"`
+	OrderId       int
+	DeliveryManId int
+}
+
 type Payment struct {
 	Id        int       `json:"id"`
 	IsPaid    bool      `json:"isPaid"`

@@ -1,6 +1,9 @@
 package repository
 
-import "github.com/jmoiron/sqlx"
+import (
+	"github.com/jmoiron/sqlx"
+	"github.com/procat-hq/procat-backend/internal/app/model"
+)
 
 type User interface {
 }
@@ -15,6 +18,7 @@ type Delivery interface {
 }
 
 type Admin interface {
+	GetDeliveries() (*model.DeliveryAndOrder, error)
 }
 
 type Cart interface {
