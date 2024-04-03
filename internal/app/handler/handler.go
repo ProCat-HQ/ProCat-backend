@@ -18,29 +18,33 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	users := router.Group("/users")
 	{
-		users.GET("/", h.GetAllUsers)
-		users.GET("/:id", h.GetUser)
+		usersAdminGroup := users.Group("", h.UserIdentify, h.CheckRole("admin"))
+		{
+			usersAdminGroup.GET("/", h.GetAllUsers)
+			usersAdminGroup.GET("/:id", h.GetUser)
+		}
 		users.POST("/sign-in", h.SignIn)
 		users.POST("/sign-up", h.SignUp)
 
-		verification := users.Group("/verification")
+		verification := users.Group("/verification", h.UserIdentify)
 		{
+			// неуверен тут насчёт прав доступа
 			verification.PUT("/send", h.SendCode)
 			verification.POST("/check", h.CheckCode)
 			verification.POST("/iin-bin", h.CheckIIN)
 		}
 
-		change := users.Group("/change")
+		change := users.Group("/change", h.UserIdentify)
 		{
 			change.POST("/iin-bin", h.ChangeIIN)
 			change.POST("/fullname", h.ChangeFullName)
 			change.POST("/password", h.ChangePassword)
 			change.POST("/email", h.ChangeEmail)
 			change.POST("/phone", h.ChangePhone)
-			change.PATCH("/role/:id", h.ChangeRole)
+			change.PATCH("/role/:id", h.CheckRole("admin"), h.ChangeRole)
 		}
 
-		deliverymen := users.Group("/deliverymen")
+		deliverymen := users.Group("/deliverymen", h.UserIdentify, h.CheckRole("deliveryman"))
 		{
 			deliverymen.GET("/", h.GetAllDeliverymen)
 			deliverymen.GET("/:id", h.GetDeliveryman)
@@ -57,7 +61,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			}
 		}
 
-		admin := users.Group("/admin")
+		admin := users.Group("/admin", h.UserIdentify, h.CheckRole("admin"))
 		{
 			admin.GET("/deliveries-to-sort", h.GetAllDeliveriesToSort)
 			admin.PATCH("/change-delivery", h.ChangeDeliveryData)
@@ -111,7 +115,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		categories.DELETE("/:id", h.DeleteCategory)
 	}
 
-	items := router.Group("/items", h.UserIdentify)
+	items := router.Group("/items")
 	{
 		items.GET("/", h.GetAllItems)
 		items.GET("/:id", h.GetItem)

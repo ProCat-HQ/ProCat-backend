@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/procat-hq/procat-backend/internal/app/custom_errors"
+	"github.com/procat-hq/procat-backend/internal/app/model"
 	"net/http"
 	"strings"
 )
@@ -37,4 +39,56 @@ func (h *Handler) UserIdentify(c *gin.Context) {
 
 	c.Set("userId", userData.UserId)
 	c.Set("userRole", userData.UserRole)
+	c.Next()
+}
+
+func (h *Handler) GetUserContext(c *gin.Context) (*model.TokenClaimsExtension, error) {
+	id, ok := c.Get("userId")
+	if !ok {
+		return nil, errors.New("userId field not found in context")
+	}
+
+	role, ok := c.Get("userRole")
+	if !ok {
+		return nil, errors.New("userRole field not found in context")
+	}
+
+	userId, ok := id.(int)
+	if !ok {
+		return nil, errors.New("userId is not a numeric (integer) type")
+	}
+
+	userRole, ok := role.(string)
+	if !ok {
+		return nil, errors.New("userRole is not a string type")
+	}
+
+	userContext := &model.TokenClaimsExtension{
+		UserId:   userId,
+		UserRole: userRole,
+	}
+	return userContext, nil
+}
+
+func (h *Handler) CheckRole(roleToCheck string) gin.HandlerFunc {
+	fn := func(c *gin.Context) {
+		role, ok := c.Get("userRole")
+		if !ok {
+			custom_errors.NewErrorResponse(c, http.StatusUnauthorized, "Can't get userRole data")
+			return
+		}
+
+		userRole, ok := role.(string)
+		if !ok {
+			custom_errors.NewErrorResponse(c, http.StatusUnauthorized, "User role is not a string type")
+			return
+		}
+
+		if userRole != roleToCheck {
+			custom_errors.NewErrorResponse(c, http.StatusForbidden, "Forbidden")
+		}
+
+		c.Next()
+	}
+	return fn
 }

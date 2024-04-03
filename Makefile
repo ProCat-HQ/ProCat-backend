@@ -31,4 +31,12 @@ migrationDown:
 migrationUpDownUp:
 	make migrationUp; make migrationDown; make migrationUp
 
+.PHONY: mockUp
+mockUp:
+	migrate -path ./migrations/mocks -database 'postgres://postgres:$(DB_PASSWORD)@localhost:5436/postgres?sslmode=disable' up
+
+.PHONY: mockDown
+mockDown:
+	migrate -path ./migrations/mocks -database 'postgres://postgres:$(DB_PASSWORD)@localhost:5436/postgres?sslmode=disable' down
+
 .DEFAULT_GOAL := build
