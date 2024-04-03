@@ -15,12 +15,12 @@ type User struct {
 }
 
 type DeliveryMan struct {
-	Id                int       `json:"id"`
-	CarCapacity       string    `json:"carCapacity"`
-	WorkingHoursStart time.Time `json:"workingHoursStart"`
-	WorkingHoursEnd   time.Time `json:"workingHoursEnd"`
-	CarId             string    `json:"carId"`
-	UserId            int
+	Id                int       `json:"id" db:"id"`
+	CarCapacity       string    `json:"carCapacity" db:"car_capacity"`
+	WorkingHoursStart time.Time `json:"workingHoursStart" db:"working_hours_start"`
+	WorkingHoursEnd   time.Time `json:"workingHoursEnd" db:"working_hours_end"`
+	CarId             string    `json:"carId" db:"car_id"`
+	UserId            int       `db:"user_id"`
 }
 
 type SignUpInput struct {

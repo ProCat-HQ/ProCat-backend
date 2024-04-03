@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"database/sql"
+	"time"
+)
 
 type Order struct {
 	Id                int       `json:"id"`
@@ -27,15 +30,15 @@ type Delivery struct {
 }
 
 type DeliveryAndOrder struct {
-	Id            int       `json:"id"`
-	TimeStart     time.Time `json:"timeStart"`
-	TimeEnd       time.Time `json:"timeEnd"`
-	Method        string    `json:"method"`
-	Address       string    `json:"address"`
-	Latitude      string    `json:"latitude"`
-	Longitude     string    `json:"longitude"`
-	OrderId       int
-	DeliveryManId int
+	Id            int           `json:"id" db:"id"`
+	TimeStart     time.Time     `json:"timeStart" db:"time_start"`
+	TimeEnd       time.Time     `json:"timeEnd" db:"time_end"`
+	Method        string        `json:"method" db:"method"`
+	Address       string        `json:"address" db:"address"`
+	Latitude      string        `json:"latitude" db:"latitude"`
+	Longitude     string        `json:"longitude" db:"longitude"`
+	OrderId       int           `db:"order_id"`
+	DeliveryManId sql.NullInt64 `db:"delivery_man_id"`
 }
 
 type Payment struct {
