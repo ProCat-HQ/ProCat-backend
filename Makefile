@@ -21,11 +21,11 @@ dockerExec:
 
 .PHONY: migrationUp
 migrationUp:
-	migrate -path ./migrations -database 'postgres://postgres:$(DB_PASSWORD)@localhost:5436/postgres?sslmode=disable' up
+	migrate -path ./migrations/init -database 'postgres://postgres:$(DB_PASSWORD)@localhost:5436/postgres?sslmode=disable' up
 
 .PHONY: migrationDown
 migrationDown:
-	migrate -path ./migrations -database 'postgres://postgres:$(DB_PASSWORD)@localhost:5436/postgres?sslmode=disable' down
+	migrate -path ./migrations/init -database 'postgres://postgres:$(DB_PASSWORD)@localhost:5436/postgres?sslmode=disable' down
 
 .PHONY: migrationUpDownUp
 migrationUpDownUp:
