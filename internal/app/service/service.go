@@ -17,6 +17,7 @@ type Delivery interface {
 }
 
 type Admin interface {
+	MakeClustering() error
 }
 
 type Cart interface {
@@ -56,5 +57,7 @@ type Service struct {
 }
 
 func NewService(repos *repository.Repository) *Service {
-	return &Service{}
+	return &Service{
+		Admin: NewAdminService(repos.Admin),
+	}
 }

@@ -61,6 +61,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		{
 			admin.GET("/deliveries-to-sort", h.GetAllDeliveriesToSort)
 			admin.PATCH("/change-delivery", h.ChangeDeliveryData)
+			admin.POST("/cluster", h.Cluster)
 		}
 
 		cart := users.Group("/cart")
