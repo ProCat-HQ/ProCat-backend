@@ -21,7 +21,7 @@ type Delivery interface {
 }
 
 type Admin interface {
-	MakeClustering() error
+	MakeClustering() (string, error)
 }
 
 type Cart interface {

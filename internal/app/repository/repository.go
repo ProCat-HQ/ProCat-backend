@@ -21,7 +21,7 @@ type Delivery interface {
 
 type Admin interface {
 	GetDeliveries() ([]model.DeliveryAndOrder, []model.DeliveryMan, error)
-	SetDeliveries(map[int]int) error
+	SetDeliveries(map[model.Point]int) error
 }
 
 type Cart interface {

@@ -30,10 +30,10 @@ func (a *AdminPostgres) GetDeliveries() ([]model.DeliveryAndOrder, []model.Deliv
 
 }
 
-func (a *AdminPostgres) SetDeliveries(answerMap map[int]int) error {
+func (a *AdminPostgres) SetDeliveries(answerMap map[model.Point]int) error {
 	query := fmt.Sprintf(`UPDATE deliveries SET delivery_man_id = $1 WHERE id = $2`)
 	for i, i2 := range answerMap {
-		if _, err := a.db.Exec(query, i2, i); err != nil {
+		if _, err := a.db.Exec(query, i2, i.DeliveryId); err != nil {
 			return err
 		}
 	}

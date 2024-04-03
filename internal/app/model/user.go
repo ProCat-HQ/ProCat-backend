@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type User struct {
 	Id                   int       `json:"id" db:"id"`
@@ -21,6 +23,17 @@ type DeliveryMan struct {
 	WorkingHoursEnd   time.Time `json:"workingHoursEnd" db:"working_hours_end"`
 	CarId             string    `json:"carId" db:"car_id"`
 	UserId            int       `db:"user_id"`
+}
+
+type Point struct {
+	Latitude   float64 `json:"latitude"`
+	Longitude  float64 `json:"longitude"`
+	DeliveryId int     `json:"deliveryId"`
+}
+
+type DeliveriesForDeliveryMan struct {
+	DeliveryManId int     `json:"deliveryManId"`
+	Deliveries    []Point `json:"deliveries"`
 }
 
 type SignUpInput struct {

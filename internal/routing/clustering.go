@@ -1,21 +1,15 @@
 package routing
 
 import (
-	"fmt"
 	"github.com/muesli/clusters"
 	"github.com/muesli/kmeans"
 	"github.com/procat-hq/procat-backend/internal/app/model"
 	"strconv"
 )
 
-type Point struct {
-	X float64
-	Y float64
-}
-
-func ClusterOrders(deliveries []model.DeliveryAndOrder, deliveryMen []model.DeliveryMan) (map[int]int, error) {
+func ClusterOrders(deliveries []model.DeliveryAndOrder, deliveryMen []model.DeliveryMan) (map[model.Point]int, error) {
 	var coordinates clusters.Observations
-	mapId := make(map[Point]int)
+	mapId := make(map[model.Point]int)
 	for i := 0; i < len(deliveries); i++ {
 		x, err := strconv.ParseFloat(deliveries[i].Latitude, 64)
 		if err != nil {
@@ -29,7 +23,7 @@ func ClusterOrders(deliveries []model.DeliveryAndOrder, deliveryMen []model.Deli
 			x,
 			y,
 		})
-		mapId[Point{x, y}] = deliveries[i].Id
+		mapId[model.Point{x, y, 0}] = deliveries[i].Id
 	}
 	//km, err := kmeans.NewWithOptions(0.01, plotter.SimplePlotter{})
 	//if err != nil {
@@ -40,14 +34,12 @@ func ClusterOrders(deliveries []model.DeliveryAndOrder, deliveryMen []model.Deli
 	if err != nil {
 		return nil, err
 	}
-	answer := make(map[int]int)
+	answer := make(map[model.Point]int)
 	for i, c := range partition {
 		for _, k := range c.Observations {
-			answer[mapId[Point{k.Coordinates()[0], k.Coordinates()[1]}]] = deliveryMen[i].Id
+			answer[model.Point{Latitude: k.Coordinates()[0], Longitude: k.Coordinates()[1],
+				DeliveryId: mapId[model.Point{Latitude: k.Coordinates()[0], Longitude: k.Coordinates()[1]}]}] = deliveryMen[i].Id
 		}
-
-		fmt.Printf("Centered at x: %.6f y: %.6f\n", c.Center[0], c.Center[1])
-		fmt.Printf("Matching data points: %+v\n\n", c.Observations)
 	}
 
 	return answer, nil

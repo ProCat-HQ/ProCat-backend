@@ -14,16 +14,17 @@ func (h *Handler) ChangeDeliveryData(c *gin.Context) {
 }
 
 func (h *Handler) Cluster(c *gin.Context) {
-	err := h.services.Admin.MakeClustering()
+	payload, err := h.services.Admin.MakeClustering()
 	if err != nil {
 		//custom_errors.NewErrorResponse(c, http.StatusInternalServerError, "Clustering hasn't done")
 		logrus.Error("Clustering hasn't done")
 		return
 	}
 
-	logrus.Info("УРА")
+	logrus.Info(payload)
 
-	//c.JSON(http.StatusOK, gin.H{
-	//	"message": "ok",
-	//})
+	c.JSON(200, gin.H{
+		"message": "ok",
+		"payload": payload,
+	})
 }
