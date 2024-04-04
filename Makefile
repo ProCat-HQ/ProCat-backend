@@ -13,7 +13,7 @@ test:
 
 .PHONY: dockerRun
 dockerRun:
-	docker run --name=procat-backend -e POSTGRES_PASSWORD=$(DB_PASSWORD) -v /tmp:/var/lib/postgresql/data -p 5436:5432 -d --rm postgres
+	docker run --name=procat-backend -e POSTGRES_PASSWORD=$(DB_PASSWORD) -v /tmp:/var/lib/postgresql/data -p 6789:5432 -d --rm postgres
 
 .PHONY: dockerExec
 dockerExec:
@@ -21,14 +21,22 @@ dockerExec:
 
 .PHONY: migrationUp
 migrationUp:
-	migrate -path ./migrations -database 'postgres://postgres:$(DB_PASSWORD)@localhost:5436/postgres?sslmode=disable' up
+	migrate -path ./migrations/init -database 'postgres://postgres:$(DB_PASSWORD)@localhost:6789/postgres?sslmode=disable' up
 
 .PHONY: migrationDown
 migrationDown:
-	migrate -path ./migrations -database 'postgres://postgres:$(DB_PASSWORD)@localhost:5436/postgres?sslmode=disable' down
+	migrate -path ./migrations/init -database 'postgres://postgres:$(DB_PASSWORD)@localhost:6789/postgres?sslmode=disable' down
 
 .PHONY: migrationUpDownUp
 migrationUpDownUp:
 	make migrationUp; make migrationDown; make migrationUp
+
+.PHONY: mockUp
+mockUp:
+	migrate -path ./migrations/mocks -database 'postgres://postgres:$(DB_PASSWORD)@localhost:6789/postgres?sslmode=disable' up
+
+.PHONY: mockDown
+mockDown:
+	migrate -path ./migrations/mocks -database 'postgres://postgres:$(DB_PASSWORD)@localhost:6789/postgres?sslmode=disable' down
 
 .DEFAULT_GOAL := build

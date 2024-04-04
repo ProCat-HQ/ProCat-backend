@@ -39,6 +39,7 @@ type Category interface {
 }
 
 type Item interface {
+	GetAllItems(limit, page, categoryId, stock string) ([]model.PieceOfItem, error)
 }
 
 type Store interface {
@@ -62,5 +63,6 @@ type Service struct {
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
 		User: NewUserService(repos.User),
+		Item: NewItemService(repos.Item),
 	}
 }

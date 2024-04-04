@@ -47,7 +47,7 @@ CREATE TABLE orders
     company_name        VARCHAR(255),
     created_at          TIMESTAMP DEFAULT now(),
     user_id             INTEGER     NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL -- OR DELETE?
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
 CREATE TABLE deliveries

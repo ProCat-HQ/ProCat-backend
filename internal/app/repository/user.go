@@ -10,15 +10,15 @@ type UserPostgres struct {
 	db *sqlx.DB
 }
 
+func NewUserPostgres(db *sqlx.DB) *UserPostgres {
+	return &UserPostgres{db: db}
+}
+
 func (r *UserPostgres) GetUser(phoneNumber, password string) (model.User, error) {
 	var user model.User
 	query := fmt.Sprintf("SELECT id, role FROM %s WHERE phone_number=$1 AND password_hash=$2", usersTable)
 	err := r.db.Get(&user, query, phoneNumber, password)
 	return user, err
-}
-
-func NewUserPostgres(db *sqlx.DB) *UserPostgres {
-	return &UserPostgres{db: db}
 }
 
 func (r *UserPostgres) CreateUser(user model.User) (int, error) {

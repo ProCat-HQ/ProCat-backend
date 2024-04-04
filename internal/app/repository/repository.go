@@ -38,6 +38,7 @@ type Category interface {
 }
 
 type Item interface {
+	GetAllItems(limit, offset, categoryId int, stock bool) ([]model.PieceOfItem, error)
 }
 
 type Store interface {
@@ -61,5 +62,6 @@ type Repository struct {
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
 		User: NewUserPostgres(db),
+		Item: NewItemPostgres(db),
 	}
 }
