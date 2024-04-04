@@ -1,7 +1,6 @@
 package routing
 
 import (
-	"encoding/json"
 	"math"
 )
 
@@ -24,12 +23,7 @@ type Response struct {
 	Routes         []Route `json:"routes"`
 }
 
-func GetRoute(jsonInput string) (string, error) {
-	var response Response
-	err := json.Unmarshal([]byte(jsonInput), &response)
-	if err != nil {
-		return "", err
-	}
+func GetRoute(response Response) (Result, error) {
 
 	pointMap := make(map[int]bool)
 	for _, route := range response.Routes {
@@ -51,12 +45,8 @@ func GetRoute(jsonInput string) (string, error) {
 		durationMatrix[route.SourceID][route.TargetID] = route.Duration
 	}
 	result := solveTSP(distanceMatrix, durationMatrix)
-	jsonResult, err := json.Marshal(result)
-	if err != nil {
-		return "", err
-	}
 
-	return string(jsonResult), nil
+	return result, nil
 }
 
 func solveTSP(distanceMatrix [][]int, durationMatrix [][]int) Result {

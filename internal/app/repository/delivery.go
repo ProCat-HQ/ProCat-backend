@@ -31,7 +31,7 @@ func (r *DeliveryPostgres) GetDeliveriesOrdersForDeliveryman(deliverymanId int) 
                                                                WHERE o.status = $1 AND d.delivery_man_id = $2`, deliveriesTable, ordersTable)
 
 	var deliveries []model.DeliveryAndOrder
-	err := r.db.Select(deliveries, query, "to_delivery", deliverymanId)
+	err := r.db.Select(&deliveries, query, "to_delivery", deliverymanId)
 	if err != nil {
 		return nil, err
 	}
