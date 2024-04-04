@@ -20,6 +20,8 @@ type Delivery interface {
 }
 
 type Admin interface {
+	GetDeliveries() ([]model.DeliveryAndOrder, []model.DeliveryMan, error)
+	SetDeliveries(map[model.Point]int) error
 }
 
 type Cart interface {
@@ -61,7 +63,8 @@ type Repository struct {
 
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
-		User: NewUserPostgres(db),
-		Item: NewItemPostgres(db),
+		User:  NewUserPostgres(db),
+		Item:  NewItemPostgres(db),
+		Admin: NewAdminPostgres(db),
 	}
 }
