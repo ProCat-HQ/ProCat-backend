@@ -70,6 +70,7 @@ func (h *Handler) GetItem(c *gin.Context) {
 }
 
 func (h *Handler) CreateItem(c *gin.Context) {
+	// TODO: не работает, переделать
 	form, err := c.MultipartForm()
 	if err != nil {
 		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "Invalid input form")
