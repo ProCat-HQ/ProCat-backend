@@ -29,6 +29,17 @@ type Delivery struct {
 	DeliveryManId int
 }
 
+type LatLon struct {
+	Latitude  float64 `json:"lat"`
+	Longitude float64 `json:"lon"`
+}
+
+type MapRequest struct {
+	Points  []LatLon `json:"points"`
+	Sources []int    `json:"sources"`
+	Targets []int    `json:"targets"`
+}
+
 type DeliveryAndOrder struct {
 	Id            int           `json:"id" db:"id"`
 	TimeStart     time.Time     `json:"timeStart" db:"time_start"`

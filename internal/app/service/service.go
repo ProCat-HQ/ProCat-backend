@@ -14,10 +14,8 @@ type User interface {
 type Verification interface {
 }
 
-type Deliveryman interface {
-}
-
 type Delivery interface {
+	GetDeliveriesForDeliveryman(userId int) (*model.MapRequest, error)
 }
 
 type Admin interface {
@@ -49,7 +47,6 @@ type Store interface {
 type Service struct {
 	User
 	Verification
-	Deliveryman
 	Delivery
 	Admin
 	Cart
@@ -63,9 +60,9 @@ type Service struct {
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
-		User:        NewUserService(repos.User),
-		Item:        NewItemService(repos.Item),
-		Admin:       NewAdminService(repos.Admin),
-		Deliveryman: NewDeliverymanService(repos.Deliveryman),
+		User:     NewUserService(repos.User),
+		Item:     NewItemService(repos.Item),
+		Admin:    NewAdminService(repos.Admin),
+		Delivery: NewDeliveryService(repos.Delivery),
 	}
 }
