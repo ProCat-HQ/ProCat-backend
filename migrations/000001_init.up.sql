@@ -105,7 +105,7 @@ CREATE TABLE stores
     working_hours_end   TIME    NOT NULL
 );
 
-CREATE TABLE item_stocks
+CREATE TABLE item_stores
 (
     id              SERIAL PRIMARY KEY,
     in_stock_number INTEGER NOT NULL,

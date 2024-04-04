@@ -11,14 +11,13 @@ build:
 test:
 	go test -v -race -timeout 30s ./...
 
-# command below needs to add -v parameter
 .PHONY: dockerRun
 dockerRun:
-	docker run --name=procat-backend -e POSTGRES_PASSWORD=$(DB_PASSWORD) -p 5436:5432 -d --rm postgres
+	docker run --name=procat-backend -e POSTGRES_PASSWORD=$(DB_PASSWORD) -v /tmp:/var/lib/postgresql/data -p 5436:5432 -d --rm postgres
 
 .PHONY: dockerExec
 dockerExec:
-	docker exec -it hash sh
+	docker exec -it $(ID) sh
 
 .PHONY: migrationUp
 migrationUp:

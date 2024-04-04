@@ -1,10 +1,14 @@
 package service
 
 import (
+	"github.com/procat-hq/procat-backend/internal/app/model"
 	"github.com/procat-hq/procat-backend/internal/app/repository"
 )
 
 type User interface {
+	CreateUser(user model.SignUpInput) (int, error)
+	GenerateToken(phoneNumber, password string) (string, error)
+	ParseToken(accessToken string) (*model.TokenClaimsExtension, error)
 }
 
 type Verification interface {
@@ -56,5 +60,7 @@ type Service struct {
 }
 
 func NewService(repos *repository.Repository) *Service {
-	return &Service{}
+	return &Service{
+		User: NewUserService(repos.User),
+	}
 }

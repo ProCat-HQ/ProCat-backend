@@ -1,8 +1,13 @@
 package repository
 
-import "github.com/jmoiron/sqlx"
+import (
+	"github.com/jmoiron/sqlx"
+	"github.com/procat-hq/procat-backend/internal/app/model"
+)
 
 type User interface {
+	CreateUser(user model.User) (int, error)
+	GetUser(phoneNumber, password string) (model.User, error)
 }
 
 type Verification interface {
@@ -54,5 +59,7 @@ type Repository struct {
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
-	return &Repository{}
+	return &Repository{
+		User: NewUserPostgres(db),
+	}
 }

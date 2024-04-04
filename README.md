@@ -5,4 +5,6 @@ Create .env file in root directory and fill following values:
 ```
 DB_PASSWORD=
 CAP_SOLVER_API_KEY=
+PASSWORD_SALT=
+SIGNING_KEY=
 ```
