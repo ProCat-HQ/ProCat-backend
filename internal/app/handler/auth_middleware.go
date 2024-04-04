@@ -70,6 +70,21 @@ func (h *Handler) GetUserContext(c *gin.Context) (*model.TokenClaimsExtension, e
 	return userContext, nil
 }
 
+func getRolePriority(role string) (int, error) {
+	switch role {
+	case "user":
+		return 1, nil
+	case "deliveryman":
+		return 2, nil
+	case "moderator":
+		return 3, nil
+	case "admin":
+		return 4, nil
+	default:
+		return 0, errors.New("unknown role")
+	}
+}
+
 func (h *Handler) CheckRole(roleToCheck string) gin.HandlerFunc {
 	fn := func(c *gin.Context) {
 		role, ok := c.Get("userRole")
@@ -84,11 +99,23 @@ func (h *Handler) CheckRole(roleToCheck string) gin.HandlerFunc {
 			return
 		}
 
-		if userRole != roleToCheck {
+		userRolePriority, err := getRolePriority(userRole)
+		if err != nil {
+			custom_errors.NewErrorResponse(c, http.StatusUnauthorized, err.Error())
+			return
+		}
+
+		roleToCheckPriority, err := getRolePriority(roleToCheck)
+		if err != nil {
+			custom_errors.NewErrorResponse(c, http.StatusUnauthorized, err.Error())
+			return
+		}
+
+		if userRolePriority < roleToCheckPriority {
 			custom_errors.NewErrorResponse(c, http.StatusForbidden, "Forbidden")
 		}
 
 		c.Next()
 	}
-	return fn
+	return gin.HandlerFunc(fn)
 }

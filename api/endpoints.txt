@@ -63,7 +63,7 @@ localhost/
          /infos (Probably this functionality must be in handlers of "item" routes)
 
          /items
-               / (GET - get all items {query params: limit, page, categoryId, stock})
+               / (GET - get all items {query params: limit (items on page), page (page number), categoryId, stock (false - for all, true - for on;y stock)})
                /{itemId} (GET - with ItemStocks and ItemImages)
                /{itemId} (DELETE)
                /{itemId} (PATCH)

@@ -1,6 +1,29 @@
 package model
 
-import "time"
+import (
+	"database/sql"
+	"time"
+)
+
+type PieceOfItem struct {
+	Id          int            `json:"id" db:"id"`
+	Name        string         `json:"name" db:"name"`
+	Description sql.NullString `json:"description" db:"description"`
+	Price       int            `json:"price" db:"price"`
+	IsInStock   bool           `json:"isInStock" db:"is_in_stock"`
+	Images      []string       `json:"images"`
+	CategoryId  sql.NullInt32  `json:"categoryId" db:"category_id"`
+}
+
+type PieceOfItemToRes struct {
+	Id          int      `json:"id" db:"id"`
+	Name        string   `json:"name" db:"name"`
+	Description *string  `json:"description" db:"description"`
+	Price       int      `json:"price" db:"price"`
+	IsInStock   bool     `json:"isInStock" db:"is_in_stock"`
+	Images      []string `json:"images"`
+	CategoryId  *int     `json:"categoryId" db:"category_id"`
+}
 
 type Item struct {
 	Id          int    `json:"id"`

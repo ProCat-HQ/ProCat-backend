@@ -48,9 +48,9 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		{
 			deliverymen.GET("/", h.GetAllDeliverymen)
 			deliverymen.GET("/:id", h.GetDeliveryman)
-			deliverymen.POST("/:id", h.CreateDeliveryman)
-			deliverymen.PATCH("/:id", h.ChangeDeliverymanData)
-			deliverymen.DELETE("/:id", h.DeleteDeliveryman)
+			deliverymen.POST("/:id", h.CheckRole("admin"), h.CreateDeliveryman)
+			deliverymen.PATCH("/:id", h.CheckRole("admin"), h.ChangeDeliverymanData)
+			deliverymen.DELETE("/:id", h.CheckRole("admin"), h.DeleteDeliveryman)
 
 			deliveries := deliverymen.Group("/deliveries")
 			{
@@ -67,41 +67,41 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			admin.PATCH("/change-delivery", h.ChangeDeliveryData)
 		}
 
-		cart := users.Group("/cart")
+		cart := users.Group("/cart", h.UserIdentify)
 		{
 			cart.GET("/", h.GetCartItems)
 			cart.POST("/", h.AddItemsToCart)
 			cart.DELETE("/", h.DeleteItemsFromCart)
 		}
 
-		orders := users.Group("/orders")
+		orders := users.Group("/orders", h.UserIdentify)
 		{
 			orders.GET("/", h.GetAllOrders)
 			orders.GET("/:id", h.GetOrder)
 			orders.POST("/", h.CreateOrder)
 			orders.POST("/cancel/:id", h.CancelOrder)
-			orders.PATCH("/status/:id", h.ChangeOrderStatus)
+			orders.PATCH("/status/:id", h.CheckRole("admin"), h.ChangeOrderStatus)
 
 			payment := orders.Group("/payment")
 			{
 				payment.GET("/:id", h.GetPaymentData)
-				payment.PATCH("/:id", h.ChangePaymentStatus)
+				payment.PATCH("/:id", h.CheckRole("admin"), h.ChangePaymentStatus)
 			}
 		}
 
-		subscriptions := users.Group("/subscriptions")
+		subscriptions := users.Group("/subscriptions", h.UserIdentify)
 		{
 			subscriptions.GET("/", h.GetAllSubscriptions)
 			subscriptions.POST("/", h.SubscribeToItem)
 			subscriptions.DELETE("/:id", h.DeleteItemFromSubscriptions)
 		}
 
-		notifications := users.Group("/notifications")
+		notifications := users.Group("/notifications", h.UserIdentify)
 		{
 			notifications.GET("/", h.GetAllNotifications)
-			notifications.POST("/:id", h.SendNotification)
+			notifications.POST("/:id", h.CheckRole("admin"), h.SendNotification)
 			notifications.PATCH("/:id", h.ViewNotification)
-			notifications.DELETE("/:id", h.DeleteNotification)
+			notifications.DELETE("/:id", h.CheckRole("admin"), h.DeleteNotification)
 		}
 
 	}
@@ -110,33 +110,33 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		categories.GET("/:id", h.GetCategory)
 		categories.GET("/route/:id", h.GetCategoryRoute)
-		categories.POST("/:id", h.CreateCategory)
-		categories.PATCH("/:id", h.ChangeCategory)
-		categories.DELETE("/:id", h.DeleteCategory)
+		categories.POST("/:id", h.UserIdentify, h.CheckRole("admin"), h.CreateCategory)
+		categories.PATCH("/:id", h.UserIdentify, h.CheckRole("admin"), h.ChangeCategory)
+		categories.DELETE("/:id", h.UserIdentify, h.CheckRole("admin"), h.DeleteCategory)
 	}
 
 	items := router.Group("/items")
 	{
 		items.GET("/", h.GetAllItems)
 		items.GET("/:id", h.GetItem)
-		items.POST("/", h.CreateItem)
-		items.PATCH("/:id", h.ChangeItem)
-		items.DELETE("/:id", h.DeleteItem)
+		items.POST("/", h.UserIdentify, h.CheckRole("admin"), h.CreateItem)
+		items.PATCH("/:id", h.UserIdentify, h.CheckRole("admin"), h.ChangeItem)
+		items.DELETE("/:id", h.UserIdentify, h.CheckRole("admin"), h.DeleteItem)
 
-		stock := items.Group("/stock")
+		stock := items.Group("/stock", h.UserIdentify, h.CheckRole("admin"))
 		{
 			stock.POST("/:id", h.CreateStock)
 			stock.PATCH("/:id", h.ChangeStock)
 		}
 
-		infos := items.Group("/infos")
+		infos := items.Group("/infos", h.UserIdentify, h.CheckRole("admin"))
 		{
 			infos.POST("/:id", h.AddInfo)
 			infos.PUT("/:id", h.ChangeInfo)
 			infos.DELETE("/:id", h.DeleteInfo)
 		}
 
-		images := items.Group("/images")
+		images := items.Group("/images", h.UserIdentify, h.CheckRole("admin"))
 		{
 			images.POST("/:id", h.AddImages)
 			images.PATCH("/:id", h.ChangeImages)
@@ -147,9 +147,9 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	stores := router.Group("/stores")
 	{
 		stores.GET("/", h.GetAllStores)
-		stores.POST("/", h.CreateStore)
-		stores.PATCH("/:id", h.ChangeStore)
-		stores.DELETE("/:id", h.DeleteStore)
+		stores.POST("/", h.UserIdentify, h.CheckRole("admin"), h.CreateStore)
+		stores.PATCH("/:id", h.UserIdentify, h.CheckRole("admin"), h.ChangeStore)
+		stores.DELETE("/:id", h.UserIdentify, h.CheckRole("admin"), h.DeleteStore)
 	}
 
 	return router

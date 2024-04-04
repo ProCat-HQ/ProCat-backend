@@ -7,5 +7,4 @@ func (h *Handler) GetAllDeliveriesToSort(c *gin.Context) {
 }
 
 func (h *Handler) ChangeDeliveryData(c *gin.Context) {
-
 }
