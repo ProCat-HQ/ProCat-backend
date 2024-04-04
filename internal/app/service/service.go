@@ -21,7 +21,7 @@ type Delivery interface {
 }
 
 type Admin interface {
-	MakeClustering() (string, error)
+	MakeClustering() ([]model.DeliveriesForDeliveryMan, error)
 }
 
 type Cart interface {
@@ -63,8 +63,9 @@ type Service struct {
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
-		User:  NewUserService(repos.User),
-		Item:  NewItemService(repos.Item),
-		Admin: NewAdminService(repos.Admin),
+		User:        NewUserService(repos.User),
+		Item:        NewItemService(repos.Item),
+		Admin:       NewAdminService(repos.Admin),
+		Deliveryman: NewDeliverymanService(repos.Deliveryman),
 	}
 }

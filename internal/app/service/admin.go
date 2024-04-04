@@ -1,8 +1,6 @@
 package service
 
 import (
-	"encoding/json"
-	"fmt"
 	"github.com/procat-hq/procat-backend/internal/app/model"
 	"github.com/procat-hq/procat-backend/internal/app/repository"
 	"github.com/procat-hq/procat-backend/internal/routing"
@@ -17,19 +15,19 @@ func NewAdminService(repo repository.Admin) *AdminService {
 	return &AdminService{repo: repo}
 }
 
-func (s *AdminService) MakeClustering() (string, error) {
+func (s *AdminService) MakeClustering() ([]model.DeliveriesForDeliveryMan, error) {
 	deliveries, deliveryMen, err := s.repo.GetDeliveries()
 	if err != nil {
 		logrus.Error(err.Error())
-		return "", err
+		return nil, err
 	}
 	answer, err := routing.ClusterOrders(deliveries, deliveryMen)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	err = s.repo.SetDeliveries(answer)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	var result []model.DeliveriesForDeliveryMan
 	for _, man := range deliveryMen {
@@ -42,7 +40,6 @@ func (s *AdminService) MakeClustering() (string, error) {
 			}
 		}
 	}
-	j, _ := json.Marshal(result)
-	fmt.Print(string(j))
-	return string(j), nil
+
+	return result, nil
 }

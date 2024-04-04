@@ -25,12 +25,14 @@ type DeliveryMan struct {
 	UserId            int       `db:"user_id"`
 }
 
+// Point переместить
 type Point struct {
 	Latitude   float64 `json:"latitude"`
 	Longitude  float64 `json:"longitude"`
 	DeliveryId int     `json:"deliveryId"`
 }
 
+// DeliveriesForDeliveryMan переместить
 type DeliveriesForDeliveryMan struct {
 	DeliveryManId int     `json:"deliveryManId"`
 	Deliveries    []Point `json:"deliveries"`
