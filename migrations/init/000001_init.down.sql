@@ -25,5 +25,7 @@ DROP TABLE deliveries;
 DROP TABLE orders;
 
 DROP TABLE verifications;
-DROP TABLE delivery_men;
+DROP TABLE coordinates;
+DROP TABLE routes;
+DROP TABLE deliverymen;
 DROP TABLE users;

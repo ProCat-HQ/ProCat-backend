@@ -34,7 +34,7 @@ type Point struct {
 
 // DeliveriesForDeliveryMan переместить
 type DeliveriesForDeliveryMan struct {
-	DeliveryManId int     `json:"deliveryManId"`
+	DeliverymanId int     `json:"deliverymanId"`
 	Deliveries    []Point `json:"deliveries"`
 }
 

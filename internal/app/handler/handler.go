@@ -18,10 +18,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	users := router.Group("/users")
 	{
-		usersAdminGroup := users.Group("", h.UserIdentify, h.CheckRole("admin"))
+		usersAuthenticatedGroup := users.Group("", h.UserIdentify)
 		{
-			usersAdminGroup.GET("/", h.GetAllUsers)
-			usersAdminGroup.GET("/:id", h.GetUser)
+			usersAuthenticatedGroup.GET("/", h.CheckRole("admin"), h.GetAllUsers)
+			usersAuthenticatedGroup.GET("/:id", h.GetUser) // need to check that the user has id equals to ":"id"
 		}
 		users.POST("/sign-in", h.SignIn)
 		users.POST("/sign-up", h.SignUp)

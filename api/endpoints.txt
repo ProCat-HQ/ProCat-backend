@@ -1,45 +1,349 @@
 localhost/
          /users
-              / (GET - to get all)
-              /{userId} (GET - for simple user only for his page, DELETE - only for admin)
-              /sign-in (POST phoneNumber + password)
-              /sign-up (POST fullname + phoneNumber + password)
-              /verification
-                           /send (PUT - creates new verification code for certain user and his new info with {type} and {value})
+              / (GET - to get all, {limit, page, role})
+              -->
+                  {
+                    "status": 200,
+                    "message": "ok",
+                    "payload": {
+                        "count": 123,
+                        "rows": [
+                            {
+                                  "id": 848,
+                                  "fullName": "Вадимов Вадим Вадимович",
+                                  "email": "vadim@mail.ru",
+                                  "phone_number": "79856523652",
+                                  "identification_number": "760724300757",
+                                  "is_confirmed": true,
+                                  "role": "user",
+                                  "created_at": "2023-10-19 10:23:54+03"
+                            }
+                        ]
+                    }
+                  }
+              /{userId} (GET - for simple user only for his page)
+              -->
+                  {
+                      "status": 200,
+                      "message": "ok",
+                      "payload": {
+                                     "id": 848,
+                                     "fullName": "Вадимов Вадим Вадимович",
+                                     "email": "vadim@mail.ru",
+                                     "phone_number": "79856523652",
+                                     "identification_number": "760724300757",
+                                     "is_confirmed": true,
+                                     "role": "user",
+                                     "created_at": "2023-10-19 10:23:54+03"
+                      }
+                  }
+              /{userId} (DELETE - only for admin)
+              /sign-in (POST phoneNumber + password --> token)
+              -->
+                  {
+                    "status": 200,
+                    "message": "ok",
+                    "payload": {
+                        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                    }
+                  }
+
+              /sign-up (POST fullName + phoneNumber + password --> created user id)
+              -->
+                {
+                  "status": 200,
+                  "message": "ok",
+                  "payload": {
+                      "id": 123
+                  }
+                }
+
+              /verification (for authorized users (for unconfirmed users --> it's possible to login but their account will be deleted (e.g. 15 min)))
+                           /send (POST - creates new verification code for certain user and his existing info with {type})
+                           {
+                                "type": "password"
+                           }                            --> status info
+
                            /check (POST - checks whether code matches or not + check on lifetime of code
                                    if all is well then update user info, otherwise - user can try again
                                    if code lifetime is still available)
 
-                           /iin (POST - additional endpoint, because this functionality will be used in {makeOrder} handler)
+                           {
+                                "code": "123sda",
+                                "type": "password"
+                           }                        --> status info
+
+                           /iin (POST - additional endpoint,
+                           because this functionality will be used in {users/orders/POST} handler)
+                           {
+                                "iin": "760724300757"
+                           } --> {ответ от министерства финансовых дел}
               /change
-                     /iin-bin (POST check on iin correctness and matching with fullname)
-                     /fullname (POST if success, then iin-bin := null, and it's needed to be filled)
+                     /iin-bin (POST check password and check on iin correctness and matching with fullname)
+                     {
+                        "password": "blaBlaBla12321",
+                        "iin": "760724300757"
+                     } --> status code
+
+                     /fullname (POST check password and if success, then iin-bin := null, and it's needed to be filled)
+                     {
+                        "password": "blaBlaBla12321",
+                        "fullName": "Surname Name Patronymic"
+                     } --> status code
+
                      /password (POST - check if old passwords match, then send confirmation code on current number)
+                     {
+                        "oldPassword": "blaBlaBla12321",
+                        "newPassword": "some_password_12345"
+                     } --> status code
+
                      /phone (POST - check password and send confirmation code on new number)
+                     {
+                        "password": "blaBlaBla12321",
+                        "phone": "+79998887766"
+                     } --> status code
+
                      /email (POST - check password and send confirmation code on new email)
+                     {
+                        "password": "blaBlaBla12321",
+                        "email": "coolEmail@gmail.com"
+                     }
+
                      /role/{userId} (PATCH - only for admin)
-              /deliverymen (through middleware to check if user is deliveryman (or admin))
-                          / (GET - to get all deliverymen)
+                     {
+                        "role": "deliveryman"
+                     }
+
+              /deliverymen (through middleware to check if user is deliveryman or higher)
+                          / (GET - to get all deliverymen, {limit, page})
+                          {
+                                "status": 200,
+                                "message": "ok",
+                                "payload": {
+                                    "count": 20,
+                                    "rows": [
+                                        {
+                                            "id": 12,
+                                            "carCapacity": "big",
+                                            "workingHoursStart": "16:00",
+                                            "workingHoursEnd": "18:00",
+                                            "carId": "AA123A",
+                                            "fullName": "Аминов Амин Аминович",
+                                            "email": "pochta@gmail.com",
+                                            "phoneNumber": "+79998887766",
+                                        }
+                                    ]
+                                }
+                          }
                           /{deliveryId} (GET - for simple user to get his deliveryman page)
-                          /{userId} (POST - to create new deliveryman)
-                          /{deliveryId} (PATCH - to change data)
-                          /{deliveryId} (DELETE - to delete deliveryman (ADMIN RIGHTS))
+                          {
+                                "status": 200,
+                                "message": "ok",
+                                "payload": {
+                                    "carCapacity": "big",
+                                    "workingHoursStart": "16:00",
+                                    "workingHoursEnd": "18:00",
+                                    "carId": "AA123A",
+                                }
+                          }
+
+                          /{userId} (POST - to create new deliveryman who is {userId} user)
+                          {
+                                "carCapacity": "big",
+                                "workingHoursStart": "16:00",
+                                "workingHoursEnd": "18:00",
+                                "carId": "AA123A",
+                          } --> status response
+
+                          /{deliverymanId} (PATCH - to change data)
+                          (all fields are optional) {
+                                "carCapacity": "small",
+                                "workingHoursStart": "12:00",
+                                "workingHoursEnd": "18:00",
+                                "carId": "AB123A",
+                          } --> status response
+
+                          /{deliverymanId} (DELETE - to delete deliveryman (ADMIN RIGHTS)) --> status response
                           /deliveries
-                                     / (GET - to get list of all his deliveries)
-                                     /{deliveryId} (GET)
+                                     / (GET - to get list of all deliveries {limit, page} for ADMIN)
+                                     -->
+                                          {
+                                                "status": 200,
+                                                "message": "ok",
+                                                "payload": {
+                                                    "count": 10,
+                                                    "rows": [
+                                                        {
+                                                            "id": 12,
+                                                            "timeStart": "2023-10-19 10:00:00+03",
+                                                            "timeEnd": "2023-10-19 20:30:00+03",
+                                                            "method": "delivery",
+                                                            "deliverymanId": 2,
+                                                            "order": {
+                                                                "id": 2,
+                                                                "status": "delivery",
+                                                                "totalPrice": 4000,
+                                                                "deposit": 0,
+                                                                "address": "улица Пушкина, дом Колотушкина",
+                                                                "latitude": "54.99928130973027",
+                                                                "longitude": "82.92137145996095",
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                          }
+                                     /{deliverymanId} (GET - to get all deliveries for {deliverymanId} {limit, page})
+                                     -->
+                                          {
+                                                "status": 200,
+                                                "message": "ok",
+                                                "payload": {
+                                                    "count": 10,
+                                                    "rows": [
+                                                        {
+                                                            "id": 12,
+                                                            "timeStart": "2023-10-19 10:00:00+03",
+                                                            "timeEnd": "2023-10-19 20:30:00+03",
+                                                            "method": "delivery",
+                                                            "order": {
+                                                                "id": 2,
+                                                                "status": "delivery",
+                                                                "totalPrice": 4000,
+                                                                "deposit": 0,
+                                                                "address": "улица Пушкина, дом Колотушкина",
+                                                                "latitude": "54.99928130973027",
+                                                                "longitude": "82.92137145996095",
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                          }
+
                                      /{deliveryId} (PATCH - to change status)
+                                     {
+                                        "status": "delivered"
+                                     } --> status response
+
                                      /create-route (POST - to build a route from deliveryman's deliveries)
+                                     -->
+                                     {
+                                         "status": 200,
+                                         "message": "ok",
+                                         "payload": {
+                                             "points": [
+                                                     {
+                                                         "lat": 54.99770587584445,
+                                                         "lon": 82.79502868652345
+                                                     },
+                                                     {
+                                                         "lat": 54.99928130973027,
+                                                         "lon": 82.92137145996095
+                                                     },
+                                                     {
+                                                         "lat": 55.04533538802211,
+                                                         "lon": 82.98179626464844
+                                                     },
+                                                     {
+                                                         "lat": 55.072470687600536,
+                                                         "lon": 83.04634094238281
+                                                     }
+                                                 ]
+                                         }
+                                     }
               /admin
-                    /deliveries-to-sort (GET all deliveries that are needed to be sorted)
+                    /cluster (POST - to make clustering)
+                    -->
+                        {
+                             "status": 200,
+                             "message": "ok",
+                             "payload": [
+                                {
+                                    "deliverymanId": 20,
+                                    "deliveries": [
+                                        {
+                                            "latitude": "213.123213122",
+                                            "longitude": "122.421412",
+                                            "deliveryId": 10
+                                        }
+                                    ]
+                                }
+                             ]
+                        }
+
+                    /deliveries-to-sort (GET all deliveries after clustering was done to sort by admin)
+                    --> {same as /cluster}
+
                     /change-delivery (PATCH - to change status of corresponding order of the delivery and maybe change deliveryman to it)
+                    {
+                        "deliverymanId": 10,
+                        "deliveryId": 2
+                    } --> status response
+
               /cart
                    / (GET - to get items from the cart)
+                        {
+                             "status": 200,
+                             "message": "ok",
+                             "payload": {
+                                "items": [
+                                    {
+                                        "id": 1,
+                                        "name": "Molotok",
+                                        "price": 1000,
+                                        "count": 2
+                                    }
+                                ]
+                             }
+                        }
+
                    / (POST - adds item with {itemId} with probably {count} to authorized user with {usedId})
+                   {
+                        "itemId": 21,
+                        "count": 2      <-- optional, by default == 1
+                   }
+
                    / (DELETE - decreases item (with {itemId}) number in cart by one or totally deletes item from the cart)
+                   {
+                        "itemId": 2,
+                   }
+
               /orders
+                     // TODO: GET all for Admin and for User
                      / (GET - get all orders for current user, maybe should add filter by status like query param ?status=)
-                     /{orderId} (GET)
+                     /{orderId} (GET - one order)
+                     -->
+                     {
+                        "id": 1,
+                        "status": "delivered",
+                        "totalPrice": 5000,
+                        "deposit": 0,
+                        "rentalPeriodStart": "2023-10-19 20:30:00+03",
+                        "rentalPeriodEnd": "2023-10-27 20:30:00+03",
+                        "address": "улица Пушкина, дом Колотушкина",
+                        "latitude": "54.99928130973027",
+                        "longitude": "82.92137145996095",
+                        "companyName": "",
+                        "createdAt": "2023-10-17 20:30:00+03",
+                        "items": [
+                                    {
+                                        "id": 1,
+                                        "name": "Molotok",
+                                        "price": 1000,
+                                        "count": 2
+                                    }
+                                 ]
+                     }
                      / (POST - creates new order and transfer all items from cart to this order)
+                     {
+                        "rentalPeriodStart": "2023-10-19 20:30:00+03",
+                        "rentalPeriodEnd": "2023-10-27 20:30:00+03",
+                        "address": "улица Пушкина, дом Колотушкина",
+                        "companyName": "SOME COMP INC.",
+                        "deliveryMethod": "by car",
+                        "deliveryTimeStart": "2023-10-18 20:30:00+03",
+                        "deliveryTimeEnd": "2023-10-19 20:30:00+03",
+                     } ---> status info, maybe with new order id
+
                      /cancel/{orderId} (POST - set status to "pending rejected", waits till admin do some stuff and then set status of order to rejected)
                      /status/{orderId} (PATCH - for ADMIN to change status)
                      /{orderId}/payment (GET, PATCH)

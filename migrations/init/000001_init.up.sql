@@ -1,7 +1,7 @@
 CREATE TABLE users
 (
     id                    SERIAL PRIMARY KEY,
-    fullName              VARCHAR            NOT NULL,
+    fullname              VARCHAR            NOT NULL,
     email                 VARCHAR(255) UNIQUE,
     phone_number          VARCHAR(20) UNIQUE NOT NULL,
     identification_number VARCHAR(20) UNIQUE,
@@ -11,7 +11,7 @@ CREATE TABLE users
     created_at            TIMESTAMP                   DEFAULT now()
 );
 
-CREATE TABLE delivery_men
+CREATE TABLE deliverymen
 (
     id                  SERIAL PRIMARY KEY,
     car_capacity        VARCHAR(255),
@@ -20,6 +20,23 @@ CREATE TABLE delivery_men
     car_id              VARCHAR(30),
     user_id             INTEGER NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+CREATE TABLE routes
+(
+    id             SERIAL PRIMARY KEY,
+    deliveryman_id INTEGER,
+    FOREIGN KEY (deliveryman_id) REFERENCES deliverymen (id) ON DELETE CASCADE
+);
+
+CREATE TABLE coordinates
+(
+    id              SERIAL PRIMARY KEY,
+    latitude        INTEGER NOT NULL,
+    longitude       INTEGER NOT NULL,
+    sequence_number INTEGER NOT NULL,
+    route_id        INTEGER NOT NULL,
+    FOREIGN KEY (route_id) REFERENCES routes (id) ON DELETE CASCADE
 );
 
 CREATE TABLE verifications
@@ -52,14 +69,14 @@ CREATE TABLE orders
 
 CREATE TABLE deliveries
 (
-    id              SERIAL PRIMARY KEY,
-    time_start      TIMESTAMP   NOT NULL,
-    time_end        TIMESTAMP   NOT NULL,
-    method          VARCHAR(50) NOT NULL,
-    order_id        INTEGER     NOT NULL,
-    delivery_man_id INTEGER,
+    id             SERIAL PRIMARY KEY,
+    time_start     TIMESTAMP   NOT NULL,
+    time_end       TIMESTAMP   NOT NULL,
+    method         VARCHAR(50) NOT NULL,
+    order_id       INTEGER     NOT NULL,
+    deliveryman_id INTEGER,
     FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE,
-    FOREIGN KEY (delivery_man_id) REFERENCES delivery_men (id) ON DELETE SET NULL
+    FOREIGN KEY (deliveryman_id) REFERENCES deliverymen (id) ON DELETE SET NULL
 );
 
 CREATE TABLE payments

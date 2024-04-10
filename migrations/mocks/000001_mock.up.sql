@@ -11,7 +11,7 @@ VALUES (100, 'Админ Админович', 'admin@gmail.com', '+79998887766',
        (103, 'User Usernamovich', 'user@gmail.com', '+72998887766', '345',
         '6e77446d383649393b4c6534287344564f61d67813c5a1818322c1cf96890b8b7934f97f', 'user');
 
-INSERT INTO delivery_men (car_capacity, working_hours_start, working_hours_end, car_id, user_id)
+INSERT INTO deliverymen (car_capacity, working_hours_start, working_hours_end, car_id, user_id)
 VALUES ('big', '10:00', '16:00', 'A123BC', 101),
        ('medium', '12:00', '20:00', 'X777XX', 102);
 
@@ -40,7 +40,7 @@ VALUES (56, 'to_delivery', 5343, 0, '2004-10-19 20:00:00+03', '2004-10-30 18:00:
        (63, 'to_delivery', 5343, 0, '2004-10-19 20:00:00+03', '2004-10-30 18:00:00+03', 'address', '54.837411',
         '83.112056', 'vd',  103);
 
-INSERT INTO deliveries (id, time_start, time_end, method, order_id, delivery_man_id)
+INSERT INTO deliveries (id, time_start, time_end, method, order_id, deliveryman_id)
 VALUES (101, '2004-10-19 10:00:00+03', '2004-10-19 12:00:00+03', 'car', 56, null),
        (102, '2004-10-19 13:00:00+03', '2004-10-19 15:00:00+03', 'car', 57, null),
        (103, '2004-10-19 16:00:00+03', '2004-10-19 18:00:00+03', 'car', 58, null),

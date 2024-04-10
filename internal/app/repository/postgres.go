@@ -7,7 +7,7 @@ import (
 
 const (
 	usersTable              = "users"
-	deliverymanTable        = "delivery_men"
+	deliverymanTable        = "deliverymen"
 	verificationsTable      = "verifications"
 	ordersTable             = "orders"
 	deliveriesTable         = "deliveries"

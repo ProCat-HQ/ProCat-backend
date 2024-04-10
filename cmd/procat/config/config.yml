@@ -4,6 +4,6 @@ log_level: "debug"
 db:
   username: "postgres"
   host: "localhost"
-  port: "6789"
+  port: "4321"
   name: "postgres"
   sslmode: "disable"
