@@ -633,22 +633,108 @@ localhost/
                             "image": "somefile"
                         }
                     ]
+               } -->
+               {
+                    "status": 200,
+                    "message": "ok",
+                    "payload": {
+                        "id": 102,
+                    }
                }
 
                /stock
-                     /{itemId} (POST - to create stock in some {storeId})
-                     /{itemId} (PATCH - to update stock in some {storeId} (when updating here, "inStock" field of item updates))
+                     /{itemId} (PUT - creates stock in some {storeId} or changes stock if relation exists)
+                      {
+                         "storeId": 2,
+                         "inStockNumber": 20,
+                      } --> status response
+
                /infos
                     /{itemId} (POST - add array of characteristics)
+                    {
+                        "info": [
+                            {
+                                "name": "blaBla",
+                                "description": "text"
+                            }
+                        ]
+                    } --> status response
+
                     /{itemId} (DELETE - delete infos with ids in array (array provided in body))
-                    /{itemId} (PUT - array with new data and ids which will be changed)
+                    {
+                        "info": [
+                            {
+                                "id": 1
+                            }
+                        ]
+                    } --> status response
+
+                    /{itemId} (PATCH - array with new data and ids which will be changed)
+                    {
+                        "info": [
+                            {
+                                "id": 1,
+                                "name": "blaBla",
+                                "description": "text"
+                            }
+                        ]
+                    } --> status response
                /images
-                    /{itemId} (POST)
-                    /{itemId} (DELETE)
-                    /{itemId} (PATCH)
+                    /{itemId} (POST - to add images to item)
+                                                                // TODO: idk how to upload images in a proper way
+                    {
+                        "images": [
+                            {
+                                "image": "somefile"
+                            }
+                        ]
+                    } --> status response
+
+                    /{itemId} (DELETE - deletes images with certain ids)
+                    {
+                        "images": [
+                            {
+                                "id": 1
+                            }
+                        ]
+                    } --> status response
 
          /stores
                 / (GET - to get all stores)
+                -->
+                {
+                    "status": 200,
+                    "message: "ok",
+                    "payload": {
+                        "stores": [
+                            {
+                                "id": 1,
+                                "name": "ProCat store #1",
+                                "address": "Some address",
+                                "latitude": "123.32131",
+                                "longitude": "123.32131",
+                                "workingHoursStart": "8:00",
+                                "workingHoursEnd": "20:00",
+                            }
+                        ]
+                    }
+                }
+
                 / (POST - creates new store and finds it's coordinates according to the address)
-                /{storeId} (DELETE)
-                /{storeId} (PATCH)
+                {
+                    "name": "ProCat store #1",
+                    "address": "Some address",
+                    "workingHoursStart": "8:00",
+                    "workingHoursEnd": "20:00",
+                }
+
+                /{storeId} (DELETE) --> status response
+
+                /{storeId} (PATCH - updates latLon if address changes)
+                all fields are optional
+                {
+                    "name": "ProCat store #1",
+                    "address": "Some address",
+                    "workingHoursStart": "8:00",
+                    "workingHoursEnd": "20:00",
+                }
