@@ -82,7 +82,7 @@ CREATE TABLE deliveries
 CREATE TABLE payments
 (
     id         SERIAL PRIMARY KEY,
-    is_paid    BOOLEAN     NOT NULL DEFAULT FALSE,
+    paid       INTEGER     NOT NULL DEFAULT 0,
     method     VARCHAR(50) NOT NULL,
     price      INTEGER     NOT NULL,
     created_at TIMESTAMP            DEFAULT now(),
@@ -189,7 +189,7 @@ CREATE TABLE subscriptions_items
     subscription_id INTEGER NOT NULL,
     item_id         INTEGER,
     FOREIGN KEY (subscription_id) REFERENCES subscriptions (id) ON DELETE CASCADE,
-    FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE SET NULL
+    FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE
 );
 
 CREATE TABLE notifications

@@ -54,7 +54,7 @@ type DeliveryAndOrder struct {
 
 type Payment struct {
 	Id        int       `json:"id"`
-	IsPaid    bool      `json:"isPaid"`
+	Paid      int       `json:"paid"`
 	Method    string    `json:"method"`
 	Price     int       `json:"price"`
 	CreatedAt time.Time `json:"createdAt"`
