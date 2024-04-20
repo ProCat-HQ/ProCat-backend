@@ -119,17 +119,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
         400:
           description: Invalid ID supplied
         404:
@@ -140,19 +130,18 @@ paths:
       tags:
         - user
       summary: phoneNumber + password
-      parameters:
-        - name: phoneNumber
-          in: query
-          description: The user phone number for login
-          required: false
-          schema:
-            type: string
-        - name: password
-          in: query
-          description: The password for login in clear text
-          required: false
-          schema:
-            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phoneNumber:
+                  type: string
+                  example: +79000000000
+                password:
+                  type: string
+                  example: kvmkd5lskdm
       responses:
         200:
           description: successful operation
@@ -178,26 +167,21 @@ paths:
     post:
       tags:
         - user
-      summary: fullName + phoneNumber + password
-      parameters:
-        - name: fullName
-          in: query
-          description: The user name for login
-          required: false
-          schema:
-            type: string
-        - name: phoneNumber
-          in: query
-          description: The user phone number for login
-          required: false
-          schema:
-            type: string
-        - name: password
-          in: query
-          description: The password for login in clear text
-          required: false
-          schema:
-            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullName:
+                  type: string
+                  example: Name Surname
+                phoneNumber:
+                  type: string
+                  example: +79000000000
+                password:
+                  type: string
+                  example: 56354dfs
       responses:
         200:
           description: successful operation
@@ -224,317 +208,222 @@ paths:
       tags:
         - verification
       summary: creates new verification code for certain user and his existing info with {type}
-      parameters:
-        - name: type
-          in: query
-          description: type of data for verification
-          required: true
-          schema:
-            type: string
-            example: password
-            enum:
-              - password
-              - phone
-              - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  example: password
+                  enum:
+                    - password
+                    - phone
+                    - email
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
 
   /users//verification/check:
     post:
       tags:
         - verification
       summary: checks whether code matches or not + check on lifetime of code if all is well then update user info, otherwise - user can try again if code lifetime is still available
-      parameters:
-        - name: code
-          in: query
-          required: true
-          schema:
-            type: string
-            example: 123sda
-        - name: type
-          in: query
-          description: type of data for verification
-          required: true
-          schema:
-            type: string
-            example: password
-            enum:
-              - password
-              - phone
-              - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  example: 123dxc
+                type:
+                  type: string
+                  example: password
+                  enum:
+                    - password
+                    - phone
+                    - email
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
   /users/verification/iin:
     post:
       tags:
         - verification
       summary: additional endpoint, because this functionality will be used in {users/orders/POST} handler
-      parameters:
-        - name: code
-          in: query
-          required: true
-          description: code for verification
-          schema:
-            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                iin:
+                  type: string
+                  example: 760724300757
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
   /users/change/iin-bin:
     post:
       tags:
         - userSettings
       summary: check on iin correctness and matching with full name
-      parameters:
-        - name: password
-          in: query
-          required: true
-          schema:
-            type: string
-            example: "12365478"
-        - name: iin-bin
-          in: query
-          required: true
-          description: new iin-bin
-          schema:
-            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: 12345678
+                iin-bin:
+                  type: string
+                  example: 68845645778
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
 
   /users/change/fullname:
     post:
       tags:
         - userSettings
       summary: if success, then iin-bin := null, and it's needed to be filled
-      parameters:
-        - name: password
-          in: query
-          required: true
-          schema:
-            type: string
-            example: "12365478"
-        - name: fullName
-          in: query
-          required: true
-          description: new full name
-          schema:
-            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: 12345678
+                fullName:
+                  type: string
+                  example: Name Surname
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
   /users/change/password:
     post:
       tags:
         - userSettings
       summary: check if old passwords match, then send confirmation code on current number
-      parameters:
-        - name: oldPassword
-          in: query
-          required: true
-          schema:
-            type: string
-            example: "12365478"
-        - name: newPassword
-          in: query
-          required: true
-          description: new password
-          schema:
-            type: string
-
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                oldPassword:
+                  type: string
+                  example: 12345678
+                newPassword:
+                  type: string
+                  example: 87654321
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
 
   /users/change/phone:
     post:
       tags:
         - userSettings
       summary: check password and send confirmation code on new number
-      parameters:
-        - name: password
-          in: query
-          required: true
-          schema:
-            type: string
-            example: "12365478"
-        - name: phone
-          in: query
-          required: true
-          description: new phone
-          schema:
-            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: 12345678
+                phone:
+                  type: string
+                  example: +79000000000
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
   /users/change/email:
     post:
       tags:
         - userSettings
       summary: check password and send confirmation code on new email
-      parameters:
-        - name: password
-          in: query
-          required: true
-          schema:
-            type: string
-            example: "12365478"
-        - name: email
-          in: query
-          required: true
-          description: new email
-          schema:
-            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: 12345678
+                email:
+                  type: string
+                  example: example@mail.ru
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
   /users/change/role/{userId}:
     patch:
       tags:
         - admin
       summary: change role
-      parameters:
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: integer
-        - name: role
-          in: query
-          required: true
-          description: new role
-          schema:
-            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: integer
+                  example: 12
+                role:
+                  type: string
+                  example: new role
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
   /users/deliverymen:
     get:
       tags:
@@ -658,31 +547,25 @@ paths:
         - admin
         - delivery
       summary: create new deliveryman
-      parameters:
-        - name: carCapacity
-          in: query
-          required: true
-          schema:
-            type: string
-            example: big
-        - name: workingHoursStart
-          in: query
-          required: true
-          schema:
-            type: string
-            example: 8:00
-        - name: workingHoursEnd
-          in: query
-          required: true
-          schema:
-            type: string
-            example: 16:00
-        - name: carId
-          in: query
-          required: true
-          schema:
-            type: string
-            example: HT236O154
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                carCapacity:
+                  type: string
+                  example: big
+                workingHoursStart:
+                  type: string
+                  example: 8:00
+                workingHoursEnd:
+                  type: string
+                  example: 16:00
+                carId:
+                  type: string
+                  example: HT236O154
+        required: true
       responses:
         200:
           description: successful operation
@@ -707,77 +590,51 @@ paths:
       tags:
         - admin
       summary: to change data
-      parameters:
-        - name: carCapacity
-          in: query
-          required: false
-          schema:
-            type: string
-            example: big
-        - name: workingHoursStart
-          in: query
-          required: false
-          schema:
-            type: string
-            example: 8:00
-        - name: workingHoursEnd
-          in: query
-          required: false
-          schema:
-            type: string
-            example: 16:00
-        - name: carId
-          in: query
-          required: false
-          schema:
-            type: string
-            example: HT236O154
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                carCapacity:
+                  type: string
+                  example: big
+                workingHoursStart:
+                  type: string
+                  example: 8:00
+                workingHoursEnd:
+                  type: string
+                  example: 16:00
+                carId:
+                  type: string
+                  example: HT236O154
+        required: false
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
   /users/deliverymen/{deliverymanId}:
+    parameters:
+      - name: deliverymanId
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 858
     delete:
       tags:
         - admin
       summary: to delete deliveryman
-      parameters:
-        - name: deliverymanId
-          in: path
-          required: true
-          schema:
-            type: integer
-            example: 858
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
   /users/deliverymen/deliveries:
     get:
       tags:
@@ -868,51 +725,44 @@ paths:
                         items:
                           $ref: '#/components/schemas/Delivery'
   /users/deliverymen/deliveries/{deliveryId}:
+    parameters:
+      - name: deliveryId
+        in: path
+        required: true
+        schema:
+          type: integer
     patch:
       tags:
         - delivery
       summary: change status
-      parameters:
-        - name: deliveryId
-          in: path
-          required: true
-          schema:
-            type: integer
-        - name: newStatus
-          in: query
-          required: true
-          schema:
-            type: string
-            example: delivered
-            enum:
-              - pendingConfirmation
-              - pendingRejected
-              - rejected
-              - needsRevision
-              - awaitingPayment
-              - accepted
-              - readyToDelivery
-              - delivering
-              - readyForPickup
-              - received
-              - closed
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: delivered
+                  enum:
+                    - pendingConfirmation
+                    - pendingRejected
+                    - rejected
+                    - needsRevision
+                    - awaitingPayment
+                    - accepted
+                    - readyToDelivery
+                    - delivering
+                    - readyForPickup
+                    - received
+                    - closed
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
   /users/deliverymen/deliveries/create-route:
     post:
       tags:
@@ -1035,34 +885,25 @@ paths:
       tags:
         - admin
       summary: change status of corresponding order of the delivery and maybe change deliveryman to it
-      parameters:
-        - name: deliveryId
-          in: query
-          required: true
-          schema:
-            type: integer
-        - name: deliveryMan
-          in: query
-          required: false
-          schema:
-            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deliveryId:
+                  type: integer
+                  example: 564
+                deliveryManId:
+                  type: integer
+                  example: 58
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
   /users/cart:
     get:
       tags:
@@ -1093,68 +934,46 @@ paths:
       tags:
         - cart
       summary: adds item with {itemId} with probably {count} to authorized user with {usedId}
-      parameters:
-        - name: itemID
-          in: query
-          required: true
-          description: new item
-          schema:
-            type: integer
-            example: 32
-        - name: count
-          in: query
-          required: false
-          description: count
-          schema:
-            type: integer
-            example: 2
-            default: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                itemID:
+                  type: integer
+                  example: 32
+                count:
+                  type: integer
+                  example: 2
+                  default: 1
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
     delete:
       tags:
         - cart
       summary: decreases item (with {itemId}) number in cart by one or totally deletes item from the cart
-      parameters:
-        - name: itemId
-          in: query
-          required: true
-          description: item id
-          schema:
-            type: integer
-            example: 31
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                itemID:
+                  type: integer
+                  example: 32
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
   /users/orders:
     get:
       tags:
@@ -1238,56 +1057,33 @@ paths:
       tags:
         - order
       summary: creates new order and transfer all items from cart to this order
-      parameters:
-        - name: rentalPeriodStart
-          in: query
-          required: true
-          description: order id
-          schema:
-            type: string
-            example: 2023-10-19 20:30:00+03
-        - name: rentalPeriodEnd
-          in: query
-          required: true
-          description: order id
-          schema:
-            type: string
-            example: 2023-10-27 20:30:00+03
-        - name: address
-          in: query
-          required: true
-          description: order id
-          schema:
-            type: string
-            example: ул. Пушкина д. 7 кв. 587
-        - name: companyName
-          in: query
-          required: false
-          description: order id
-          schema:
-            type: string
-            example: SOME COMP INC.
-        - name: deliveryMethod
-          in: query
-          required: true
-          description: order id
-          schema:
-            type: string
-            example: by car
-        - name: deliveryTimeStart
-          in: query
-          required: false
-          description: order id
-          schema:
-            type: string
-            example: 2023-10-18 18:00:00+03
-        - name: deliveryTimeEnd
-          in: query
-          required: false
-          description: order id
-          schema:
-            type: string
-            example: 2023-10-18 20:00:00+03
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rentalPeriodStart:
+                  type: string
+                  example: 2023-10-19 20:30:00+03
+                rentalPeriodEnd:
+                  type: string
+                  example: 2023-10-27 20:30:00+03
+                address:
+                  type: string
+                  example: ул. Пушкина д. 7 кв. 587
+                companyName:
+                  type: string
+                  example: SOME COMP INC.
+                deliveryMethod:
+                  type: string
+                  example: by car
+                deliveryTimeStart:
+                  type: string
+                  example: 2023-10-18 18:00:00+03
+                deliveryTimeEnd:
+                  type: string
+                  example: 2023-10-18 20:00:00+03
       responses:
         default:
           description: successful operation
@@ -1310,34 +1106,24 @@ paths:
                         example: 45
 
   /users/orders/cancel/{orderId}:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 54
     post:
       tags:
         - orders
       summary: set status to "pending rejected", waits till admin do some stuff and then set status of order to "rejected"
-      parameters:
-        - name: orderId
-          in: path
-          required: true
-          schema:
-            type: integer
-            example: 54
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
   /users/status/{orderId}:
     parameters:
       - name: orderId
@@ -1350,41 +1136,33 @@ paths:
       tags:
         - admin
       summary: for ADMIN to change status
-      parameters:
-        - name: status
-          in: query
-          required: true
-          schema:
-            type: string
-            enum:
-              - pendingConfirmation
-              - pendingRejected
-              - rejected
-              - needsRevision
-              - awaitingPayment
-              - accepted
-              - readyToDelivery
-              - delivering
-              - readyForPickup
-              - received
-              - closed
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - pendingConfirmation
+                    - pendingRejected
+                    - rejected
+                    - needsRevision
+                    - awaitingPayment
+                    - accepted
+                    - readyToDelivery
+                    - delivering
+                    - readyForPickup
+                    - received
+                    - closed
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
 
   /users/orders/payment/{orderId}:
     get:
@@ -1437,48 +1215,38 @@ paths:
                               type: string
                               example: 2023-10-19 10:23:54+03
   /users/orders/payment/{paymentId}:
+    parameters:
+      - name: paymentId
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 56
     patch:
       tags:
         - payment
       summary: update payment info (for deliveryman (maybe ADMIN?) or higher)
-      parameters:
-        - name: paymentId
-          in: path
-          required: true
-          schema:
-            type: integer
-            example: 56
-        - name: paid
-          in: query
-          required: true
-          schema:
-            type: integer
-            example: 1000
-        - name: method
-          in: query
-          required: true
-          schema:
-            type: string
-            enum:
-              - cash
-              - kaspi
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                paid:
+                  type: integer
+                  example: 1000
+                method:
+                  type: string
+                  enum:
+                    - cash
+                    - kaspi
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
   /users/subscriptions:
     get:
       tags:
@@ -1530,58 +1298,40 @@ paths:
       tags:
         - subscriptions
       summary: add {itemId} to subs
-      parameters:
-        - name: itemId
-          in: query
-          required: true
-          schema:
-            type: integer
-            example: 459
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                itemId:
+                  type: integer
+                  example: 459
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
   /users/subscriptions/{subscriptionId}:
+    parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 89
     delete:
       tags:
         - subscriptions
-      parameters:
-        - name: subscriptionId
-          in: path
-          required: true
-          schema:
-            type: integer
-            example: 89
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
   /users/notifications:
     get:
       tags:
@@ -1608,59 +1358,49 @@ paths:
                         items:
                           $ref: '#/components/schemas/Notification'
   /users/notifications/{userId}:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 848
     post:
       tags:
         - admin
         - notifications
       summary: send notification to user
-      parameters:
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: integer
-            example: 848
-        - name: title
-          in: query
-          required: true
-          schema:
-            type: string
-            example: Hello
-        - name: description
-          in: query
-          required: true
-          schema:
-            type: string
-            example: It's me!!!
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: Hello
+                description:
+                  type: string
+                  example: It's me!!!
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
   /users/notifications/{notificationId}:
+    parameters:
+      - name: notificationId
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 56
     patch:
       tags:
         - notifications
       summary: patch is because this will change "isViewed" DB field) to open notification body
-      parameters:
-        - name: notificationId
-          in: path
-          required: true
-          schema:
-            type: integer
-            example: 56
       responses:
         200:
           description: successful operation
@@ -1681,30 +1421,13 @@ paths:
       tags:
         - admin
         - notifications
-      parameters:
-        - name: notificationId
-          in: path
-          required: true
-          schema:
-            type: integer
-            example: 789
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
   /categories/{categoryId}:
     parameters:
       - name: categoryId
@@ -1717,30 +1440,22 @@ paths:
       tags:
         - categories
       summary: create category with parent id equals to{categoryId}, 0 - root category
-      parameters:
-        - name: name
-          in: query
-          required: true
-          schema:
-            type: string
-            example: name
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: name
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
     get:
       tags:
         - categories
@@ -1770,42 +1485,34 @@ paths:
       tags:
         - categories
       summary: edit name
-      parameters:
-        - name: name
-          in: query
-          required: true
-          schema:
-            type: string
-            example: new name
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: new name
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
   /categories/route/{categoryId}:
+    parameters:
+      - name: categoryId
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 547
     get:
       tags:
         - categories
       summary: get category route
-      parameters:
-        - name: categoryId
-          in: path
-          required: true
-          schema:
-            type: integer
-            example: 547
       responses:
         200:
           description: successful operation
@@ -1897,8 +1604,6 @@ paths:
                       image:
                         type: string
                         example: pic.jpg
-
-
   /items/{itemId}:
     parameters:
       - name: itemId
@@ -1936,104 +1641,66 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
     patch:
       tags:
         - admin
         - items
-      parameters:
-        - name: name
-          in: query
-          required: false
-          schema:
-            type: string
-            example: Новое имя
-        - name: description
-          in: query
-          required: false
-          schema:
-            type: string
-            example: Новое описание
-        - name: price
-          in: query
-          required: false
-          schema:
-            type: integer
-            example: 2500
-        - name: categoryId
-          in: query
-          required: false
-          schema:
-            type: integer
-            example: 0
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Новое имя
+                description:
+                  type: string
+                  example: Новое описание
+                price:
+                  type: integer
+                  example: 2500
+                categoryId:
+                  type: integer
+                  example: 0
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
     post:
       tags:
         - admin
         - items
       summary: for ADMIN, only for main info, another field will be filled by another requests
-      parameters:
-        - name: name
-          in: query
-          required: true
-          schema:
-            type: string
-            example: Новое имя
-        - name: description
-          in: query
-          required: true
-          schema:
-            type: string
-            example: Новое описание
-        - name: price
-          in: query
-          required: true
-          schema:
-            type: integer
-            example: 2500
-        - name: categoryId
-          in: query
-          required: true
-          schema:
-            type: integer
-            example: 0
-        - name: images
-          in: query
-          required: false
-          schema:
-            type: array
-            items:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
               properties:
-                image:
+                name:
                   type: string
-                  example: image.jpg
-
+                  example: Новое имя
+                description:
+                  type: string
+                  example: Новое описание
+                price:
+                  type: integer
+                  example: 2500
+                categoryId:
+                  type: integer
+                  example: 0
+                images:
+                  type: array
+                  items:
+                    properties:
+                      image:
+                        type: string
+                        example: image.jpg
       responses:
         200:
           description: successful operation
@@ -2066,36 +1733,25 @@ paths:
       tags:
         - items
       summary: creates stock in some {storeId} or changes stock if relation exists
-      parameters:
-        - name: storeId
-          in: query
-          required: true
-          schema:
-            type: integer
-            example: 524
-        - name: inStockNumber
-          in: query
-          required: true
-          schema:
-            type: integer
-            example: 5
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                storeId:
+                  type: integer
+                  example: 524
+                inStockNumber:
+                  type: integer
+                  example: 5
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
   /items/infos/{itemId}:
     parameters:
       - name: itemId
@@ -2108,107 +1764,84 @@ paths:
       tags:
         - items
       summary: add array of characteristics
-      parameters:
-        - name: info
-          in: query
-          required: true
-          schema:
-            type: array
-            items:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
               properties:
-                name:
-                  type: string
-                  example: name
-                description:
-                  type: string
-                  example: description
+                info:
+                  type: array
+                  items:
+                    properties:
+                      name:
+                        type: string
+                        example: name
+                      description:
+                        type: string
+                        example: description
+        required: true
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
     delete:
       tags:
         - items
       summary: delete infos with ids in array (array provided in body)
-      parameters:
-        - name: info
-          in: query
-          required: true
-          schema:
-            type: array
-            items:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
               properties:
-                id:
-                  type: integer
-                  example: 56
+                info:
+                  type: array
+                  items:
+                    properties:
+                      id:
+                        type: integer
+                        example: 56
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
     patch:
       tags:
         - items
       summary: array with new data and ids which will be changed
-      parameters:
-        - name: info
-          in: query
-          required: true
-          schema:
-            type: array
-            items:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
               properties:
-                id:
-                  type: integer
-                  example: 56
-                name:
-                  type: string
-                  example: name
-                description:
-                  type: string
-                  example: description
+                info:
+                  type: array
+                  items:
+                    properties:
+                      id:
+                        type: integer
+                        example: 56
+                      name:
+                        type: string
+                        example: name
+                      description:
+                        type: string
+                        example: description
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
   /items/images/{itemId}:
     parameters:
       - name: itemId
@@ -2221,67 +1854,51 @@ paths:
       tags:
         - items
       summary: to add images to item
-      parameters:
-        - name: images
-          in: query
-          required: true
-          schema:
-            type: array
-            items:
+      requestBody:
+        content:
+          application/json:
+            schema:
               type: object
               properties:
-                image:
-                  type: string
-                  example: h.jpg
+                images:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      image:
+                        type: string
+                        example: h.jpg
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
     delete:
       tags:
         - items
       summary: deletes images with certain ids
-      parameters:
-        - name: images
-          in: query
-          required: true
-          schema:
-            type: array
-            items:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
               properties:
-                id:
-                  type: integer
-                  example: 5
+                images:
+                  type: array
+                  items:
+                    properties:
+                      id:
+                        type: integer
+                        example: 5
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
   /stores:
     get:
       tags:
@@ -2330,31 +1947,24 @@ paths:
       tags:
         - stores
       summary: creates new store and finds it's coordinates according to the address
-      parameters:
-        - name: name
-          in: query
-          required: true
-          schema:
-            type: string
-            example: name
-        - name: address
-          in: query
-          required: true
-          schema:
-            type: string
-            example: name
-        - name: workingHoursStart
-          in: query
-          required: true
-          schema:
-            type: string
-            example: 8:00
-        - name: workingHoursEnd
-          in: query
-          required: true
-          schema:
-            type: string
-            example: 20:00
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: name
+                address:
+                  type: string
+                  example: name
+                workingHoursStart:
+                  type: string
+                  example: 8:00
+                workingHoursEnd:
+                  type: string
+                  example: 20:00
       responses:
         200:
           description: successful operation
@@ -2387,48 +1997,31 @@ paths:
       tags:
         - stores
       summary: updates latLon if address changes
-      parameters:
-        - name: name
-          in: query
-          required: false
-          schema:
-            type: string
-            example: name
-        - name: address
-          in: query
-          required: false
-          schema:
-            type: string
-            example: name
-        - name: workingHoursStart
-          in: query
-          required: false
-          schema:
-            type: string
-            example: 8:00
-        - name: workingHoursEnd
-          in: query
-          required: false
-          schema:
-            type: string
-            example: 20:00
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: name
+                address:
+                  type: string
+                  example: name
+                workingHoursStart:
+                  type: string
+                  example: 8:00
+                workingHoursEnd:
+                  type: string
+                  example: 20:00
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
     delete:
       tags:
         - stores
@@ -2438,17 +2031,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: string
-                    example: ""
+                $ref: '#/components/schemas/StatusCode200'
 components:
   schemas:
     User:
@@ -2732,3 +2315,16 @@ components:
         created_at:
           format: date-time
           example: 2023-10-19 12:00:00+03
+
+    StatusCode200:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: ok
+        payload:
+          type: string
+          example:
