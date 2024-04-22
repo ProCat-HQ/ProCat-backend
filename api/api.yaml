@@ -962,15 +962,13 @@ paths:
       tags:
         - cart
       summary: decreases item (with {itemId}) number in cart by one or totally deletes item from the cart
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                itemID:
-                  type: integer
-                  example: 32
+      parameters:
+        - name: itemID
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 45
       responses:
         200:
           description: successful operation
@@ -1796,19 +1794,22 @@ paths:
       tags:
         - items
       summary: delete infos with ids in array (array provided in body)
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                info:
-                  type: array
-                  items:
-                    properties:
-                      id:
-                        type: integer
-                        example: 56
+      parameters:
+        - name: tags
+          in: query
+          required: false
+          description: One or more tags
+          schema:
+            type: array
+            items:
+             type: integer
+          explode: false
+          style: form
+          examples:
+            oneTag:
+              value: [ 52 ]
+            multipleTags:
+              value: [ 52, 85, 45 ]
       responses:
         200:
           description: successful operation
@@ -1883,19 +1884,22 @@ paths:
       tags:
         - items
       summary: deletes images with certain ids
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                images:
-                  type: array
-                  items:
-                    properties:
-                      id:
-                        type: integer
-                        example: 5
+      parameters:
+        - name: images
+          in: query
+          required: false
+          description: One or more tags
+          schema:
+            type: array
+            items:
+              type: string
+          explode: false
+          style: form
+          examples:
+            oneTag:
+              value: [ 'pic1.jpg' ]
+            multipleTags:
+              value: [ 'pic2.jpg', 'pic5.jpg', 'pic8.jpg' ]
       responses:
         200:
           description: successful operation
