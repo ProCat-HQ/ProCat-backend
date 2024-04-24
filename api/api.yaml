@@ -475,18 +475,18 @@ paths:
                               type: integer
                               format: int64
                               example: 125
-                            car_capacity:
+                            carCapacity:
                               type: string
                               example: 4?
-                            working_hours_start:
+                            workingHoursStart:
                               type: string
                               format: time
                               example: 08:00
-                            working_hours_end:
+                            workingHoursEnd:
                               type: string
                               format: time
                               example: 16:00
-                            car_id:
+                            carId:
                               type: string
                               example: P425YB154
                             fullName:
@@ -1593,10 +1593,10 @@ paths:
                       price:
                         type: integer
                         example: 3000
-                      is_in_stock:
+                      isInStock:
                         type: boolean
                         example: true
-                      category_id:
+                      categoryId:
                         type: integer
                         format: int64
                         example: 58
@@ -2055,7 +2055,7 @@ components:
         email:
           type: string
           example: vadim@mail.ru
-        phone_number:
+        phoneNumber:
           type: string
           example: +79856523652
         identificationNumber:
@@ -2118,10 +2118,10 @@ components:
         longitude:
           type: string
           example: 82.994966
-        company_name:
+        companyName:
           type: string
           example: Строим с радостью
-        created_at:
+        createdAt:
           type: string
           format: date-time
           example: 2023-10-19 10:00:00+03
@@ -2155,11 +2155,11 @@ components:
           type: integer
           format: int64
           example: 523
-        time_start:
+        timeStart:
           type: string
           format: date-time
           example: 2023-10-19 10:00:00+03
-        time_end:
+        timeEnd:
           type: string
           format: date-time
           example: 2023-10-19 12:00:00+03
@@ -2188,7 +2188,7 @@ components:
                 - readyForPickup
                 - received
                 - closed
-            total_price:
+            totalPrice:
               type: integer
               example: 5000
             address:
@@ -2211,7 +2211,7 @@ components:
         name:
           type: string
           example: Категория
-        parent_id:
+        parentId:
           type: integer
           format: int64
           example: 52
@@ -2232,10 +2232,10 @@ components:
         price:
           type: integer
           example: 3000
-        is_in_stock:
+        isInStock:
           type: boolean
           example: true
-        category_id:
+        categoryId:
           type: integer
           format: int64
           example: 58
@@ -2320,7 +2320,7 @@ components:
         isViewed:
           type: boolean
           example: true
-        created_at:
+        createdAt:
           format: date-time
           example: 2023-10-19 12:00:00+03
 
