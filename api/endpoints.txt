@@ -1,6 +1,6 @@
 localhost/
          /users
-              / (GET - to get all, {limit, page, role})
+              / (GET - to get all, {limit, page, role, isConfirmed})
               -->
                   {
                     "status": 200,
@@ -12,9 +12,9 @@ localhost/
                                   "id": 848,
                                   "fullName": "Вадимов Вадим Вадимович",
                                   "email": "vadim@mail.ru",
-                                  "phone_number": "79856523652",
-                                  "identification_number": "760724300757",
-                                  "is_confirmed": true,
+                                  "phoneNumber": "79856523652",
+                                  "identificationNumber": "760724300757",
+                                  "isConfirmed": true,
                                   "role": "user",
                                   "createdAt": "2023-10-19 10:23:54+03"
                             }
@@ -30,9 +30,9 @@ localhost/
                                      "id": 848,
                                      "fullName": "Вадимов Вадим Вадимович",
                                      "email": "vadim@mail.ru",
-                                     "phone_number": "79856523652",
-                                     "identification_number": "760724300757",
-                                     "is_confirmed": true,
+                                     "phoneNumber": "79856523652",
+                                     "identificationNumber": "760724300757",
+                                     "isConfirmed": true,
                                      "role": "user",
                                      "createdAt": "2023-10-19 10:23:54+03"
                       }
