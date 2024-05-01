@@ -20,7 +20,7 @@ dockerRun:
 dockerExec:
 	docker exec -it $(ID) sh
 
-# to run on some hosting
+# for deployment
 .PHONY: dockerCompose
 dockerCompose:
 	docker compose up --build -d
@@ -39,6 +39,6 @@ migration:
 
 .PHONY: migrationUpDownUp
 migrationUpDownUp:
-	make migration up 1; make migrationDown down 1; make migration up 1
+	make migration up 1; make migration down 1; make migration up 1
 
 .DEFAULT_GOAL := build
