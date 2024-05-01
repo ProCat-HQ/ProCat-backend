@@ -18,7 +18,7 @@ func (a *AdminPostgres) GetDeliveries() ([]model.DeliveryAndOrder, []model.Deliv
 	query := fmt.Sprintf(`SELECT d.id, d.time_start, d.time_end, d.method, o.address, o.latitude, o.longitude, d.order_id, d.deliveryman_id
 								 FROM %s d INNER JOIN %s o ON d.order_id = o.id WHERE o.status = $1`, deliveriesTable, ordersTable)
 
-	queryDeliveryMan := fmt.Sprintf(`SELECT id, car_capacity, working_hours_start, working_hours_end  FROM delivery_men`)
+	queryDeliveryMan := fmt.Sprintf(`SELECT id, car_capacity, working_hours_start, working_hours_end  FROM %s`, deliverymanTable)
 
 	var deliveries []model.DeliveryAndOrder
 	var deliverymen []model.DeliveryMan
@@ -33,7 +33,7 @@ func (a *AdminPostgres) GetDeliveries() ([]model.DeliveryAndOrder, []model.Deliv
 }
 
 func (a *AdminPostgres) SetDeliveries(answerMap map[model.Point]int) error {
-	query := fmt.Sprintf(`UPDATE %s SET delivery_man_id = $1 WHERE id = $2`, deliveriesTable)
+	query := fmt.Sprintf(`UPDATE %s SET deliveryman_id = $1 WHERE id = $2`, deliveriesTable)
 	for point, deliverymanId := range answerMap {
 		if _, err := a.db.Exec(query, deliverymanId, point.DeliveryId); err != nil {
 			return err

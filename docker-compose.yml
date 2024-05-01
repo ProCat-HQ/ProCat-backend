@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  procat-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: procat-server
+    restart: unless-stopped
+    depends_on:
+      - procat-db
+    ports:
+      - "${BIND_ADDR}:${BIND_ADDR}"
+    networks:
+      - appnet
+      - internet
+
+  procat-db:
+    image: postgres
+    container_name: procat-db
+    restart: unless-stopped
+    volumes:
+      - procat_db_tmp:/var/lib/postgresql/data
+    ports:
+      - "2200:${DB_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    command: -p ${DB_PORT}
+    networks:
+      - appnet
+
+volumes:
+  procat_db_tmp:
+
+networks:
+  internet:
+    name: internet
+    driver: bridge
+  appnet:
+    name: appnet
+    driver: bridge

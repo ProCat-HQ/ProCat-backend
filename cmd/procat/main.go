@@ -10,7 +10,6 @@ import (
 	"github.com/procat-hq/procat-backend/internal/app/server"
 	"github.com/procat-hq/procat-backend/internal/app/service"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"net/http"
 	"os"
 	"os/signal"
@@ -20,21 +19,17 @@ import (
 func main() {
 	logrus.SetFormatter(new(logrus.JSONFormatter))
 
-	if err := initConfig(); err != nil {
-		logrus.Fatalf("Error while reading configs %s", err.Error())
-	}
-
 	if err := godotenv.Load(); err != nil {
 		logrus.Fatalf("Error while loading .env file: %s", err.Error())
 	}
 
 	db, err := repository.NewPostgresDB(repository.Config{
-		Host:     viper.GetString("db.host"),
-		Port:     viper.GetString("db.port"),
-		Username: viper.GetString("db.username"),
+		Host:     os.Getenv("DB_HOST"),
+		Port:     os.Getenv("DB_PORT"),
+		Username: os.Getenv("DB_USERNAME"),
 		Password: os.Getenv("DB_PASSWORD"),
-		DBName:   viper.GetString("db.name"),
-		SSLMode:  viper.GetString("db.sslmode"),
+		DBName:   os.Getenv("DB_NAME"),
+		SSLMode:  os.Getenv("DB_SSLMODE"),
 	})
 
 	if err != nil {
@@ -46,7 +41,7 @@ func main() {
 	handlers := handler.NewHandler(services)
 
 	srv := new(server.Server)
-	bindAddr := viper.GetString("bind_addr")
+	bindAddr := os.Getenv("BIND_ADDR")
 
 	go func() {
 		if err := srv.Run(bindAddr, handlers.InitRoutes()); !errors.Is(err, http.ErrServerClosed) {
@@ -67,10 +62,4 @@ func main() {
 	if err := db.Close(); err != nil {
 		logrus.Errorf("Can't close DB connection: %s", err.Error())
 	}
-}
-
-func initConfig() error {
-	viper.AddConfigPath("cmd/procat/config")
-	viper.SetConfigName("config")
-	return viper.ReadInConfig()
 }

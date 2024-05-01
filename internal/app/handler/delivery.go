@@ -2,12 +2,14 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/procat-hq/procat-backend/internal/app/custom_errors"
 	"github.com/procat-hq/procat-backend/internal/app/model"
 	"github.com/procat-hq/procat-backend/internal/routing"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 )
 
@@ -15,7 +17,7 @@ func (h *Handler) GetAllDeliveries(c *gin.Context) {
 
 }
 
-func (h *Handler) GetDelivery(c *gin.Context) {
+func (h *Handler) GetAllDeliveriesForOneDeliveryman(c *gin.Context) {
 
 }
 
@@ -42,7 +44,7 @@ func (h *Handler) CreateRoute(c *gin.Context) {
 		return
 	}
 
-	resp, err := http.Post("https://routing.api.2gis.com/get_dist_matrix?key=810e358b-1439-4919-9eab-4618b85be168&version=2.0",
+	resp, err := http.Post(fmt.Sprintf("https://routing.api.2gis.com/get_dist_matrix?key=%s&version=2.0", os.Getenv("API_KEY_2GIS")),
 		"application/json", strings.NewReader(string(jsn)))
 	if err != nil {
 		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -70,7 +72,13 @@ func (h *Handler) CreateRoute(c *gin.Context) {
 		realResponse = append(realResponse, requestBody.Points[val])
 	}
 
-	c.JSON(http.StatusOK, realResponse)
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: gin.H{
+			"points": realResponse,
+		},
+	})
 
 	defer resp.Body.Close()
 }

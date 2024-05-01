@@ -28,7 +28,7 @@ func (r *DeliveryPostgres) GetDeliverymanId(userId int) (int, error) {
 func (r *DeliveryPostgres) GetDeliveriesOrdersForDeliveryman(deliverymanId int) ([]model.DeliveryAndOrder, error) {
 	query := fmt.Sprintf(`SELECT d.id, d.time_start, d.time_end, d.method, o.address, o.latitude, o.longitude,
        d.order_id, d.deliveryman_id FROM %s d INNER JOIN %s o ON d.order_id = o.id
-                                                               WHERE o.status = $1 AND d.delivery_man_id = $2`, deliveriesTable, ordersTable)
+                                                               WHERE o.status = $1 AND d.deliveryman_id = $2`, deliveriesTable, ordersTable)
 
 	var deliveries []model.DeliveryAndOrder
 	err := r.db.Select(&deliveries, query, "to_delivery", deliverymanId)

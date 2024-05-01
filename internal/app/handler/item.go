@@ -19,7 +19,7 @@ func (h *Handler) GetAllItems(c *gin.Context) {
 	}
 	categoryId := c.Query("categoryId")
 	if categoryId == "" {
-		categoryId = "-1"
+		categoryId = "0"
 	}
 	stock := c.Query("stock")
 	if stock == "" {
@@ -52,8 +52,8 @@ func (h *Handler) GetAllItems(c *gin.Context) {
 			Id:          item.Id,
 			Name:        item.Name,
 			Description: desc,
-			Price:       0,
-			IsInStock:   false,
+			Price:       item.Price,
+			IsInStock:   false, // TODO
 			Images:      nil,
 			CategoryId:  cat,
 		}
@@ -61,7 +61,14 @@ func (h *Handler) GetAllItems(c *gin.Context) {
 		itemsToRes = append(itemsToRes, i)
 	}
 
-	c.JSON(http.StatusOK, itemsToRes)
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: gin.H{
+			"count": 120, // TODO
+			"rows":  itemsToRes,
+		},
+	})
 
 }
 
@@ -115,15 +122,7 @@ func (h *Handler) AddImages(c *gin.Context) {
 
 }
 
-func (h *Handler) ChangeImages(c *gin.Context) {
-
-}
-
 func (h *Handler) DeleteImages(c *gin.Context) {
-
-}
-
-func (h *Handler) CreateStock(c *gin.Context) {
 
 }
 

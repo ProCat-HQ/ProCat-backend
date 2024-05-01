@@ -21,6 +21,10 @@ func (h *Handler) GetUser(c *gin.Context) {
 
 }
 
+func (h *Handler) DeleteUser(c *gin.Context) {
+
+}
+
 type SignInInput struct {
 	PhoneNumber string `json:"phoneNumber" binding:"required"`
 	Password    string `json:"password" binding:"required"`
@@ -44,8 +48,12 @@ func (h *Handler) SignIn(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"token": token,
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: gin.H{
+			"token": token,
+		},
 	})
 }
 
@@ -72,8 +80,12 @@ func (h *Handler) SignUp(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"id": id,
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: gin.H{
+			"id": id,
+		},
 	})
 }
 
