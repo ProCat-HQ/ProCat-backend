@@ -32,10 +32,10 @@ CREATE TABLE IF NOT EXISTS routes
 CREATE TABLE IF NOT EXISTS coordinates
 (
     id              SERIAL PRIMARY KEY,
-    latitude        INTEGER NOT NULL,
-    longitude       INTEGER NOT NULL,
     sequence_number INTEGER NOT NULL,
+    order_id        INTEGER NOT NULL,
     route_id        INTEGER NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE SET NULL,
     FOREIGN KEY (route_id) REFERENCES routes (id) ON DELETE CASCADE
 );
 
@@ -203,12 +203,12 @@ CREATE TABLE IF NOT EXISTS notifications
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
---Нужно created_at
 CREATE TABLE IF NOT EXISTS chats
 (
     id             SERIAL PRIMARY KEY,
     name           VARCHAR(255) NOT NULL,
     is_solved      BOOLEAN      NOT NULL DEFAULT FALSE,
+    created_at     TIMESTAMP             DEFAULT now(),
     first_user_id  INTEGER,
     second_user_id INTEGER,
     order_id       INTEGER,

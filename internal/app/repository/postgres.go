@@ -7,7 +7,9 @@ import (
 
 const (
 	usersTable              = "users"
-	deliverymanTable        = "deliverymen"
+	deliverymenTable        = "deliverymen"
+	routesTable             = "routes"
+	coordinatesTable        = "coordinates"
 	verificationsTable      = "verifications"
 	ordersTable             = "orders"
 	deliveriesTable         = "deliveries"
