@@ -836,7 +836,7 @@ paths:
                 $ref: '#/components/schemas/StatusCode200'
   /users/deliverymen/deliveries/create-route:
     post:
-      deprecated: true
+      deprecated: false
       tags:
         - delivery
       summary: build a route from deliveryman's deliveries
@@ -872,7 +872,7 @@ paths:
                               example: 82.79502868652345
   /users/admin/cluster:
     post:
-      deprecated: true
+      deprecated: false
       tags:
         - admin
       summary: make clustering orders for deliveryman
