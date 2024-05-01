@@ -49,12 +49,12 @@ type DeliveryAndOrder struct {
 	Latitude      string        `json:"latitude" db:"latitude"`
 	Longitude     string        `json:"longitude" db:"longitude"`
 	OrderId       int           `db:"order_id"`
-	DeliveryManId sql.NullInt64 `db:"delivery_man_id"`
+	DeliveryManId sql.NullInt64 `db:"deliveryman_id"`
 }
 
 type Payment struct {
 	Id        int       `json:"id"`
-	IsPaid    bool      `json:"isPaid"`
+	Paid      int       `json:"paid"`
 	Method    string    `json:"method"`
 	Price     int       `json:"price"`
 	CreatedAt time.Time `json:"createdAt"`

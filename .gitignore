@@ -3,3 +3,4 @@ procat.exe
 tmp/
 .env
 /.cache/
+/procat

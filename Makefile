@@ -5,38 +5,40 @@ endif
 
 .PHONY: build
 build:
-	GOCACHE=`pwd`/.cache go build -v ./cmd/procat
+	GOCACHE=`pwd`/.cache go build -v -o procat ./cmd/procat
 
 .PHONY: test
 test:
 	go test -v -race -timeout 30s ./...
 
+# for local testing
 .PHONY: dockerRun
 dockerRun:
-	docker run --name=procat-backend -e POSTGRES_PASSWORD=$(DB_PASSWORD) -v /tmp:/var/lib/postgresql/data -p 6789:5432 -d --rm postgres
+	docker run --name=procat-db -e POSTGRES_PASSWORD=$(DB_PASSWORD) -v procat_db_dev_tmp:/var/lib/postgresql/data -p $(DB_PORT):5432 -d --rm postgres
 
 .PHONY: dockerExec
 dockerExec:
 	docker exec -it $(ID) sh
 
-.PHONY: migrationUp
-migrationUp:
-	migrate -path ./migrations/init -database 'postgres://postgres:$(DB_PASSWORD)@localhost:6789/postgres?sslmode=disable' up
+# to run on some hosting
+.PHONY: dockerCompose
+dockerCompose:
+	docker compose up --build -d
 
-.PHONY: migrationDown
-migrationDown:
-	migrate -path ./migrations/init -database 'postgres://postgres:$(DB_PASSWORD)@localhost:6789/postgres?sslmode=disable' down
+ifeq (migration,$(firstword $(MAKECMDGOALS)))
+  RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  $(eval $(RUN_ARGS):;@:)
+endif
+
+# usage: make migration up 2
+#		 make migration down 1
+#		 make migration version
+.PHONY: migration
+migration:
+	migrate -path ./migrations -database 'postgres://$(DB_USERNAME):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=$(DB_SSLMODE)' $(RUN_ARGS)
 
 .PHONY: migrationUpDownUp
 migrationUpDownUp:
-	make migrationUp; make migrationDown; make migrationUp
-
-.PHONY: mockUp
-mockUp:
-	migrate -path ./migrations/mocks -database 'postgres://postgres:$(DB_PASSWORD)@localhost:6789/postgres?sslmode=disable' up
-
-.PHONY: mockDown
-mockDown:
-	migrate -path ./migrations/mocks -database 'postgres://postgres:$(DB_PASSWORD)@localhost:6789/postgres?sslmode=disable' down
+	make migration up 1; make migrationDown down 1; make migration up 1
 
 .DEFAULT_GOAL := build

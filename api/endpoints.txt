@@ -1,87 +1,740 @@
 localhost/
          /users
-              / (GET - to get all)
-              /{userId} (GET - for simple user only for his page, DELETE - only for admin)
-              /sign-in (POST phoneNumber + password)
-              /sign-up (POST fullname + phoneNumber + password)
-              /verification
-                           /send (PUT - creates new verification code for certain user and his new info with {type} and {value})
+              / (GET - to get all, {limit, page, role, isConfirmed})
+              -->
+                  {
+                    "status": 200,
+                    "message": "ok",
+                    "payload": {
+                        "count": 123,
+                        "rows": [
+                            {
+                                  "id": 848,
+                                  "fullName": "Вадимов Вадим Вадимович",
+                                  "email": "vadim@mail.ru",
+                                  "phoneNumber": "79856523652",
+                                  "identificationNumber": "760724300757",
+                                  "isConfirmed": true,
+                                  "role": "user",
+                                  "createdAt": "2023-10-19 10:23:54+03"
+                            }
+                        ]
+                    }
+                  }
+              /{userId} (GET - for simple user only for his page)
+              -->
+                  {
+                      "status": 200,
+                      "message": "ok",
+                      "payload": {
+                                     "id": 848,
+                                     "fullName": "Вадимов Вадим Вадимович",
+                                     "email": "vadim@mail.ru",
+                                     "phoneNumber": "79856523652",
+                                     "identificationNumber": "760724300757",
+                                     "isConfirmed": true,
+                                     "role": "user",
+                                     "createdAt": "2023-10-19 10:23:54+03"
+                      }
+                  }
+              /{userId} (DELETE - only for admin)
+              /sign-in (POST phoneNumber + password --> token)
+              -->
+                  {
+                    "status": 200,
+                    "message": "ok",
+                    "payload": {
+                        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                    }
+                  }
+
+              /sign-up (POST fullName + phoneNumber + password --> created user id)
+              -->
+                {
+                  "status": 200,
+                  "message": "ok",
+                  "payload": {
+                      "id": 123
+                  }
+                }
+
+              /verification (for authorized users (for unconfirmed users -->
+                             it's possible to login but their account will be deleted (e.g. 15 min)))
+                           /send (POST - creates new verification code for certain user and his existing info with {type})
+                           {
+                                "type": "password"
+                           }                            --> status info
+
                            /check (POST - checks whether code matches or not + check on lifetime of code
                                    if all is well then update user info, otherwise - user can try again
                                    if code lifetime is still available)
 
-                           /iin (POST - additional endpoint, because this functionality will be used in {makeOrder} handler)
+                           {
+                                "code": "123sda",
+                                "type": "password"
+                           }                        --> status info
+
+                           /iin (POST - additional endpoint,
+                           because this functionality will be used in {users/orders/POST} handler)
+                           {
+                                "iin": "760724300757"
+                           } --> {ответ от министерства финансовых дел}
               /change
-                     /iin-bin (POST check on iin correctness and matching with fullname)
-                     /fullname (POST if success, then iin-bin := null, and it's needed to be filled)
+                     /iin-bin (POST check password and check on iin correctness and matching with fullname)
+                     {
+                        "password": "blaBlaBla12321",
+                        "iin": "760724300757"
+                     } --> status code
+
+                     /fullname (POST check password and if success, then iin-bin := null, and it's needed to be filled)
+                     {
+                        "password": "blaBlaBla12321",
+                        "fullName": "Surname Name Patronymic"
+                     } --> status code
+
                      /password (POST - check if old passwords match, then send confirmation code on current number)
+                     {
+                        "oldPassword": "blaBlaBla12321",
+                        "newPassword": "some_password_12345"
+                     } --> status code
+
                      /phone (POST - check password and send confirmation code on new number)
+                     {
+                        "password": "blaBlaBla12321",
+                        "phone": "+79998887766"
+                     } --> status code
+
                      /email (POST - check password and send confirmation code on new email)
+                     {
+                        "password": "blaBlaBla12321",
+                        "email": "coolEmail@gmail.com"
+                     }
+
                      /role/{userId} (PATCH - only for admin)
-              /deliverymen (through middleware to check if user is deliveryman (or admin))
-                          / (GET - to get all deliverymen)
+                     {
+                        "role": "deliveryman"
+                     }
+
+              /deliverymen (through middleware to check if user is deliveryman or higher)
+                          / (GET - to get all deliverymen, {limit, page})
+                          {
+                                "status": 200,
+                                "message": "ok",
+                                "payload": {
+                                    "count": 20,
+                                    "rows": [
+                                        {
+                                            "id": 12,
+                                            "carCapacity": "big",
+                                            "workingHoursStart": "16:00",
+                                            "workingHoursEnd": "18:00",
+                                            "carId": "AA123A",
+                                            "fullName": "Аминов Амин Аминович",
+                                            "email": "pochta@gmail.com",
+                                            "phoneNumber": "+79998887766",
+                                        }
+                                    ]
+                                }
+                          }
                           /{deliveryId} (GET - for simple user to get his deliveryman page)
-                          /{userId} (POST - to create new deliveryman)
-                          /{deliveryId} (PATCH - to change data)
-                          /{deliveryId} (DELETE - to delete deliveryman (ADMIN RIGHTS))
+                          {
+                                "status": 200,
+                                "message": "ok",
+                                "payload": {
+                                    "carCapacity": "big",
+                                    "workingHoursStart": "16:00",
+                                    "workingHoursEnd": "18:00",
+                                    "carId": "AA123A",
+                                }
+                          }
+
+                          /{userId} (POST - to create new deliveryman who is {userId} user)
+                          {
+                                "carCapacity": "big",
+                                "workingHoursStart": "16:00",
+                                "workingHoursEnd": "18:00",
+                                "carId": "AA123A",
+                          } --> status response
+
+                          /{deliverymanId} (PATCH - to change data)
+                          (all fields are optional) {
+                                "carCapacity": "small",
+                                "workingHoursStart": "12:00",
+                                "workingHoursEnd": "18:00",
+                                "carId": "AB123A",
+                          } --> status response
+
+                          /{deliverymanId} (DELETE - to delete deliveryman (ADMIN RIGHTS)) --> status response
                           /deliveries
-                                     / (GET - to get list of all his deliveries)
-                                     /{deliveryId} (GET)
+                                     / (GET - to get list of all deliveries {limit, page} for ADMIN)
+                                     -->
+                                          {
+                                                "status": 200,
+                                                "message": "ok",
+                                                "payload": {
+                                                    "count": 10,
+                                                    "rows": [
+                                                        {
+                                                            "id": 12,
+                                                            "timeStart": "2023-10-19 10:00:00+03",
+                                                            "timeEnd": "2023-10-19 20:30:00+03",
+                                                            "method": "delivery",
+                                                            "deliverymanId": 2,
+                                                            "order": {
+                                                                "id": 2,
+                                                                "status": "delivery",
+                                                                "totalPrice": 4000,
+                                                                "deposit": 0,
+                                                                "address": "улица Пушкина, дом Колотушкина",
+                                                                "latitude": "54.99928130973027",
+                                                                "longitude": "82.92137145996095",
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                          }
+                                     /{deliverymanId} (GET - to get all deliveries for {deliverymanId} {limit, page})
+                                     -->
+                                          {
+                                                "status": 200,
+                                                "message": "ok",
+                                                "payload": {
+                                                    "count": 10,
+                                                    "rows": [
+                                                        {
+                                                            "id": 12,
+                                                            "timeStart": "2023-10-19 10:00:00+03",
+                                                            "timeEnd": "2023-10-19 20:30:00+03",
+                                                            "method": "delivery",
+                                                            "order": {
+                                                                "id": 2,
+                                                                "status": "delivery",
+                                                                "totalPrice": 4000,
+                                                                "deposit": 0,
+                                                                "address": "улица Пушкина, дом Колотушкина",
+                                                                "latitude": "54.99928130973027",
+                                                                "longitude": "82.92137145996095",
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                          }
+
                                      /{deliveryId} (PATCH - to change status)
+                                     {
+                                        "status": "delivered"
+                                     } --> status response
+
                                      /create-route (POST - to build a route from deliveryman's deliveries)
+                                     -->
+                                     {
+                                         "status": 200,
+                                         "message": "ok",
+                                         "payload": {
+                                             "points": [
+                                                     {
+                                                         "lat": 54.99770587584445,
+                                                         "lon": 82.79502868652345
+                                                     },
+                                                     {
+                                                         "lat": 54.99928130973027,
+                                                         "lon": 82.92137145996095
+                                                     },
+                                                     {
+                                                         "lat": 55.04533538802211,
+                                                         "lon": 82.98179626464844
+                                                     },
+                                                     {
+                                                         "lat": 55.072470687600536,
+                                                         "lon": 83.04634094238281
+                                                     }
+                                                 ]
+                                         }
+                                     }
               /admin
-                    /deliveries-to-sort (GET all deliveries that are needed to be sorted)
-                    /change-delivery (PATCH - to change status of corresponding order of the delivery and maybe change deliveryman to it)
+                    /cluster (POST - to make clustering)
+                    -->
+                        {
+                             "status": 200,
+                             "message": "ok",
+                             "payload": {
+                                "result": [
+                                    {
+                                        "deliverymanId": 20,
+                                        "deliveries": [
+                                            {
+                                                "latitude": "213.123213122",
+                                                "longitude": "122.421412",
+                                                "deliveryId": 10
+                                            }
+                                        ]
+                                    }
+                                ]
+                             }
+                        }
+
+                    /deliveries-to-sort (GET all deliveries after clustering was done to sort by admin)
+                    --> {same as /cluster}
+
+                    /change-delivery (PATCH - to change status of corresponding order
+                                      of the delivery and maybe change deliveryman to it)
+                    {
+                        "deliverymanId": 10,
+                        "deliveryId": 2
+                    } --> status response
+
               /cart
                    / (GET - to get items from the cart)
+                        {
+                             "status": 200,
+                             "message": "ok",
+                             "payload": {
+                                "items": [
+                                    {
+                                        "id": 1,
+                                        "name": "Molotok",
+                                        "price": 1000,
+                                        "count": 2,
+                                        "image": "ksadkasdkaskdk.jpg"
+                                    }
+                                ]
+                             }
+                        }
+
                    / (POST - adds item with {itemId} with probably {count} to authorized user with {usedId})
+                   {
+                        "itemId": 21,
+                        "count": 2      <-- optional, by default == 1
+                   }
+
                    / (DELETE - decreases item (with {itemId}) number in cart by one or totally deletes item from the cart)
+                   {
+                        "itemId": 2,
+                   }
+
               /orders
-                     / (GET - get all orders for current user, maybe should add filter by status like query param ?status=)
-                     /{orderId} (GET)
-                     / (POST - creates new order and transfer all items from cart to this order)
-                     /cancel/{orderId} (POST - set status to "pending rejected", waits till admin do some stuff and then set status of order to rejected)
+                     / (GET - get all orders at all (for ADMIN) or for certain user (if this.userId != param userId
+                     then only allowed for ADMIN))
+                     query params: {limit, page, userId, status}
+                     -->
+                     {
+                         "status": 200,
+                         "message": "ok",
+                         "payload": {
+                            "count": 154,
+                            "rows": [
+                                {
+                                     "id": 1,
+                                     "status": "delivered",
+                                     "totalPrice": 5000,
+                                     "deposit": 0,
+                                     "rentalPeriodStart": "2023-10-19 20:30:00+03",
+                                     "rentalPeriodEnd": "2023-10-27 20:30:00+03",
+                                     "address": "улица Пушкина, дом Колотушкина",
+                                     "latitude": "54.99928130973027",
+                                     "longitude": "82.92137145996095",
+                                     "companyName": "",
+                                     "createdAt": "2023-10-17 20:30:00+03",
+                                     "items": [
+                                                 {
+                                                     "id": 1,
+                                                     "name": "Molotok",
+                                                     "price": 1000,
+                                                     "count": 2,
+                                                     "image": "ksadkasdkaskdk.jpg"
+                                                 }
+                                              ]
+                                }
+                            ]
+                         }
+                      }
+
+                     /{orderId} (GET - one order)
+                     -->
+                     {
+                        "status": 200,
+                        "message": "ok",
+                        "payload": {
+                            "id": 1,
+                            "status": "delivered",
+                            "totalPrice": 5000,
+                            "deposit": 0,
+                            "rentalPeriodStart": "2023-10-19 20:30:00+03",
+                            "rentalPeriodEnd": "2023-10-27 20:30:00+03",
+                            "address": "улица Пушкина, дом Колотушкина",
+                            "latitude": "54.99928130973027",
+                            "longitude": "82.92137145996095",
+                            "companyName": "",
+                            "createdAt": "2023-10-17 20:30:00+03",
+                            "items": [
+                                        {
+                                            "id": 1,
+                                            "name": "Molotok",
+                                            "price": 1000,
+                                            "count": 2,
+                                            "image": "ksadkasdkaskdk.jpg"
+                                        }
+                                     ]
+                        }
+                     }
+
+                     / (POST - creates new order (here payment will be created) and transfer all items from cart to this order)
+                     {
+                        "rentalPeriodStart": "2023-10-19 20:30:00+03",
+                        "rentalPeriodEnd": "2023-10-27 20:30:00+03",
+                        "address": "улица Пушкина, дом Колотушкина",
+                        "companyName": "SOME COMP INC.",
+                        "deliveryMethod": "by car",
+                        "deliveryTimeStart": "2023-10-18 20:30:00+03",
+                        "deliveryTimeEnd": "2023-10-19 20:30:00+03",
+                     } ---> status info, maybe with new order id
+
+                     /cancel/{orderId} (POST - set status to "pending rejected",
+                     waits till admin do some stuff and then set status of order to "rejected")
+                     --> status
+
                      /status/{orderId} (PATCH - for ADMIN to change status)
-                     /{orderId}/payment (GET, PATCH)
+                     {
+                        "status": "done"
+                     } --> status response
+
+                     /payment
+                            /{orderId} (GET - to get info about order's payments (only for owner user or ADMIN))
+                            {
+                                "status": 200,
+                                "message": "ok",
+                                "payload": {
+                                    "payments": [
+                                        {
+                                            "id": 2,
+                                            "paid": 0,
+                                            "method": "kaspi",
+                                            "price": 5000,
+                                            "createdAt": "2023-10-19 10:23:54+03"
+                                        }
+                                    ]
+                                }
+                            }
+
+                            /{paymentId} (PATCH - update payment info (for deliveryman (maybe ADMIN?) or higher))
+                            {
+                                "paid": 1000,
+                                "method": "money",
+
+                            } --> status
+
+
               /subscriptions
-                            / (GET)
+                            / (GET - to get all subs for self user {limit, page})
+                            -->
+                            {
+                                "status": 200,
+                                "message": "ok",
+                                "payload": {
+                                    "count": 100,
+                                    "rows": [
+                                        {
+                                            "id": 1,
+                                            "item": {
+                                                "id": 10,
+                                                "name": "Molotok",
+                                                "price": 1000,
+                                                "isInStock": true,
+                                                "image": "ksadkasdkaskdk.jpg"
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+
                             / (POST - add {itemId} to subs)
-                            /{subscriptionId} (DELETE)
+                            {
+                                "itemId": 2
+                            } --> status response
+
+                            /{subscriptionId} (DELETE) --> status response
               /notifications
                             / (GET - get all)
+                            -->
+                            {
+                                "status": 200,
+                                "message": "ok",
+                                "payload": {
+                                    "notifications": [
+                                        "id": 1,
+                                        "title": "Message",
+                                        "description": "This is some long text of current message",
+                                        "isViewed": false,
+                                        "createdAt": "2023-10-19 10:23:54+03"
+                                    ]
+                                }
+                            }
+
                             /{userId} (POST - to send notification to user (ADMIN))
+                            {
+                                "title": "title",
+                                "description": "Some text",
+                            } --> status response
+
                             /{notificationId} (PATCH - ("patch" is because this will change "isViewed" DB field) to open notification body)
-                            /{notificationId} (DELETE - (for ADMIN))
+                            -->
+                            {
+                                "status": 200,
+                                "message": "ok",
+                                "payload": {
+                                    "id": 1,
+                                    "title": "Message",
+                                    "description": "This is some long text of current message",
+                                    "isViewed": true,
+                                    "createdAt": "2023-10-19 10:23:54+03"
+                                }
+                            }
+                            /{notificationId} (DELETE - (for ADMIN)) --> status response
 
          /categories
-                  /{categoryId} (POST - create category with {parentId})
-                  /route/{categoryId} (GET - get category route)
-                  /{categoryId} (GET)
-                  /{categoryId} (PATCH - edit name)
-                  /{categoryId} (DELETE - delete all route if it's not a leaf in the category tree)
+                  /{categoryId} (POST - create category with parent id equals to{categoryId}, 0 - root category)
+                  {
+                    "name": "Electronics"
+                  } --> status response
 
-         /infos (Probably this functionality must be in handlers of "item" routes)
+                  /route/{categoryId} (GET - get category route)
+                  -->
+                    {
+                        "status": 200,
+                        "message": "ok",
+                        "payload": {
+                            "route": [
+                                {
+                                    "id": 1,
+                                    "name": "Root Category",
+                                    "parentId": 0,
+                                },
+                                {
+                                    "id": 2,
+                                    "name": "Next Category",
+                                    "parentId": 1,
+                                },
+                            ]
+                        }
+                    }
+
+                  /{categoryId} (GET - to get all categories with {categoryId} parent id)
+                  -->
+                    {
+                        "status": 200,
+                        "message": "ok",
+                        "payload": {
+                            "categories": [
+                                {
+                                    "id": 1,
+                                    "name": "Root Category",
+                                    "parentId": 0,
+                                },
+                                {
+                                    "id": 2,
+                                    "name": "Root Category 2",
+                                    "parentId": 0,
+                                },
+                            ]
+                        }
+                    }
+
+                  /{categoryId} (PATCH - edit name)
+                  {
+                    "name": "New name"
+                  } --> status response
+
+                  /{categoryId} (DELETE - delete all route if it's not a leaf in the category tree) --> status response
+
 
          /items
-               / (GET - get all items {query params: limit (items on page), page (page number), categoryId, stock (false - for all, true - for on;y stock)})
-               /{itemId} (GET - with ItemStocks and ItemImages)
-               /{itemId} (DELETE)
-               /{itemId} (PATCH)
-               / (POST)
+               / (GET - get all items {query params: limit (items on page), page (page number),
+                         categoryId, stock (false - for all, true - for only in stock)}
+                         NOTE: description in this items must be shorter than in full item page)
+               -->
+               {
+                    "status": 200,
+                    "message": "ok",
+                    "payload": {
+                        "count": 632,
+                        "rows": [
+                            {
+                                "id": 2,
+                                "name": "Screwdriver",
+                                "description": "Вращается как черт.",
+                                "price": 1200,
+                                "isInStock": true,
+                                "categoryId": 2,
+                                "categoryName": "Instruments",
+                                "image": "ksadkasdkaskdk.jpg"
+                            }
+                        ]
+                    }
+               }
+
+               /{itemId} (GET - with Info, ItemStocks and ItemImages)
+               {
+                    "status": 200,
+                    "message": "ok",
+                    "payload": {
+                                "id": 2,
+                                "name": "Screwdriver",
+                                "description": "Вращается как черт.",
+                                "price": 1200,
+                                "isInStock": true,
+                                "categoryId": 2,
+                                "categoryName": "Instruments",
+                                "info": [
+                                    {
+                                        "id": 1
+                                        "name": "Вес",
+                                        "description": "5 грамм"
+                                    }
+                                ],
+                                "images": [
+                                    {
+                                        "id": 3,
+                                        "image": "someImage.jpg"
+                                    }
+                                ],
+                                "itemStores": [
+                                    {
+                                        "id": 1,
+                                        "inStockNumber": 23,
+                                        "name": "Склад ПроКат №1",
+                                        "address": "Адрес 1",
+                                        "workingHoursStart": "8:00",
+                                        "workingHoursEnd": "20:00",
+                                    }
+                                ]
+
+                    }
+               }
+
+               /{itemId} (DELETE - for ADMIN) --> status response
+
+               /{itemId} (PATCH - for ADMIN)
+               request (all fields are  optional)
+               {
+                   "name": "Screwdriver",
+                   "description": "отвёртка тупо",
+                   "price": 1200,
+                   "categoryId": 2,
+               } --> status response
+
+               / (POST - for ADMIN, only for main info, another field will be filled by another requests)
+               {
+                    "name": "Some item",
+                    "description": "Yeah, just item",
+                    "price": 200,
+                    "categoryId": 10,
+                    "images": [
+                        {
+                            "image": "somefile"
+                        }
+                    ]
+               } -->
+               {
+                    "status": 200,
+                    "message": "ok",
+                    "payload": {
+                        "id": 102,
+                    }
+               }
+
                /stock
-                     /{itemId} (POST - to create stock in some {storeId})
-                     /{itemId} (PATCH - to update stock in some {storeId} (when updating here, "inStock" field of item updates))
+                     /{itemId} (PUT - creates stock in some {storeId} or changes stock if relation exists)
+                      {
+                         "storeId": 2,
+                         "inStockNumber": 20,
+                      } --> status response
+
                /infos
                     /{itemId} (POST - add array of characteristics)
+                    {
+                        "info": [
+                            {
+                                "name": "blaBla",
+                                "description": "text"
+                            }
+                        ]
+                    } --> status response
+
                     /{itemId} (DELETE - delete infos with ids in array (array provided in body))
-                    /{itemId} (PUT - array with new data and ids which will be changed)
+                    {
+                        "info": [
+                            {
+                                "id": 1
+                            }
+                        ]
+                    } --> status response
+
+                    /{itemId} (PATCH - array with new data and ids which will be changed)
+                    {
+                        "info": [
+                            {
+                                "id": 1,
+                                "name": "blaBla",
+                                "description": "text"
+                            }
+                        ]
+                    } --> status response
                /images
-                    /{itemId} (POST)
-                    /{itemId} (DELETE)
-                    /{itemId} (PATCH)
+                    /{itemId} (POST - to add images to item)
+                                                                // TODO: idk how to upload images in a proper way
+                    {
+                        "images": [
+                            {
+                                "image": "somefile"
+                            }
+                        ]
+                    } --> status response
+
+                    /{itemId} (DELETE - deletes images with certain ids)
+                    {
+                        "images": [
+                            {
+                                "id": 1
+                            }
+                        ]
+                    } --> status response
 
          /stores
                 / (GET - to get all stores)
+                -->
+                {
+                    "status": 200,
+                    "message: "ok",
+                    "payload": {
+                        "stores": [
+                            {
+                                "id": 1,
+                                "name": "ProCat store #1",
+                                "address": "Some address",
+                                "latitude": "123.32131",
+                                "longitude": "123.32131",
+                                "workingHoursStart": "8:00",
+                                "workingHoursEnd": "20:00",
+                            }
+                        ]
+                    }
+                }
+
                 / (POST - creates new store and finds it's coordinates according to the address)
-                /{storeId} (DELETE)
-                /{storeId} (PATCH)
+                {
+                    "name": "ProCat store #1",
+                    "address": "Some address",
+                    "workingHoursStart": "8:00",
+                    "workingHoursEnd": "20:00",
+                }
+
+                /{storeId} (DELETE) --> status response
+
+                /{storeId} (PATCH - updates latLon if address changes)
+                all fields are optional
+                {
+                    "name": "ProCat store #1",
+                    "address": "Some address",
+                    "workingHoursStart": "8:00",
+                    "workingHoursEnd": "20:00",
+                }

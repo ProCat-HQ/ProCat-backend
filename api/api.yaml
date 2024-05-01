@@ -1102,35 +1102,7 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/Order'
-  /users/orders/{orderId}:
-    parameters:
-      - name: orderId
-        in: path
-        required: true
-        description: order id
-        schema:
-          type: integer
-    get:
-      deprecated: true
-      tags:
-        - order
-      summary: get certain order
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    $ref: '#/components/schemas/Order'
+
     post:
       deprecated: true
       tags:
@@ -1183,6 +1155,35 @@ paths:
                       orderId:
                         type: integer
                         example: 45
+  /users/orders/{orderId}:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        description: order id
+        schema:
+          type: integer
+    get:
+      deprecated: true
+      tags:
+        - order
+      summary: get certain order
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: ok
+                  payload:
+                    $ref: '#/components/schemas/Order'
 
   /users/orders/cancel/{orderId}:
     parameters:
@@ -1549,7 +1550,20 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StatusCode200'
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: ok
+                  payload:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 20
     get:
       deprecated: true
       tags:
@@ -1725,6 +1739,58 @@ paths:
                             image:
                               type: string
                               example: pic.jpg
+
+    post:
+      deprecated: true
+      tags:
+        - item
+      summary: for ADMIN, only for main info, another fields will be filled by another requests
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Новое имя
+                description:
+                  type: string
+                  example: Новое описание
+                price:
+                  type: integer
+                  example: 2500
+                categoryId:
+                  type: integer
+                  example: 0
+                images:
+                  type: array
+                  items:
+                    properties:
+                      image:
+                        type: string
+                        example: image.jpg
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: ok
+                  payload:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 123
+
   /items/{itemId}:
     parameters:
       - name: itemId
@@ -1793,56 +1859,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StatusCode200'
-    post:
-      deprecated: true
-      tags:
-        - item
-      summary: for ADMIN, only for main info, another fields will be filled by another requests
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  example: Новое имя
-                description:
-                  type: string
-                  example: Новое описание
-                price:
-                  type: integer
-                  example: 2500
-                categoryId:
-                  type: integer
-                  example: 0
-                images:
-                  type: array
-                  items:
-                    properties:
-                      image:
-                        type: string
-                        example: image.jpg
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: ok
-                  payload:
-                    type: object
-                    properties:
-                      id:
-                        type: integer
-                        example: 123
+
   /items/stock/{itemId}:
     parameters:
       - name: itemId
@@ -2547,4 +2564,4 @@ components:
           example: ok
         payload:
           type: string
-          example:
+          example: null
