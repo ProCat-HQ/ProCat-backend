@@ -10,6 +10,7 @@ import (
 	"github.com/procat-hq/procat-backend/internal/app/model"
 	"github.com/procat-hq/procat-backend/internal/app/repository"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -37,17 +38,20 @@ func NewUserService(repo repository.User) *UserService {
 	return &UserService{repo: repo}
 }
 
-func (s *UserService) CreateUser(user model.SignUpInput) (int, error) {
-	user.Password = generatePasswordHash(user.PhoneNumber, user.Password)
+func generatePasswordHash(phoneNumber, password string) string {
+	hash := sha1.New()
+	hash.Write([]byte(phoneNumber + password))
 
-	u := &model.User{
+	salt := os.Getenv("PASSWORD_SALT")
+	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
+}
+
+func (s *UserService) CreateUser(user model.SignUpInput) (int, error) {
+	return s.repo.CreateUser(model.SignUpInput{
 		FullName:    user.FullName,
 		PhoneNumber: user.PhoneNumber,
-		Password:    user.Password,
-		IsConfirmed: false,
-		Role:        "user",
-	}
-	return s.repo.CreateUser(*u)
+		Password:    generatePasswordHash(user.PhoneNumber, user.Password),
+	})
 }
 
 func (s *UserService) GetUserByCredentials(phoneNumber, password string) (model.User, error) {
@@ -198,10 +202,37 @@ func (s *UserService) RegenerateTokens(userId int, refreshToken, fingerprint str
 	return signedAccessToken, signedRefreshToken, nil
 }
 
-func generatePasswordHash(phoneNumber, password string) string {
-	hash := sha1.New()
-	hash.Write([]byte(phoneNumber + password))
+func (s *UserService) GetAllUsers(limit, page, role, isConfirmed string) (int, []model.User, error) {
+	limitInt, err := strconv.Atoi(limit)
+	if err != nil {
+		return 0, nil, err
+	}
 
-	salt := os.Getenv("PASSWORD_SALT")
-	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
+	pageInt, err := strconv.Atoi(page)
+	if err != nil {
+		return 0, nil, err
+	}
+
+	offset := limitInt * pageInt
+
+	if isConfirmed != "" {
+		_, err = strconv.ParseBool(isConfirmed)
+		if err != nil {
+			return 0, nil, err
+		}
+	}
+	count, users, err := s.repo.GetAllUsers(limitInt, offset, role, isConfirmed)
+	if err != nil {
+		return 0, nil, err
+	}
+	return count, users, nil
+}
+
+func (s *UserService) GetUserById(userId int) (model.User, error) {
+	user, err := s.repo.GetUserById(userId)
+	return user, err
+}
+
+func (s *UserService) DeleteUserById(userId int) error {
+	return s.repo.DeleteUserById(userId)
 }

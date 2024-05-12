@@ -6,6 +6,7 @@ import (
 	"github.com/procat-hq/procat-backend/internal/app/custom_errors"
 	"github.com/procat-hq/procat-backend/internal/app/model"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -39,6 +40,26 @@ func (h *Handler) UserIdentify(c *gin.Context) {
 
 	c.Set("userId", userData.UserId)
 	c.Set("userRole", userData.UserRole)
+	c.Next()
+}
+
+func (h *Handler) MustBelongsToUser(c *gin.Context) {
+	paramUserId, err := strconv.Atoi(c.Param("id")) // string
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "userId param is not a number: "+err.Error())
+		return
+	}
+
+	userId, ok := c.Get("userId") // int
+	if !ok {
+		custom_errors.NewErrorResponse(c, http.StatusUnauthorized, "userId field not found in context")
+		return
+	}
+	if userId != paramUserId {
+		custom_errors.NewErrorResponse(c, http.StatusForbidden, "Forbidden")
+		return
+	}
+
 	c.Next()
 }
 
@@ -95,24 +116,25 @@ func (h *Handler) CheckRole(roleToCheck string) gin.HandlerFunc {
 
 		userRole, ok := role.(string)
 		if !ok {
-			custom_errors.NewErrorResponse(c, http.StatusUnauthorized, "User role is not a string type")
+			custom_errors.NewErrorResponse(c, http.StatusBadRequest, "User role is not a string type")
 			return
 		}
 
 		userRolePriority, err := getRolePriority(userRole)
 		if err != nil {
-			custom_errors.NewErrorResponse(c, http.StatusUnauthorized, err.Error())
+			custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		roleToCheckPriority, err := getRolePriority(roleToCheck)
 		if err != nil {
-			custom_errors.NewErrorResponse(c, http.StatusUnauthorized, err.Error())
+			custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		if userRolePriority < roleToCheckPriority {
 			custom_errors.NewErrorResponse(c, http.StatusForbidden, "Forbidden")
+			return
 		}
 
 		c.Next()

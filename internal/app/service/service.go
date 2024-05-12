@@ -13,6 +13,10 @@ type User interface {
 	ParseRefreshToken(refreshToken string) (*model.RefreshTokenClaimsExtension, error)
 	LogoutUser(refreshToken string, userId int) (int, error)
 	RegenerateTokens(userId int, refreshToken, fingerprint string) (string, string, error)
+
+	GetAllUsers(limit, page, role, isConfirmed string) (int, []model.User, error)
+	GetUserById(userId int) (model.User, error)
+	DeleteUserById(userId int) error
 }
 
 type Verification interface {

@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS deliverymen
     working_hours_start TIME    NOT NULL,
     working_hours_end   TIME    NOT NULL,
     car_id              VARCHAR(30),
-    user_id             INTEGER NOT NULL,
+    user_id             INTEGER UNIQUE NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
@@ -171,7 +171,7 @@ CREATE TABLE IF NOT EXISTS infos
 CREATE TABLE IF NOT EXISTS carts
 (
     id      SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
+    user_id INTEGER UNIQUE NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
@@ -188,7 +188,7 @@ CREATE TABLE IF NOT EXISTS carts_items
 CREATE TABLE IF NOT EXISTS subscriptions
 (
     id      SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
+    user_id INTEGER UNIQUE NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 

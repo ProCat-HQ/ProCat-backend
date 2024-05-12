@@ -8,6 +8,7 @@ import (
 	"github.com/procat-hq/procat-backend/internal/app/model"
 	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -16,15 +17,84 @@ const (
 )
 
 func (h *Handler) GetAllUsers(c *gin.Context) {
+	limit := c.Query("limit")
+	if limit == "" {
+		limit = "20"
+	}
+	page := c.Query("page")
+	if page == "" {
+		page = "0"
+	}
+	role := c.Query("role")
+	isConfirmed := c.Query("isConfirmed")
 
+	count, users, err := h.services.User.GetAllUsers(limit, page, role, isConfirmed)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: gin.H{
+			"count": count,
+			"rows":  users,
+		},
+	})
 }
 
 func (h *Handler) GetUser(c *gin.Context) {
+	paramUserId, err := strconv.Atoi(c.Param("id")) // string
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "userId param is not a number: "+err.Error())
+		return
+	}
 
+	user, err := h.services.User.GetUserById(paramUserId)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+	}
+
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: user,
+	})
 }
 
 func (h *Handler) DeleteUser(c *gin.Context) {
+	paramUserId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "userId param is not a number: "+err.Error())
+		return
+	}
 
+	selfId, ok := c.Get("userId")
+	if !ok {
+		custom_errors.NewErrorResponse(c, http.StatusUnauthorized, "userId field not found in context")
+		return
+	}
+	if selfId == paramUserId {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "please don't delete yourself")
+		return
+	}
+
+	err = h.services.User.DeleteUserById(paramUserId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			custom_errors.NewErrorResponse(c, http.StatusBadRequest, "no user with such id")
+			return
+		}
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: nil,
+	})
 }
 
 type SignInInput struct {

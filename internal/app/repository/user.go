@@ -1,10 +1,14 @@
 package repository
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/procat-hq/procat-backend/internal/app/model"
+	"github.com/sirupsen/logrus"
+	"strconv"
+	"strings"
 )
 
 type UserPostgres struct {
@@ -16,7 +20,9 @@ func NewUserPostgres(db *sqlx.DB) *UserPostgres {
 }
 
 func (r *UserPostgres) GetUser(phoneNumber, password string) (model.User, error) {
-	query := fmt.Sprintf("SELECT id, role FROM %s WHERE phone_number=$1 AND password_hash=$2", usersTable)
+	query := fmt.Sprintf(`SELECT id, fullname, COALESCE(email, '') AS email, phone_number,
+       							COALESCE(identification_number, '') AS identification_number, is_confirmed, role, created_at
+								FROM %s WHERE phone_number=$1 AND password_hash=$2`, usersTable)
 
 	var user model.User
 	err := r.db.Get(&user, query, phoneNumber, password)
@@ -25,7 +31,9 @@ func (r *UserPostgres) GetUser(phoneNumber, password string) (model.User, error)
 }
 
 func (r *UserPostgres) GetUserById(userId int) (model.User, error) {
-	query := fmt.Sprintf("SELECT id, role FROM %s WHERE id=$1", usersTable)
+	query := fmt.Sprintf(`SELECT id, fullname, COALESCE(email, '') AS email, phone_number,
+       							COALESCE(identification_number, '') AS identification_number, is_confirmed, role, created_at
+								 FROM %s WHERE id=$1`, usersTable)
 
 	var user model.User
 	err := r.db.Get(&user, query, userId)
@@ -33,7 +41,7 @@ func (r *UserPostgres) GetUserById(userId int) (model.User, error) {
 	return user, err
 }
 
-func (r *UserPostgres) CreateUser(user model.User) (int, error) {
+func (r *UserPostgres) CreateUser(user model.SignUpInput) (int, error) {
 	query := fmt.Sprintf("INSERT INTO %s (fullname, phone_number, password_hash) VALUES ($1, $2, $3) RETURNING id", usersTable)
 	row := r.db.QueryRow(query, user.FullName, user.PhoneNumber, user.Password)
 
@@ -50,7 +58,7 @@ func (r *UserPostgres) SaveSessionData(refreshToken, fingerprint string, userId 
 		return err
 	}
 
-	defer tx.Rollback() // how can I handle it?
+	defer tx.Rollback() // TODO: how can I handle it?
 
 	query := fmt.Sprintf(`DELETE FROM %s WHERE fingerprint=$1 AND user_id=$2`, refreshSessionsTable)
 	_, err = tx.Exec(query, fingerprint, userId)
@@ -114,4 +122,73 @@ func (r *UserPostgres) DeleteUserRefreshSession(refreshToken string, userId int)
 		return 400, errors.New("nothing was deleted")
 	}
 	return 200, nil
+}
+
+func (r *UserPostgres) GetAllUsers(limit, offset int, role, isConfirmed string) (int, []model.User, error) {
+	queryCount := fmt.Sprintf(`SELECT COUNT(*) FROM %s`, usersTable)
+	var count int
+	err := r.db.Get(&count, queryCount)
+	if err != nil {
+		return 0, nil, err
+	}
+
+	query := fmt.Sprintf(`SELECT id, fullname, COALESCE(email, '') AS email, phone_number, COALESCE(identification_number, '') AS identification_number,
+       							is_confirmed, role, created_at FROM %s`, usersTable)
+
+	argCounter := 1
+	var params []string
+	if role != "" || isConfirmed != "" {
+		if role != "" {
+			params = append(params, `role=$`+strconv.Itoa(argCounter))
+			argCounter += 1
+		}
+		if isConfirmed != "" {
+			params = append(params, `is_confirmed=$`+strconv.Itoa(argCounter))
+			argCounter += 1
+		}
+	}
+	if len(params) > 0 {
+		query = query + ` WHERE ` + strings.Join(params, ` AND `)
+	}
+	query += ` OFFSET $` + strconv.Itoa(argCounter)
+	argCounter += 1
+	query += ` LIMIT $` + strconv.Itoa(argCounter)
+
+	logrus.Info(fmt.Sprintf("Query: %s", query))
+
+	var users []model.User
+	switch len(params) {
+	case 0:
+		err = r.db.Select(&users, query, offset, limit)
+	case 1:
+		if role != "" {
+			err = r.db.Select(&users, query, role, offset, limit)
+		}
+		if isConfirmed != "" {
+			err = r.db.Select(&users, query, isConfirmed, offset, limit)
+		}
+	case 2:
+		err = r.db.Select(&users, query, role, isConfirmed, offset, limit)
+	}
+
+	if err != nil {
+		return 0, nil, err
+	}
+	return count, users, nil
+}
+
+func (r *UserPostgres) DeleteUserById(userId int) error {
+	query := fmt.Sprintf(`DELETE FROM %s WHERE id=$1`, usersTable)
+	res, err := r.db.Exec(query, userId)
+	if err != nil {
+		return err
+	}
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
+	return nil
 }

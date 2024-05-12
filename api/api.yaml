@@ -48,7 +48,7 @@ tags:
 paths:
   /users:
     get:
-      deprecated: true
+      deprecated: false
       tags:
         - user
       summary: to get all users
@@ -109,7 +109,7 @@ paths:
 
   /users/{userId}:
     get:
-      deprecated: true
+      deprecated: false
       tags:
         - user
       summary: for simple user only for his page
@@ -143,7 +143,7 @@ paths:
           description: User not found
 
     delete:
-      deprecated: true
+      deprecated: false
       tags:
         - user
       summary: only for admin

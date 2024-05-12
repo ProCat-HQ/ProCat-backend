@@ -6,7 +6,7 @@ import (
 )
 
 type User interface {
-	CreateUser(user model.User) (int, error)
+	CreateUser(user model.SignUpInput) (int, error)
 	GetUser(phoneNumber, password string) (model.User, error)
 	GetUserById(userId int) (model.User, error)
 	GetRefreshSessions(userId int) ([]model.RefreshSession, error)
@@ -15,6 +15,9 @@ type User interface {
 	WipeRefreshSessions(userId int) error
 	SaveSessionData(refreshToken, fingerprint string, userId int) error
 	DeleteUserRefreshSession(refreshToken string, userId int) (int, error)
+
+	GetAllUsers(limit, offset int, role, isConfirmed string) (int, []model.User, error)
+	DeleteUserById(userId int) error
 }
 
 type Verification interface {

@@ -6,14 +6,13 @@ import (
 
 type User struct {
 	Id                   int       `json:"id" db:"id"`
-	FullName             string    `json:"fullName"`
-	Email                string    `json:"email"`
-	PhoneNumber          string    `json:"phoneNumber"`
-	IdentificationNumber string    `json:"identificationNumber"`
-	Password             string    `json:"password"`
-	IsConfirmed          bool      `json:"isConfirmed"`
+	FullName             string    `json:"fullName" db:"fullname"`
+	Email                string    `json:"email" db:"email"`
+	PhoneNumber          string    `json:"phoneNumber" db:"phone_number"`
+	IdentificationNumber string    `json:"identificationNumber" db:"identification_number"`
+	IsConfirmed          bool      `json:"isConfirmed" db:"is_confirmed"`
 	Role                 string    `json:"role" db:"role"`
-	CreatedAt            time.Time `json:"createdAt"`
+	CreatedAt            time.Time `json:"createdAt" db:"created_at"`
 }
 
 type DeliveryMan struct {
