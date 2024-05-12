@@ -11,6 +11,15 @@ CREATE TABLE IF NOT EXISTS users
     created_at            TIMESTAMP                   DEFAULT now()
 );
 
+CREATE TABLE IF NOT EXISTS refresh_sessions
+(
+    id            SERIAL PRIMARY KEY,
+    refresh_token VARCHAR NOT NULL,
+    fingerprint   VARCHAR NOT NULL,
+    user_id       INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS deliverymen
 (
     id                  SERIAL PRIMARY KEY,
@@ -20,23 +29,6 @@ CREATE TABLE IF NOT EXISTS deliverymen
     car_id              VARCHAR(30),
     user_id             INTEGER NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS routes
-(
-    id             SERIAL PRIMARY KEY,
-    deliveryman_id INTEGER,
-    FOREIGN KEY (deliveryman_id) REFERENCES deliverymen (id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS coordinates
-(
-    id              SERIAL PRIMARY KEY,
-    sequence_number INTEGER NOT NULL,
-    order_id        INTEGER NOT NULL,
-    route_id        INTEGER NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE SET NULL,
-    FOREIGN KEY (route_id) REFERENCES routes (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS verifications
@@ -65,6 +57,23 @@ CREATE TABLE IF NOT EXISTS orders
     created_at          TIMESTAMP DEFAULT now(),
     user_id             INTEGER     NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS routes
+(
+    id             SERIAL PRIMARY KEY,
+    deliveryman_id INTEGER,
+    FOREIGN KEY (deliveryman_id) REFERENCES deliverymen (id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS coordinates
+(
+    id              SERIAL PRIMARY KEY,
+    sequence_number INTEGER NOT NULL,
+    order_id        INTEGER NOT NULL,
+    route_id        INTEGER NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE SET NULL,
+    FOREIGN KEY (route_id) REFERENCES routes (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS deliveries

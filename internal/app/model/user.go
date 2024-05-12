@@ -25,6 +25,13 @@ type DeliveryMan struct {
 	UserId            int       `db:"user_id"`
 }
 
+type RefreshSession struct {
+	Id           int    `json:"id" db:"id"`
+	RefreshToken string `json:"refreshToken" db:"refresh_token"`
+	Fingerprint  string `json:"fingerprint" db:"fingerprint"`
+	UserId       int    `json:"userId" db:"user_id"`
+}
+
 // DeliveriesForDeliveryMan переместить
 type DeliveriesForDeliveryMan struct {
 	DeliverymanId int     `json:"deliverymanId"`
@@ -37,7 +44,11 @@ type SignUpInput struct {
 	Password    string `json:"password" binding:"required"`
 }
 
-type TokenClaimsExtension struct {
+type AccessTokenClaimsExtension struct {
 	UserId   int    `json:"userId"`
 	UserRole string `json:"userRole"`
+}
+
+type RefreshTokenClaimsExtension struct {
+	UserId int `json:"userId"`
 }

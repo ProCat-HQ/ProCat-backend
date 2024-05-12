@@ -167,23 +167,21 @@ paths:
         404:
           description: User not found
 
-  /users/sign-in:
+  /users/logout:
     post:
       tags:
         - auth
-      summary: phoneNumber + password
+      summary: deletes refresh token from db [Requires Auth header with Access Token]
       requestBody:
         content:
           application/json:
             schema:
               type: object
               properties:
-                phoneNumber:
+                refreshToken:
                   type: string
-                  example: +79000000000
-                password:
-                  type: string
-                  example: kvmkd5lskdm
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjA2ODU4MzQsImlhdCI6MTcxNTUwMTgzNCwidXNlcklkIjoxMDB9.-uqsK1tTSjh1amOch1NhyaCoAQGr4YRUjt936WH43gM
+
       responses:
         200:
           description: successful operation
@@ -202,6 +200,91 @@ paths:
                     type: object
                     properties:
                       token:
+                        type: string
+                        example: null
+
+  /users/refresh:
+    post:
+      tags:
+        - auth
+      summary: refresh token pair
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjA2OTQ2ODksImp0aSI6IjU1NWQ0OWYzLTJjYzAtNDU0MC04Nzk5LTQwNGQ5Zjg2OGU4NiIsImlhdCI6MTcxNTUxMDY4OSwidXNlcklkIjoxMDB9.0ZiP5vw_1K6s-vGgbjjn4xY9TfaVEeqxOCy9uXRjYL0
+                fingerprint:
+                  type: string
+                  example: 541AF321CD12321
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: ok
+                  payload:
+                    type: object
+                    properties:
+                      accessToken:
+                        type: string
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                      refreshToken:
+                        type: string
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+
+  /users/sign-in:
+    post:
+      tags:
+        - auth
+      summary: phoneNumber + password + fingerprint
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phoneNumber:
+                  type: string
+                  example: +79000000000
+                password:
+                  type: string
+                  example: kvmkd5lskdm
+                fingerprint:
+                  type: string
+                  example: 541AF321CD12321
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: ok
+                  payload:
+                    type: object
+                    properties:
+                      accessToken:
+                        type: string
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                      refreshToken:
                         type: string
                         example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
 

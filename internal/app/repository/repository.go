@@ -8,6 +8,13 @@ import (
 type User interface {
 	CreateUser(user model.User) (int, error)
 	GetUser(phoneNumber, password string) (model.User, error)
+	GetUserById(userId int) (model.User, error)
+	GetRefreshSessions(userId int) ([]model.RefreshSession, error)
+	GetRefreshSession(refreshToken string, userId int) (model.RefreshSession, error)
+	WipeRefreshSessionsWithFingerprint(fingerprint string, userId int) error
+	WipeRefreshSessions(userId int) error
+	SaveSessionData(refreshToken, fingerprint string, userId int) error
+	DeleteUserRefreshSession(refreshToken string, userId int) (int, error)
 }
 
 type Verification interface {

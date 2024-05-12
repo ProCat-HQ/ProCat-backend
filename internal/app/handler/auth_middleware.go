@@ -31,7 +31,7 @@ func (h *Handler) UserIdentify(c *gin.Context) {
 		return
 	}
 
-	userData, err := h.services.User.ParseToken(headerParts[1])
+	userData, err := h.services.User.ParseAccessToken(headerParts[1])
 	if err != nil {
 		custom_errors.NewErrorResponse(c, http.StatusUnauthorized, err.Error())
 		return
@@ -42,7 +42,7 @@ func (h *Handler) UserIdentify(c *gin.Context) {
 	c.Next()
 }
 
-func (h *Handler) GetUserContext(c *gin.Context) (*model.TokenClaimsExtension, error) {
+func (h *Handler) GetUserContext(c *gin.Context) (*model.AccessTokenClaimsExtension, error) {
 	id, ok := c.Get("userId")
 	if !ok {
 		return nil, errors.New("userId field not found in context")
@@ -63,7 +63,7 @@ func (h *Handler) GetUserContext(c *gin.Context) (*model.TokenClaimsExtension, e
 		return nil, errors.New("userRole is not a string type")
 	}
 
-	userContext := &model.TokenClaimsExtension{
+	userContext := &model.AccessTokenClaimsExtension{
 		UserId:   userId,
 		UserRole: userRole,
 	}
