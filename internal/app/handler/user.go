@@ -45,7 +45,7 @@ func (h *Handler) GetAllUsers(c *gin.Context) {
 }
 
 func (h *Handler) GetUser(c *gin.Context) {
-	paramUserId, err := strconv.Atoi(c.Param("id")) // string
+	paramUserId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "userId param is not a number: "+err.Error())
 		return

@@ -49,7 +49,13 @@ type Category interface {
 }
 
 type Item interface {
-	GetAllItems(limit, offset, categoryId int, stock bool) ([]model.PieceOfItem, error)
+	GetCategoryChildren(categoryId int) ([]int, error)
+	GetAllItems(limit, offset, categoryId int, stock bool, search string) (int, []model.PieceOfItem, error)
+	GetItem(itemId int) (model.Item, error)
+	CreateItem(name, description string, price, categoryId int) (int, error)
+	SaveFilenames(itemId int, filenames []string) error
+	DeleteItem(itemId int) error
+	ChangeItem(itemId int, name, description, price, categoryId *string) error
 }
 
 type Store interface {

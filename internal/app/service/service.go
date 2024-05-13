@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/procat-hq/procat-backend/internal/app/model"
 	"github.com/procat-hq/procat-backend/internal/app/repository"
+	"mime/multipart"
 )
 
 type User interface {
@@ -46,7 +47,11 @@ type Category interface {
 }
 
 type Item interface {
-	GetAllItems(limit, page, categoryId, stock string) ([]model.PieceOfItem, error)
+	GetAllItems(limit, page, search, categoryId, stock string) (int, []model.PieceOfItem, error)
+	GetItem(itemId string) (model.Item, error)
+	CreateItem(name, description, price, categoryId string, files []*multipart.FileHeader) (int, error)
+	DeleteItem(itemId int) error
+	ChangeItem(itemId int, name, description, price, categoryId *string) error
 }
 
 type Store interface {
