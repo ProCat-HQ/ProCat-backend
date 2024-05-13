@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/procat-hq/procat-backend/internal/app/model"
-	"github.com/sirupsen/logrus"
 	"strconv"
 	"strings"
 )
@@ -153,8 +152,6 @@ func (r *UserPostgres) GetAllUsers(limit, offset int, role, isConfirmed string) 
 	query += ` OFFSET $` + strconv.Itoa(argCounter)
 	argCounter += 1
 	query += ` LIMIT $` + strconv.Itoa(argCounter)
-
-	logrus.Info(fmt.Sprintf("Query: %s", query))
 
 	var users []model.User
 	switch len(params) {

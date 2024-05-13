@@ -15,30 +15,56 @@ INSERT INTO deliverymen (car_capacity, working_hours_start, working_hours_end, c
 VALUES ('big', '10:00', '16:00', 'A123BC', 101),
        ('medium', '12:00', '20:00', 'X777XX', 102);
 
-INSERT INTO items (name, description, price, is_in_stock, category_id)
-VALUES ('Молоток', 'Хороший молоток, крепкий', 2000, true, null),
-       ('Пила', 'Хорошо пилит, мощно', 3000, true, null),
-       ('Отвёртка', 'Хорошо крутит, отлично', 4000, false, null);
+INSERT INTO categories (id, name, parent_id)
+VALUES (0, 'root', NULL), -- THIS CATEGORY ALWAYS MUST BE!!!
+       (1, 'cat1', 0),
+       (2, 'cat2', 1);
 
+INSERT INTO items (name, description, price, is_in_stock, category_id)
+VALUES ('Молоток', 'Хороший молоток, крепкий', 2000, true, 2),
+       ('Пила', 'Хорошо пилит, мощно', 3000, true, null),
+       ('Отвёртка', 'Хорошо крутит, отлично', 4000, false, 1);
+
+INSERT INTO infos (name, description, item_id)
+VALUES ('ВЕС', 'большой', 1),
+       ('gabariti', 'like a closet', 1),
+       ('eshcho cho-ta', 'property', 1),
+       ('eshcho cho-ta', 'property', 2);
+
+INSERT INTO item_images (image, item_id)
+VALUES ('first1', 1),
+       ('second1', 1),
+       ('third1', 1),
+       ('first3', 3);
+
+INSERT INTO stores (name, address, working_hours_start, working_hours_end)
+VALUES ('1', '1', '8:00', '20:00'),
+       ('2', '2', '7:30', '21:00');
+
+INSERT INTO item_stores (in_stock_number, store_id, item_id)
+VALUES (2, 1, 1),
+       (3, 2, 1),
+       (0, 1, 2),
+       (1, 2, 3);
 
 INSERT INTO orders (id, status, total_price, deposit, rental_period_start, rental_period_end, address, latitude,
                     longitude, company_name, user_id)
 VALUES (56, 'to_delivery', 5343, 0, '2004-10-19 20:00:00+03', '2004-10-30 18:00:00+03', 'address', '55.04868',
         '82.988786', 'vd', 103),
        (57, 'to_delivery', 5343, 0, '2004-10-19 20:00:00+03', '2004-10-30 18:00:00+03', 'address', '54.98254',
-        '82.814378', 'vd',  103),
+        '82.814378', 'vd', 103),
        (58, 'to_delivery', 5343, 0, '2004-10-19 20:00:00+03', '2004-10-30 18:00:00+03', 'address', '54.96244',
-        '82.885103', 'vd',  103),
+        '82.885103', 'vd', 103),
        (59, 'to_delivery', 5343, 0, '2004-10-19 20:00:00+03', '2004-10-30 18:00:00+03', 'address', '54.988017',
-        '83.015966', 'vd',  103),
+        '83.015966', 'vd', 103),
        (60, 'to_delivery', 5343, 0, '2004-10-19 20:00:00+03', '2004-10-30 18:00:00+03', 'address', '54.849023',
-        '83.109914', 'vd',  103),
+        '83.109914', 'vd', 103),
        (61, 'to_delivery', 5343, 0, '2004-10-19 20:00:00+03', '2004-10-30 18:00:00+03', 'address', '54.864174',
-        '83.092518', 'vd',  103),
+        '83.092518', 'vd', 103),
        (62, 'to_delivery', 5343, 0, '2004-10-19 20:00:00+03', '2004-10-30 18:00:00+03', 'address', '54.850213',
-        '83.046704', 'vd',  103),
+        '83.046704', 'vd', 103),
        (63, 'to_delivery', 5343, 0, '2004-10-19 20:00:00+03', '2004-10-30 18:00:00+03', 'address', '54.837411',
-        '83.112056', 'vd',  103);
+        '83.112056', 'vd', 103);
 
 INSERT INTO deliveries (id, time_start, time_end, method, order_id, deliveryman_id)
 VALUES (101, '2004-10-19 10:00:00+03', '2004-10-19 12:00:00+03', 'car', 56, null),

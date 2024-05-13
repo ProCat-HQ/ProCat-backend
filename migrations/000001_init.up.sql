@@ -138,7 +138,7 @@ CREATE TABLE IF NOT EXISTS item_stores
     store_id        INTEGER,
     item_id         INTEGER NOT NULL,
     FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE,
-    FOREIGN KEY (store_id) REFERENCES stores (id) ON DELETE SET NULL
+    FOREIGN KEY (store_id) REFERENCES stores (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS item_images
