@@ -37,3 +37,15 @@ func (r *DeliveryPostgres) GetDeliveriesOrdersForDeliveryman(deliverymanId int) 
 	}
 	return deliveries, nil
 }
+
+func (r *DeliveryPostgres) GetAllDeliveries(limit int, offset int) ([]model.DeliveryFullInfo, error) {
+	return nil, nil
+}
+
+func (r *DeliveryPostgres) GetAllDeliveriesForOneDeliveryman(id int, limit int, offset int) (*model.DeliveryFullInfo, error) {
+	return nil, nil
+}
+
+func (r *DeliveryPostgres) ChangeDeliveryStatus(id int, newStatus string) error {
+	return nil
+}

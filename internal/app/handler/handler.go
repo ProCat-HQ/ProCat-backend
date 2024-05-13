@@ -46,11 +46,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		deliverymen := users.Group("/deliverymen", h.UserIdentify, h.CheckRole("deliveryman"))
 		{
-			deliverymen.GET("/", h.GetAllDeliverymen)                                // TODO
-			deliverymen.GET("/:id", h.GetDeliveryman)                                // TODO
-			deliverymen.POST("/:id", h.CheckRole("admin"), h.CreateDeliveryman)      // TODO
-			deliverymen.PATCH("/:id", h.CheckRole("admin"), h.ChangeDeliverymanData) // TODO
-			deliverymen.DELETE("/:id", h.CheckRole("admin"), h.DeleteDeliveryman)    // TODO
+			deliverymen.GET("/", h.GetAllDeliverymen)
+			deliverymen.GET("/:id", h.GetDeliveryman)
+			deliverymen.POST("/:id", h.CheckRole("admin"), h.CreateDeliveryman)
+			deliverymen.PATCH("/:id", h.CheckRole("admin"), h.ChangeDeliverymanData)
+			deliverymen.DELETE("/:id", h.CheckRole("admin"), h.DeleteDeliveryman)
 
 			deliveries := deliverymen.Group("/deliveries")
 			{

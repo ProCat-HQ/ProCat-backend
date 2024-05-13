@@ -15,10 +15,10 @@ CREATE TABLE IF NOT EXISTS deliverymen
 (
     id                  SERIAL PRIMARY KEY,
     car_capacity        VARCHAR(255),
-    working_hours_start TIME    NOT NULL,
-    working_hours_end   TIME    NOT NULL,
+    working_hours_start TIME           NOT NULL,
+    working_hours_end   TIME           NOT NULL,
     car_id              VARCHAR(30),
-    user_id             INTEGER NOT NULL,
+    user_id             INTEGER UNIQUE NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 

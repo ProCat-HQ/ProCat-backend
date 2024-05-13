@@ -1,11 +1,9 @@
 package model
 
-import "github.com/gin-gonic/gin"
-
 type Response struct {
 	Status  int    `json:"status"`
 	Message string `json:"message"`
-	Payload gin.H  `json:"payload"`
+	Payload any    `json:"payload"`
 }
 
 type Point struct {

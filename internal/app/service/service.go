@@ -14,6 +14,14 @@ type User interface {
 type Verification interface {
 }
 
+type Deliveryman interface {
+	GetAllDeliverymen(limit string, page string) ([]model.DeliveryManInfoDB, error)
+	GetDeliveryman(deliveryId string) (*model.DeliveryManInfoCreate, error)
+	CreateDeliveryman(newDeliveryman model.DeliveryManInfoCreate, userId string) (int, error)
+	ChangeDeliverymanData(newData model.DeliveryManInfoCreate, deliverymanId string) error
+	DeleteDeliveryman(deliverymanId string) error
+}
+
 type Delivery interface {
 	GetDeliveriesForDeliveryman(userId int) (*model.MapRequest, error)
 }
@@ -47,6 +55,7 @@ type Store interface {
 type Service struct {
 	User
 	Verification
+	Deliveryman
 	Delivery
 	Admin
 	Cart
@@ -60,9 +69,10 @@ type Service struct {
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
-		User:     NewUserService(repos.User),
-		Item:     NewItemService(repos.Item),
-		Admin:    NewAdminService(repos.Admin),
-		Delivery: NewDeliveryService(repos.Delivery),
+		User:        NewUserService(repos.User),
+		Item:        NewItemService(repos.Item),
+		Admin:       NewAdminService(repos.Admin),
+		Deliveryman: NewDeliverymanService(repos.Deliveryman),
+		Delivery:    NewDeliveryService(repos.Delivery),
 	}
 }

@@ -13,9 +13,19 @@ type User interface {
 type Verification interface {
 }
 
+type Deliveryman interface {
+	GetAllDeliverymen(limit int, offset int) ([]model.DeliveryManInfoDB, error)
+	GetDeliveryman(deliverymanId int) (*model.DeliveryManInfoCreate, error)
+	CreateDeliveryman(newDeliveryman model.DeliveryManInfoCreate, userId int) (int, error)
+	ChangeDeliverymanData(newData model.DeliveryManInfoCreate, deliverymanId int) error
+	DeleteDeliveryman(deliverymanId int) error
+}
+
 type Delivery interface {
 	GetDeliverymanId(userId int) (int, error)
 	GetDeliveriesOrdersForDeliveryman(deliverymanId int) ([]model.DeliveryAndOrder, error)
+	GetAllDeliveries(limit int, offset int) ([]model.DeliveryFullInfo, error)
+	ChangeDeliveryStatus(id int, newStatus string) error
 }
 
 type Admin interface {
@@ -48,6 +58,7 @@ type Store interface {
 type Repository struct {
 	User
 	Verification
+	Deliveryman
 	Delivery
 	Admin
 	Cart
@@ -61,9 +72,10 @@ type Repository struct {
 
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
-		User:     NewUserPostgres(db),
-		Item:     NewItemPostgres(db),
-		Admin:    NewAdminPostgres(db),
-		Delivery: NewDeliveryPostgres(db),
+		User:        NewUserPostgres(db),
+		Item:        NewItemPostgres(db),
+		Admin:       NewAdminPostgres(db),
+		Deliveryman: NewDeliverymanPostgres(db),
+		Delivery:    NewDeliveryPostgres(db),
 	}
 }
