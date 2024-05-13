@@ -17,7 +17,7 @@ func (h *Handler) GetAllDeliverymen(c *gin.Context) {
 		page = "0"
 	}
 
-	deliverymen, err := h.services.Deliveryman.GetAllDeliverymen(limit, page)
+	deliverymen, count, err := h.services.Deliveryman.GetAllDeliverymen(limit, page)
 	if err != nil {
 		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -27,7 +27,7 @@ func (h *Handler) GetAllDeliverymen(c *gin.Context) {
 		Status:  http.StatusOK,
 		Message: "ok",
 		Payload: gin.H{
-			"count": len(deliverymen),
+			"count": count,
 			"rows":  deliverymen,
 		},
 	})

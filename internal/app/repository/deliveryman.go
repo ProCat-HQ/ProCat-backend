@@ -16,17 +16,23 @@ func NewDeliverymanPostgres(db *sqlx.DB) *DeliverymanPostgres {
 	return &DeliverymanPostgres{db: db}
 }
 
-func (r *DeliverymanPostgres) GetAllDeliverymen(limit int, offset int) ([]model.DeliveryManInfoDB, error) {
+func (r *DeliverymanPostgres) GetAllDeliverymen(limit int, offset int) ([]model.DeliveryManInfoDB, int, error) {
+	queryForCount := fmt.Sprintf(`SELECT COUNT(*) FROM %s`, deliverymanTable)
+	var count int
+	err := r.db.Get(&count, queryForCount)
+	if err != nil {
+		return nil, 0, err
+	}
 	query := fmt.Sprintf(`SELECT d.id, d.car_capacity, coalesce(cast(d.working_hours_start as varchar), '') as working_hours_start,
 								   coalesce(cast(d.working_hours_end as varchar), '') as working_hours_end,
 								   d.car_id, u.fullname, u.email, u.phone_number
 									FROM %s d join %s u on d.user_id = u.id OFFSET $1 LIMIT $2`, deliverymanTable, usersTable)
 	var deliverymen []model.DeliveryManInfoDB
-	err := r.db.Select(&deliverymen, query, offset, limit)
+	err = r.db.Select(&deliverymen, query, offset, limit)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return deliverymen, nil
+	return deliverymen, count, nil
 }
 
 func (r *DeliverymanPostgres) GetDeliveryman(deliveryId int) (*model.DeliveryManInfoCreate, error) {

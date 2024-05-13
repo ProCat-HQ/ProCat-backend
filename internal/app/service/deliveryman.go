@@ -14,20 +14,20 @@ func NewDeliverymanService(repo repository.Deliveryman) *DeliverymanService {
 	return &DeliverymanService{repo: repo}
 }
 
-func (s *DeliverymanService) GetAllDeliverymen(limit string, page string) ([]model.DeliveryManInfoDB, error) {
+func (s *DeliverymanService) GetAllDeliverymen(limit string, page string) ([]model.DeliveryManInfoDB, int, error) {
 	lim, err := strconv.Atoi(limit)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	pag, err := strconv.Atoi(page)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	deliverymen, err := s.repo.GetAllDeliverymen(lim, lim*pag)
+	deliverymen, count, err := s.repo.GetAllDeliverymen(lim, lim*pag)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return deliverymen, nil
+	return deliverymen, count, nil
 }
 
 func (s *DeliverymanService) GetDeliveryman(deliveryId string) (*model.DeliveryManInfoCreate, error) {

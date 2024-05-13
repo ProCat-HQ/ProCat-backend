@@ -15,7 +15,7 @@ type Verification interface {
 }
 
 type Deliveryman interface {
-	GetAllDeliverymen(limit string, page string) ([]model.DeliveryManInfoDB, error)
+	GetAllDeliverymen(limit string, page string) ([]model.DeliveryManInfoDB, int, error)
 	GetDeliveryman(deliveryId string) (*model.DeliveryManInfoCreate, error)
 	CreateDeliveryman(newDeliveryman model.DeliveryManInfoCreate, userId string) (int, error)
 	ChangeDeliverymanData(newData model.DeliveryManInfoCreate, deliverymanId string) error

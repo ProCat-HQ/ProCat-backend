@@ -14,7 +14,7 @@ type Verification interface {
 }
 
 type Deliveryman interface {
-	GetAllDeliverymen(limit int, offset int) ([]model.DeliveryManInfoDB, error)
+	GetAllDeliverymen(limit int, offset int) ([]model.DeliveryManInfoDB, int, error)
 	GetDeliveryman(deliverymanId int) (*model.DeliveryManInfoCreate, error)
 	CreateDeliveryman(newDeliveryman model.DeliveryManInfoCreate, userId int) (int, error)
 	ChangeDeliverymanData(newData model.DeliveryManInfoCreate, deliverymanId int) error
@@ -24,7 +24,7 @@ type Deliveryman interface {
 type Delivery interface {
 	GetDeliverymanId(userId int) (int, error)
 	GetDeliveriesOrdersForDeliveryman(deliverymanId int) ([]model.DeliveryAndOrder, error)
-	GetAllDeliveries(limit int, offset int) ([]model.DeliveryFullInfo, error)
+	GetAllDeliveries(limit int, offset int) ([]model.DeliveryFullInfo, int, error)
 	ChangeDeliveryStatus(id int, newStatus string) error
 }
 
