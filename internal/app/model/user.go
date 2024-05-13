@@ -6,14 +6,13 @@ import (
 
 type User struct {
 	Id                   int       `json:"id" db:"id"`
-	FullName             string    `json:"fullName"`
-	Email                string    `json:"email"`
-	PhoneNumber          string    `json:"phoneNumber"`
-	IdentificationNumber string    `json:"identificationNumber"`
-	Password             string    `json:"password"`
-	IsConfirmed          bool      `json:"isConfirmed"`
+	FullName             string    `json:"fullName" db:"fullname"`
+	Email                string    `json:"email" db:"email"`
+	PhoneNumber          string    `json:"phoneNumber" db:"phone_number"`
+	IdentificationNumber string    `json:"identificationNumber" db:"identification_number"`
+	IsConfirmed          bool      `json:"isConfirmed" db:"is_confirmed"`
 	Role                 string    `json:"role" db:"role"`
-	CreatedAt            time.Time `json:"createdAt"`
+	CreatedAt            time.Time `json:"createdAt" db:"created_at"`
 }
 
 type DeliveryMan struct {
@@ -23,6 +22,13 @@ type DeliveryMan struct {
 	WorkingHoursEnd   time.Time `json:"workingHoursEnd" db:"working_hours_end"`
 	CarId             string    `json:"carId" db:"car_id"`
 	UserId            int       `db:"user_id"`
+}
+
+type RefreshSession struct {
+	Id           int    `json:"id" db:"id"`
+	RefreshToken string `json:"refreshToken" db:"refresh_token"`
+	Fingerprint  string `json:"fingerprint" db:"fingerprint"`
+	UserId       int    `json:"userId" db:"user_id"`
 }
 
 // DeliveriesForDeliveryMan переместить
@@ -37,7 +43,11 @@ type SignUpInput struct {
 	Password    string `json:"password" binding:"required"`
 }
 
-type TokenClaimsExtension struct {
+type AccessTokenClaimsExtension struct {
 	UserId   int    `json:"userId"`
 	UserRole string `json:"userRole"`
+}
+
+type RefreshTokenClaimsExtension struct {
+	UserId int `json:"userId"`
 }

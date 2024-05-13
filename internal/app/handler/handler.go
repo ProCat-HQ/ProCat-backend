@@ -20,12 +20,15 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		usersAuthenticatedGroup := users.Group("", h.UserIdentify)
 		{
-			usersAuthenticatedGroup.GET("/", h.CheckRole("admin"), h.GetAllUsers)      // TODO
-			usersAuthenticatedGroup.GET("/:id", h.GetUser)                             // TODO need to check that the user has id equals to ":"id"
+			usersAuthenticatedGroup.GET("/", h.CheckRole("admin"), h.GetAllUsers)
+			usersAuthenticatedGroup.GET("/:id", h.MustBelongsToUser, h.GetUser)
 			usersAuthenticatedGroup.DELETE("/:id", h.CheckRole("admin"), h.DeleteUser) // TODO
+
+			users.POST("/logout", h.Logout)
 		}
 		users.POST("/sign-in", h.SignIn)
 		users.POST("/sign-up", h.SignUp)
+		users.POST("/refresh", h.RefreshToken)
 
 		verification := users.Group("/verification", h.UserIdentify)
 		{

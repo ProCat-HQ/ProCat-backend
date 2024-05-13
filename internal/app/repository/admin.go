@@ -18,7 +18,7 @@ func (a *AdminPostgres) GetDeliveries() ([]model.DeliveryAndOrder, []model.Deliv
 	query := fmt.Sprintf(`SELECT d.id, d.time_start, d.time_end, d.method, o.address, o.latitude, o.longitude, d.order_id, d.deliveryman_id
 								 FROM %s d INNER JOIN %s o ON d.order_id = o.id WHERE o.status = $1`, deliveriesTable, ordersTable)
 
-	queryDeliveryMan := fmt.Sprintf(`SELECT id, car_capacity, working_hours_start, working_hours_end  FROM %s`, deliverymanTable)
+	queryDeliveryMan := fmt.Sprintf(`SELECT id, car_capacity, working_hours_start, working_hours_end  FROM %s`, deliverymenTable)
 
 	var deliveries []model.DeliveryAndOrder
 	var deliverymen []model.DeliveryMan

@@ -7,8 +7,16 @@ import (
 
 type User interface {
 	CreateUser(user model.SignUpInput) (int, error)
-	GenerateToken(phoneNumber, password string) (string, error)
-	ParseToken(accessToken string) (*model.TokenClaimsExtension, error)
+	GetUserByCredentials(phoneNumber, password string) (model.User, error)
+	GenerateTokens(user model.User, fingerprint string) (string, string, error)
+	ParseAccessToken(accessToken string) (*model.AccessTokenClaimsExtension, error)
+	ParseRefreshToken(refreshToken string) (*model.RefreshTokenClaimsExtension, error)
+	LogoutUser(refreshToken string, userId int) (int, error)
+	RegenerateTokens(userId int, refreshToken, fingerprint string) (string, string, error)
+
+	GetAllUsers(limit, page, role, isConfirmed string) (int, []model.User, error)
+	GetUserById(userId int) (model.User, error)
+	DeleteUserById(userId int) error
 }
 
 type Verification interface {

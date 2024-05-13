@@ -15,7 +15,7 @@ func NewDeliveryPostgres(db *sqlx.DB) *DeliveryPostgres {
 }
 
 func (r *DeliveryPostgres) GetDeliverymanId(userId int) (int, error) {
-	query := fmt.Sprintf(`SELECT id FROM %s WHERE user_id = $1`, deliverymanTable)
+	query := fmt.Sprintf(`SELECT id FROM %s WHERE user_id = $1`, deliverymenTable)
 	row := r.db.QueryRow(query, userId)
 
 	var id int
