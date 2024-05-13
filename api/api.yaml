@@ -197,11 +197,8 @@ paths:
                     type: string
                     example: ok
                   payload:
-                    type: object
-                    properties:
-                      token:
-                        type: string
-                        example: null
+                    type: string
+                    example: null
 
   /users/refresh:
     post:
