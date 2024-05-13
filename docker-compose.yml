@@ -24,10 +24,11 @@ services:
     ports:
       - "2200:${DB_PORT}"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME}"]
-      interval: 5s
+      test: ["CMD-SHELL", "pg_isready", "-U", "${DB_USERNAME}", "-d", "${DB_NAME}"]
+      interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 15s
     environment:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
