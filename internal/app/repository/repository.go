@@ -34,6 +34,10 @@ type Admin interface {
 }
 
 type Cart interface {
+	GetUsersCartId(userId int) (int, error)
+	AddItemToCart(cartId, itemId, count int) error
+	DeleteItemFromCart(cartId, itemId int) error
+	GetCartItems(cartId int) ([]model.CartItem, error)
 }
 
 type Order interface {
@@ -81,5 +85,6 @@ func NewRepository(db *sqlx.DB) *Repository {
 		Item:     NewItemPostgres(db),
 		Admin:    NewAdminPostgres(db),
 		Delivery: NewDeliveryPostgres(db),
+		Cart:     NewCartPostgres(db),
 	}
 }

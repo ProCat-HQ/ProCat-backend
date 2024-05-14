@@ -1,3 +1,8 @@
+DROP INDEX IF EXISTS unique_index_carts_items;
+DROP INDEX IF EXISTS unique_index_subscriptions_items;
+DROP INDEX IF EXISTS unique_index_orders_items;
+DROP INDEX IF EXISTS unique_index_item_stores;
+
 DROP TABLE IF EXISTS message_images;
 DROP TABLE IF EXISTS messages;
 DROP TABLE IF EXISTS chats;

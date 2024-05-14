@@ -75,9 +75,9 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		cart := users.Group("/cart", h.UserIdentify)
 		{
-			cart.GET("", h.GetCartItems)           // TODO
-			cart.POST("", h.AddItemsToCart)        // TODO
-			cart.DELETE("", h.DeleteItemsFromCart) // TODO
+			cart.GET("", h.GetCartItems)
+			cart.POST("", h.AddItemsToCart)
+			cart.DELETE("/:id", h.DeleteItemsFromCart)
 		}
 
 		orders := users.Group("/orders", h.UserIdentify)
