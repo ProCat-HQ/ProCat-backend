@@ -32,6 +32,9 @@ type Admin interface {
 }
 
 type Cart interface {
+	AddItemsToCart(userId, itemId, count int) error
+	DeleteItemFromCart(userId, itemId int) error
+	GetCartItems(userId int) ([]model.CartItem, error)
 }
 
 type Order interface {
@@ -77,5 +80,6 @@ func NewService(repos *repository.Repository) *Service {
 		Item:     NewItemService(repos.Item),
 		Admin:    NewAdminService(repos.Admin),
 		Delivery: NewDeliveryService(repos.Delivery),
+		Cart:     NewCartService(repos.Cart),
 	}
 }

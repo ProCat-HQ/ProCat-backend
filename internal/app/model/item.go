@@ -4,6 +4,14 @@ import (
 	"time"
 )
 
+type CartItem struct {
+	Id    int    `json:"id" db:"id"`
+	Name  string `json:"name" db:"name"`
+	Price int    `json:"price" db:"price"`
+	Count int    `json:"count" db:"count"`
+	Image string `json:"image" db:"image"`
+}
+
 type PieceOfItem struct {
 	Id           int    `json:"id" db:"id"`
 	Name         string `json:"name" db:"name"`

@@ -244,3 +244,8 @@ CREATE TABLE IF NOT EXISTS message_images
     message_id INTEGER NOT NULL,
     FOREIGN KEY (message_id) REFERENCES messages (id) ON DELETE CASCADE
 );
+
+CREATE UNIQUE INDEX unique_index_carts_items ON carts_items(cart_id, item_id);
+CREATE UNIQUE INDEX unique_index_subscriptions_items ON subscriptions_items(subscription_id, item_id);
+CREATE UNIQUE INDEX unique_index_orders_items ON orders_items(order_id, item_id);
+CREATE UNIQUE INDEX unique_index_item_stores ON item_stores(store_id, item_id);

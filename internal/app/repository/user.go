@@ -42,12 +42,28 @@ func (r *UserPostgres) GetUserById(userId int) (model.User, error) {
 
 func (r *UserPostgres) CreateUser(user model.SignUpInput) (int, error) {
 	query := fmt.Sprintf("INSERT INTO %s (fullname, phone_number, password_hash) VALUES ($1, $2, $3) RETURNING id", usersTable)
-	row := r.db.QueryRow(query, user.FullName, user.PhoneNumber, user.Password)
-
-	var id int
-	if err := row.Scan(&id); err != nil {
+	queryCart := fmt.Sprintf(`INSERT INTO %s (user_id) VALUES ($1)`, cartsTable)
+	tx, err := r.db.Beginx()
+	if err != nil {
 		return 0, err
 	}
+	defer tx.Rollback()
+
+	var id int
+	err = tx.Get(&id, query, user.FullName, user.PhoneNumber, user.Password)
+	if err != nil {
+		return 0, err
+	}
+	_, err = tx.Exec(queryCart, id)
+	if err != nil {
+		return 0, err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return 0, err
+	}
+
 	return id, nil
 }
 
