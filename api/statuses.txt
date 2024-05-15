@@ -1,0 +1,19 @@
+1.  Ожидание оплаты                                 - awaitingPayment
+2.  Сбор заказа                                     - accepted
+b.  Пользователь захотел отменить заказ             - awaitingRejection
+b.  Ожидание возврата денег                         - awaitingMoneyBack
+b.  Админ сделал всё необходимое чтобы его отменить - rejected
+3.  Заказ готов для самовывоза                      - readyToPickup
+3.  В ожидании доставки                             - readyToDelivery
+3.  Доставляется                                    - delivering
+4.  В аренде                                        - rent
+5.  Подходит срок сдачи заказа                      - shouldBeReturned
+5.  Просрочено                                      - expired
+6.  Пользователь сделал запрос на продление аренды  - extensionRequest
+6.  Продлено                                        - extended
+7.  Проблема с инструментом                         - problem
+8.  Доставка обратно на склад                       - deliveryBack
+9.  Заказ доставлен на склад                        - returned
+10. Проверка состояния инструмента                  - itemsCheck
+11. Ожидание оплаты за ремонт                       - awaitingRepairPayment
+12. Заказ закрыт                                    - closed

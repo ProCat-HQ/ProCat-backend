@@ -38,6 +38,7 @@ type Cart interface {
 }
 
 type Order interface {
+	CreateOrder(userId int, order model.OrderCreationWithTime) (model.OrderCheque, error)
 }
 
 type Subscription interface {
@@ -52,9 +53,9 @@ type Category interface {
 type Item interface {
 	GetAllItems(limit, page, search, categoryId, stock string) (int, []model.PieceOfItem, error)
 	GetItem(itemId string) (model.Item, error)
-	CreateItem(name, description, price, categoryId string, files []*multipart.FileHeader) (int, error)
+	CreateItem(name, description, price, priceDeposit, categoryId string, files []*multipart.FileHeader) (int, error)
 	DeleteItem(itemId int) error
-	ChangeItem(itemId int, name, description, price, categoryId *string) error
+	ChangeItem(itemId int, name, description, price, priceDeposit, categoryId *string) error
 }
 
 type Store interface {
@@ -81,5 +82,6 @@ func NewService(repos *repository.Repository) *Service {
 		Admin:    NewAdminService(repos.Admin),
 		Delivery: NewDeliveryService(repos.Delivery),
 		Cart:     NewCartService(repos.Cart),
+		Order:    NewOrderService(repos.Order),
 	}
 }

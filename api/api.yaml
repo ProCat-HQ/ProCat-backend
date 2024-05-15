@@ -618,11 +618,11 @@ paths:
                             workingHoursStart:
                               type: string
                               format: time
-                              example: 08:00
+                              example: 2006-01-02T20:30:00Z
                             workingHoursEnd:
                               type: string
                               format: time
-                              example: 16:00
+                              example: 2006-01-02T20:30:00Z
                             carId:
                               type: string
                               example: P425YB154
@@ -669,10 +669,10 @@ paths:
                         example: big
                       workingHoursStart:
                         type: string
-                        example: 08:00
+                        example: 2006-01-02T20:30:00Z
                       workingHoursEnd:
                         type: string
-                        example: 16:00
+                        example: 2006-01-02T20:30:00Z
                       carId:
                         type: string
                         example: P425YB154
@@ -700,10 +700,10 @@ paths:
                   example: big
                 workingHoursStart:
                   type: string
-                  example: 8:00
+                  example: 08:00:00
                 workingHoursEnd:
                   type: string
-                  example: 16:00
+                  example: 16:00:00
                 carId:
                   type: string
                   example: HT236O154
@@ -744,10 +744,10 @@ paths:
                   example: big
                 workingHoursStart:
                   type: string
-                  example: 8:00
+                  example: 08:00:00
                 workingHoursEnd:
                   type: string
-                  example: 16:00
+                  example: 16:00:00
                 carId:
                   type: string
                   example: HT236O154
@@ -892,21 +892,25 @@ paths:
                   type: string
                   example: delivered
                   enum:
-                    - pendingConfirmation
-                    - pendingRejected
-                    - rejected
-                    - needsRevision
                     - awaitingPayment
                     - accepted
+                    - awaitingRejection
+                    - awaitingMoneyBack
+                    - rejected
+                    - readyToPickup
                     - readyToDelivery
                     - delivering
-                    - readyForPickup
-                    - received
-                    - closed
+                    - rent
                     - shouldBeReturned
-                    - returned
+                    - expired
                     - extensionRequest
                     - extended
+                    - problem
+                    - deliveryBack
+                    - returned
+                    - itemsCheck
+                    - awaitingRepairPayment
+                    - closed
       responses:
         200:
           description: successful operation
@@ -1135,7 +1139,7 @@ paths:
       deprecated: true
       tags:
         - order
-      summary: get all orders for current user
+      summary: get all orders for current user (if userId passed as param then you must be an 'admin')
       parameters:
         - name: limit
           in: query
@@ -1184,7 +1188,7 @@ paths:
                           $ref: '#/components/schemas/Order'
 
     post:
-      deprecated: true
+      deprecated: false
       tags:
         - order
       summary: creates new order and transfer all items from cart to this order
@@ -1196,10 +1200,10 @@ paths:
               properties:
                 rentalPeriodStart:
                   type: string
-                  example: 2023-10-19 20:30:00+03
+                  example: 2023-10-19 20:30:00
                 rentalPeriodEnd:
                   type: string
-                  example: 2023-10-27 20:30:00+03
+                  example: 2023-10-27 20:30:00
                 address:
                   type: string
                   example: ул. Пушкина д. 7 кв. 587
@@ -1235,6 +1239,30 @@ paths:
                       orderId:
                         type: integer
                         example: 45
+                      totalPrice:
+                        type: integer
+                        example: 2000
+                      totalDeposit:
+                        type: integer
+                        example: 20000
+                      items:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              example: Молоток
+                            count:
+                              type: integer
+                              example: 2
+                            price:
+                              type: integer
+                              example: 1000
+                            priceDeposit:
+                              type: integer
+                              example: 10000
+
   /users/orders/{orderId}:
     parameters:
       - name: orderId
@@ -1307,21 +1335,25 @@ paths:
                 status:
                   type: string
                   enum:
-                    - pendingConfirmation
-                    - pendingRejected
-                    - rejected
-                    - needsRevision
                     - awaitingPayment
                     - accepted
+                    - awaitingRejection
+                    - awaitingMoneyBack
+                    - rejected
+                    - readyToPickup
                     - readyToDelivery
                     - delivering
-                    - readyForPickup
-                    - received
-                    - closed
+                    - rent
                     - shouldBeReturned
-                    - returned
+                    - expired
                     - extensionRequest
                     - extended
+                    - problem
+                    - deliveryBack
+                    - returned
+                    - itemsCheck
+                    - awaitingRepairPayment
+                    - closed
       responses:
         200:
           description: successful operation
@@ -1844,6 +1876,9 @@ paths:
                 price:
                   type: integer
                   example: 2500
+                priceDeposit:
+                  type: integer
+                  example: 25000
                 categoryId:
                   type: integer
                   example: 0
@@ -1931,6 +1966,9 @@ paths:
                   type: string
                   example: Новое описание
                 price:
+                  type: integer
+                  example: 2500
+                priceDeposit:
                   type: integer
                   example: 2500
                 categoryId:
@@ -2175,10 +2213,10 @@ paths:
                           example: 123.32131
                         workingHoursStart:
                           type: string
-                          example: 8:00
+                          example: 2006-01-02T20:30:00Z
                         workingHoursEnd:
                           type: string
-                          example: 20:00
+                          example: 2006-01-02T20:30:00Z
     post:
       deprecated: true
       tags:
@@ -2198,10 +2236,10 @@ paths:
                   example: name
                 workingHoursStart:
                   type: string
-                  example: 8:00
+                  example: 08:00:00
                 workingHoursEnd:
                   type: string
-                  example: 20:00
+                  example: 20:00:00
       responses:
         200:
           description: successful operation
@@ -2249,10 +2287,10 @@ paths:
                   example: name
                 workingHoursStart:
                   type: string
-                  example: 8:00
+                  example: 08:00:00
                 workingHoursEnd:
                   type: string
-                  example: 20:00
+                  example: 20:00:00
       responses:
         200:
           description: successful operation
@@ -2306,7 +2344,7 @@ components:
         createdAt:
           type: string
           format: date-time
-          example: 2023-10-19 10:23:54+03
+          example: 2006-01-02T20:30:00Z
 
     Order:
       type: object
@@ -2319,15 +2357,24 @@ components:
           type: string
           example: delivering
           enum:
-            - pendingConfirmation
-            - cancelled
-            - needsRevision
             - awaitingPayment
             - accepted
+            - awaitingRejection
+            - awaitingMoneyBack
+            - rejected
+            - readyToPickup
             - readyToDelivery
             - delivering
-            - readyForPickup
-            - received
+            - rent
+            - shouldBeReturned
+            - expired
+            - extensionRequest
+            - extended
+            - problem
+            - deliveryBack
+            - returned
+            - itemsCheck
+            - awaitingRepairPayment
             - closed
         totalPrice:
           type: integer
@@ -2335,11 +2382,11 @@ components:
         rentalPeriodStart:
           type: string
           format: date-time
-          example: 2023-10-19
+          example: 2006-01-02T20:30:00Z
         rentalPeriodEnd:
           type: string
           format: date-time
-          example: 2023-11-04
+          example: 2006-01-02T20:30:00Z
         address:
           type: string
           example: ул. Пушкина д. 7 кв. 587
@@ -2355,7 +2402,7 @@ components:
         createdAt:
           type: string
           format: date-time
-          example: 2023-10-19 10:00:00+03
+          example: 2006-01-02T20:30:00Z
         items:
           type: array
           items:
@@ -2407,11 +2454,11 @@ components:
         timeStart:
           type: string
           format: date-time
-          example: 2023-10-19 10:00:00+03
+          example: 2006-01-02T20:30:00Z
         timeEnd:
           type: string
           format: date-time
-          example: 2023-10-19 12:00:00+03
+          example: 2006-01-02T20:30:00Z
         method:
           type: string
           example: car
@@ -2426,21 +2473,25 @@ components:
               type: string
               example: delivering
               enum:
-                - pendingConfirmation
-                - pendingRejected
-                - rejected
-                - needsRevision
                 - awaitingPayment
                 - accepted
+                - awaitingRejection
+                - awaitingMoneyBack
+                - rejected
+                - readyToPickup
                 - readyToDelivery
                 - delivering
-                - readyForPickup
-                - received
-                - closed
+                - rent
                 - shouldBeReturned
-                - returned
+                - expired
                 - extensionRequest
                 - extended
+                - problem
+                - deliveryBack
+                - returned
+                - itemsCheck
+                - awaitingRepairPayment
+                - closed
             totalPrice:
               type: integer
               example: 5000
@@ -2464,11 +2515,11 @@ components:
         timeStart:
           type: string
           format: date-time
-          example: 2023-10-19 10:00:00+03
+          example: 2006-01-02T20:30:00Z
         timeEnd:
           type: string
           format: date-time
-          example: 2023-10-19 12:00:00+03
+          example: 2006-01-02T20:30:00Z
         method:
           type: string
           example: car
@@ -2486,21 +2537,25 @@ components:
               type: string
               example: delivering
               enum:
-                - pendingConfirmation
-                - pendingRejected
-                - rejected
-                - needsRevision
                 - awaitingPayment
                 - accepted
+                - awaitingRejection
+                - awaitingMoneyBack
+                - rejected
+                - readyToPickup
                 - readyToDelivery
                 - delivering
-                - readyForPickup
-                - received
-                - closed
+                - rent
                 - shouldBeReturned
-                - returned
+                - expired
                 - extensionRequest
                 - extended
+                - problem
+                - deliveryBack
+                - returned
+                - itemsCheck
+                - awaitingRepairPayment
+                - closed
             totalPrice:
               type: integer
               example: 5000
@@ -2586,10 +2641,10 @@ components:
           example: ул. Хорошая, д. 12
         workingHoursStart:
           type: string
-          example: 8:00
+          example: 2006-01-02T20:30:00Z
         workingHoursEnd:
           type: string
-          example: 20:00
+          example: 2006-01-02T20:30:00Z
 
 
     ItemImage:
@@ -2635,7 +2690,7 @@ components:
           example: true
         createdAt:
           format: date-time
-          example: 2023-10-19 12:00:00+03
+          example: 2006-01-02T20:30:00Z
 
     StatusCode200:
       type: object

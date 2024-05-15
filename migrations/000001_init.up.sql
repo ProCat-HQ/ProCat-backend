@@ -24,8 +24,8 @@ CREATE TABLE IF NOT EXISTS deliverymen
 (
     id                  SERIAL PRIMARY KEY,
     car_capacity        VARCHAR(255),
-    working_hours_start TIME    NOT NULL,
-    working_hours_end   TIME    NOT NULL,
+    working_hours_start TIME           NOT NULL,
+    working_hours_end   TIME           NOT NULL,
     car_id              VARCHAR(30),
     user_id             INTEGER UNIQUE NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS payments
 (
     id         SERIAL PRIMARY KEY,
     paid       INTEGER     NOT NULL DEFAULT 0,
-    method     VARCHAR(50) NOT NULL,
+    method     VARCHAR(50),
     price      INTEGER     NOT NULL,
     created_at TIMESTAMP            DEFAULT now(),
     order_id   INTEGER     NOT NULL,
@@ -109,12 +109,13 @@ CREATE TABLE IF NOT EXISTS categories
 
 CREATE TABLE IF NOT EXISTS items
 (
-    id          SERIAL PRIMARY KEY,
-    name        VARCHAR(255) NOT NULL,
-    description VARCHAR,
-    price       INTEGER      NOT NULL,
-    is_in_stock BOOLEAN      NOT NULL DEFAULT FALSE,
-    category_id INTEGER,
+    id            SERIAL PRIMARY KEY,
+    name          VARCHAR(255) NOT NULL,
+    description   VARCHAR,
+    price         INTEGER      NOT NULL,
+    price_deposit INTEGER      NOT NULL,
+    is_in_stock   BOOLEAN      NOT NULL DEFAULT FALSE,
+    category_id   INTEGER,
     FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE SET NULL
 --     similar_to INTEGER[],
 --     FOREIGN KEY (EACH ELEMENT OF similar_to) REFERENCES items
@@ -245,7 +246,7 @@ CREATE TABLE IF NOT EXISTS message_images
     FOREIGN KEY (message_id) REFERENCES messages (id) ON DELETE CASCADE
 );
 
-CREATE UNIQUE INDEX unique_index_carts_items ON carts_items(cart_id, item_id);
-CREATE UNIQUE INDEX unique_index_subscriptions_items ON subscriptions_items(subscription_id, item_id);
-CREATE UNIQUE INDEX unique_index_orders_items ON orders_items(order_id, item_id);
-CREATE UNIQUE INDEX unique_index_item_stores ON item_stores(store_id, item_id);
+CREATE UNIQUE INDEX unique_index_carts_items ON carts_items (cart_id, item_id);
+CREATE UNIQUE INDEX unique_index_subscriptions_items ON subscriptions_items (subscription_id, item_id);
+CREATE UNIQUE INDEX unique_index_orders_items ON orders_items (order_id, item_id);
+CREATE UNIQUE INDEX unique_index_item_stores ON item_stores (store_id, item_id);

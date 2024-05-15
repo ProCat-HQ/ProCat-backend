@@ -20,10 +20,10 @@ VALUES (0, 'root', NULL), -- THIS CATEGORY ALWAYS MUST BE!!!
        (1, 'cat1', 0),
        (2, 'cat2', 1);
 
-INSERT INTO items (name, description, price, is_in_stock, category_id)
-VALUES ('Молоток', 'Хороший молоток, крепкий', 2000, true, 2),
-       ('Пила', 'Хорошо пилит, мощно', 3000, true, null),
-       ('Отвёртка', 'Хорошо крутит, отлично', 4000, false, 1);
+INSERT INTO items (name, description, price, price_deposit, is_in_stock, category_id)
+VALUES ('Молоток', 'Хороший молоток, крепкий', 2000, 20000, true, 2),
+       ('Пила', 'Хорошо пилит, мощно', 3000, 30000, true, null),
+       ('Отвёртка', 'Хорошо крутит, отлично', 4000, 40000, false, 1);
 
 INSERT INTO infos (name, description, item_id)
 VALUES ('ВЕС', 'большой', 1),

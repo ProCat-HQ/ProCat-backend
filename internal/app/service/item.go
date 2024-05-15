@@ -61,8 +61,12 @@ func (s *ItemService) GetItem(itemId string) (model.Item, error) {
 	return item, err
 }
 
-func (s *ItemService) CreateItem(name, description, price, categoryId string, files []*multipart.FileHeader) (int, error) {
+func (s *ItemService) CreateItem(name, description, price, priceDeposit, categoryId string, files []*multipart.FileHeader) (int, error) {
 	priceInt, err := strconv.Atoi(price)
+	if err != nil {
+		return 0, err
+	}
+	priceDepositInt, err := strconv.Atoi(priceDeposit)
 	if err != nil {
 		return 0, err
 	}
@@ -89,7 +93,7 @@ func (s *ItemService) CreateItem(name, description, price, categoryId string, fi
 		filenames = append(filenames, newFilename)
 	}
 
-	itemId, err := s.repo.CreateItem(name, description, priceInt, categoryIdInt)
+	itemId, err := s.repo.CreateItem(name, description, priceInt, priceDepositInt, categoryIdInt)
 	if err != nil {
 		err1 := utils.RemoveFiles(filenames, "./assets/")
 		if err1 != nil {
@@ -108,9 +112,16 @@ func (s *ItemService) CreateItem(name, description, price, categoryId string, fi
 	return itemId, nil
 }
 
-func (s *ItemService) ChangeItem(itemId int, name, description, price, categoryId *string) error {
+func (s *ItemService) ChangeItem(itemId int, name, description, price, priceDeposit, categoryId *string) error {
 	if price != nil {
 		_, err := strconv.Atoi(*price)
+		if err != nil {
+			return err
+		}
+	}
+
+	if priceDeposit != nil {
+		_, err := strconv.Atoi(*priceDeposit)
 		if err != nil {
 			return err
 		}
@@ -123,7 +134,7 @@ func (s *ItemService) ChangeItem(itemId int, name, description, price, categoryI
 		}
 	}
 
-	return s.repo.ChangeItem(itemId, name, description, price, categoryId)
+	return s.repo.ChangeItem(itemId, name, description, price, priceDeposit, categoryId)
 }
 
 func (s *ItemService) DeleteItem(itemId int) error {

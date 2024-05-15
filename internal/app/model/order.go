@@ -5,6 +5,40 @@ import (
 	"time"
 )
 
+type OrderCreation struct {
+	RentalPeriodStart string `json:"rentalPeriodStart" binding:"required"`
+	RentalPeriodEnd   string `json:"rentalPeriodEnd" binding:"required"`
+	Address           string `json:"address" binding:"required"`
+	CompanyName       string `json:"companyName"`
+	DeliveryMethod    string `json:"deliveryMethod" binding:"required"`
+	TimeStart         string `json:"deliveryTimeStart" binding:"required"`
+	TimeEnd           string `json:"deliveryTimeEnd" binding:"required"`
+}
+
+type OrderCreationWithTime struct {
+	RentalPeriodStart time.Time `json:"rentalPeriodStart"`
+	RentalPeriodEnd   time.Time `json:"rentalPeriodEnd"`
+	Address           string    `json:"address"`
+	CompanyName       string    `json:"companyName"`
+	DeliveryMethod    string    `json:"deliveryMethod"`
+	TimeStart         time.Time `json:"deliveryTimeStart"`
+	TimeEnd           time.Time `json:"deliveryTimeEnd"`
+}
+
+type ItemCheque struct {
+	Name         string `json:"name" db:"name"`
+	Count        int    `json:"count" db:"count"`
+	Price        int    `json:"price" db:"price"`
+	PriceDeposit int    `json:"priceDeposit" db:"price_deposit"`
+}
+
+type OrderCheque struct {
+	OrderId      int          `json:"orderId"`
+	TotalPrice   int          `json:"totalPrice"`
+	TotalDeposit int          `json:"totalDeposit"`
+	Items        []ItemCheque `json:"items"`
+}
+
 type Order struct {
 	Id                int       `json:"id"`
 	Status            string    `json:"status"`
