@@ -1,5 +1,7 @@
 1.  Ожидание оплаты                                 - awaitingPayment
+⬇   (когда оплачен счёт)
 2.  Сбор заказа                                     - accepted
+⬇   (с 1. или 2. или readyToPickup, если отменил заказ)
 b.  Пользователь захотел отменить заказ             - awaitingRejection
 b.  Ожидание возврата денег                         - awaitingMoneyBack
 b.  Админ сделал всё необходимое чтобы его отменить - rejected
@@ -17,3 +19,7 @@ b.  Админ сделал всё необходимое чтобы его от
 10. Проверка состояния инструмента                  - itemsCheck
 11. Ожидание оплаты за ремонт                       - awaitingRepairPayment
 12. Заказ закрыт                                    - closed
+
+accepted - до Cluster
+accepted и у delivery появилася deliveryman_id - после Cluster, то, что возвращает deliveries-to-sort
+readyToDelivery - после согласия админа с кластером системы

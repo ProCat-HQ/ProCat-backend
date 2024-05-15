@@ -81,7 +81,7 @@ func (h *Handler) GetDelivery(c *gin.Context) {
 func (h *Handler) ChangeDeliveryStatus(c *gin.Context) {
 	id := c.Param("id")
 	var statusStruct struct {
-		Status string `json:"status"`
+		Status string `json:"status" binding:"required"`
 	}
 	err := c.ShouldBindJSON(&statusStruct)
 	if err != nil {
@@ -96,6 +96,7 @@ func (h *Handler) ChangeDeliveryStatus(c *gin.Context) {
 	c.JSON(http.StatusOK, model.Response{
 		Status:  http.StatusOK,
 		Message: "ok",
+		Payload: nil,
 	})
 }
 

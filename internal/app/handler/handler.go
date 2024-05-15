@@ -63,13 +63,13 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				deliveries.GET("/:id", h.GetAllDeliveriesForOneDeliveryman)
 				deliveries.GET("/delivery/:id", h.GetDelivery)
 				deliveries.PATCH("/:id", h.ChangeDeliveryStatus)
-				deliveries.POST("/create-route", h.CreateRoute)
+				deliveries.POST("/create-route", h.CreateRoute) // TODO
 			}
 		}
 
 		admin := users.Group("/admin", h.UserIdentify, h.CheckRole("admin"))
 		{
-			admin.POST("/cluster", h.Cluster)
+			admin.POST("/cluster", h.Cluster) // TODO
 			admin.GET("/deliveries-to-sort", h.GetAllDeliveriesToSort)
 			admin.PATCH("/change-delivery", h.ChangeDeliveryData)
 		}

@@ -43,7 +43,7 @@ type Delivery interface {
 type Admin interface {
 	GetDeliveries() ([]model.DeliveryAndOrder, []model.DeliveryMan, error)
 	SetDeliveries(map[model.Point]int) error
-	GetActualDeliveries() ([]model.DeliveryAddress, []model.Id, error)
+	GetDeliveriesToSort() (int, []model.DeliveriesForDeliveryMan, error)
 	ChangeDeliveryman(delivery int, deliverymanId int) error
 }
 

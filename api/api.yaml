@@ -48,7 +48,7 @@ tags:
 paths:
   /users:
     get:
-      deprecated: true
+      deprecated: false
       tags:
         - user
       summary: to get all users
@@ -109,7 +109,7 @@ paths:
 
   /users/{userId}:
     get:
-      deprecated: true
+      deprecated: false
       tags:
         - user
       summary: for simple user only for his page
@@ -143,7 +143,7 @@ paths:
           description: User not found
 
     delete:
-      deprecated: true
+      deprecated: false
       tags:
         - user
       summary: only for admin
@@ -167,23 +167,56 @@ paths:
         404:
           description: User not found
 
-  /users/sign-in:
+  /users/logout:
     post:
       tags:
         - auth
-      summary: phoneNumber + password
+      summary: deletes refresh token from db [Requires Auth header with Access Token]
       requestBody:
         content:
           application/json:
             schema:
               type: object
               properties:
-                phoneNumber:
+                refreshToken:
                   type: string
-                  example: +79000000000
-                password:
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjA2ODU4MzQsImlhdCI6MTcxNTUwMTgzNCwidXNlcklkIjoxMDB9.-uqsK1tTSjh1amOch1NhyaCoAQGr4YRUjt936WH43gM
+
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: ok
+                  payload:
+                    type: string
+                    example: null
+
+  /users/refresh:
+    post:
+      tags:
+        - auth
+      summary: refresh token pair
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
                   type: string
-                  example: kvmkd5lskdm
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjA2OTQ2ODksImp0aSI6IjU1NWQ0OWYzLTJjYzAtNDU0MC04Nzk5LTQwNGQ5Zjg2OGU4NiIsImlhdCI6MTcxNTUxMDY4OSwidXNlcklkIjoxMDB9.0ZiP5vw_1K6s-vGgbjjn4xY9TfaVEeqxOCy9uXRjYL0
+                fingerprint:
+                  type: string
+                  example: 541AF321CD12321
       responses:
         200:
           description: successful operation
@@ -201,7 +234,54 @@ paths:
                   payload:
                     type: object
                     properties:
-                      token:
+                      accessToken:
+                        type: string
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                      refreshToken:
+                        type: string
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+
+  /users/sign-in:
+    post:
+      tags:
+        - auth
+      summary: phoneNumber + password + fingerprint
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phoneNumber:
+                  type: string
+                  example: +79000000000
+                password:
+                  type: string
+                  example: kvmkd5lskdm
+                fingerprint:
+                  type: string
+                  example: 541AF321CD12321
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: ok
+                  payload:
+                    type: object
+                    properties:
+                      accessToken:
+                        type: string
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                      refreshToken:
                         type: string
                         example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
 
@@ -858,21 +938,25 @@ paths:
                   type: string
                   example: delivered
                   enum:
-                    - pendingConfirmation
-                    - pendingRejected
-                    - rejected
-                    - needsRevision
                     - awaitingPayment
                     - accepted
+                    - awaitingRejection
+                    - awaitingMoneyBack
+                    - rejected
+                    - readyToPickup
                     - readyToDelivery
                     - delivering
-                    - readyForPickup
-                    - received
-                    - closed
+                    - rent
                     - shouldBeReturned
-                    - returned
+                    - expired
                     - extensionRequest
                     - extended
+                    - problem
+                    - deliveryBack
+                    - returned
+                    - itemsCheck
+                    - awaitingRepairPayment
+                    - closed
       responses:
         200:
           description: successful operation
@@ -985,7 +1069,10 @@ paths:
                   payload:
                     type: object
                     properties:
-                      result:
+                      count:
+                        type: integer
+                        example: 10
+                      rows:
                         type: array
                         items:
                           properties:
@@ -1012,7 +1099,7 @@ paths:
     patch:
       tags:
         - admin
-      summary: change status of corresponding order of the delivery and maybe change deliveryman to it
+      summary: change status of corresponding order to 'readyToDelivery' and maybe changes 'deliveryman_id'
       requestBody:
         content:
           application/json:
@@ -1034,7 +1121,7 @@ paths:
                 $ref: '#/components/schemas/StatusCode200'
   /users/cart:
     get:
-      deprecated: true
+      deprecated: false
       tags:
         - cart
       summary: get items from the cart
@@ -1060,7 +1147,7 @@ paths:
                         items:
                           $ref: '#/components/schemas/ItemMini'
     post:
-      deprecated: true
+      deprecated: false
       tags:
         - cart
       summary: adds item with {itemId} with probably {count} to authorized user with {usedId}
@@ -1070,7 +1157,7 @@ paths:
             schema:
               type: object
               properties:
-                itemID:
+                itemId:
                   type: integer
                   example: 32
                 count:
@@ -1085,12 +1172,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/StatusCode200'
     delete:
-      deprecated: true
+      deprecated: false
       tags:
         - cart
       summary: decreases item (with {itemId}) number in cart by one or totally deletes item from the cart
       parameters:
-        - name: itemID
+        - name: itemId
           in: query
           required: false
           schema:
@@ -1108,7 +1195,7 @@ paths:
       deprecated: true
       tags:
         - order
-      summary: get all orders for current user
+      summary: get all orders for current user (if userId passed as param then you must be an 'admin')
       parameters:
         - name: limit
           in: query
@@ -1157,7 +1244,7 @@ paths:
                           $ref: '#/components/schemas/Order'
 
     post:
-      deprecated: true
+      deprecated: false
       tags:
         - order
       summary: creates new order and transfer all items from cart to this order
@@ -1169,10 +1256,10 @@ paths:
               properties:
                 rentalPeriodStart:
                   type: string
-                  example: 2023-10-19 20:30:00+03
+                  example: 2023-10-19 20:30:00
                 rentalPeriodEnd:
                   type: string
-                  example: 2023-10-27 20:30:00+03
+                  example: 2023-10-27 20:30:00
                 address:
                   type: string
                   example: ул. Пушкина д. 7 кв. 587
@@ -1208,6 +1295,29 @@ paths:
                       orderId:
                         type: integer
                         example: 45
+                      totalPrice:
+                        type: integer
+                        example: 2000
+                      totalDeposit:
+                        type: integer
+                        example: 20000
+                      items:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              example: Молоток
+                            count:
+                              type: integer
+                              example: 2
+                            price:
+                              type: integer
+                              example: 1000
+                            priceDeposit:
+                              type: integer
+                              example: 10000
   /users/orders/{orderId}:
     parameters:
       - name: orderId
@@ -1280,21 +1390,25 @@ paths:
                 status:
                   type: string
                   enum:
-                    - pendingConfirmation
-                    - pendingRejected
-                    - rejected
-                    - needsRevision
                     - awaitingPayment
                     - accepted
+                    - awaitingRejection
+                    - awaitingMoneyBack
+                    - rejected
+                    - readyToPickup
                     - readyToDelivery
                     - delivering
-                    - readyForPickup
-                    - received
-                    - closed
+                    - rent
                     - shouldBeReturned
-                    - returned
+                    - expired
                     - extensionRequest
                     - extended
+                    - problem
+                    - deliveryBack
+                    - returned
+                    - itemsCheck
+                    - awaitingRepairPayment
+                    - closed
       responses:
         200:
           description: successful operation
@@ -1715,7 +1829,7 @@ paths:
                           $ref: '#/components/schemas/Category'
   /items:
     get:
-      deprecated: true
+      deprecated: false
       tags:
         - item
       summary: get all items
@@ -1730,6 +1844,11 @@ paths:
           required: false
           schema:
             type: integer
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
         - name: categoryId
           in: query
           required: false
@@ -1794,15 +1913,14 @@ paths:
                               example: pic.jpg
 
     post:
-      deprecated: true
+      deprecated: false
       tags:
         - item
-      summary: for ADMIN, only for main info, another fields will be filled by another requests
+      summary: FORM-DATA HERE!!!, for ADMIN, only for main info, another fields will be filled by another requests
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              type: object
               properties:
                 name:
                   type: string
@@ -1813,6 +1931,9 @@ paths:
                 price:
                   type: integer
                   example: 2500
+                priceDeposit:
+                  type: integer
+                  example: 25000
                 categoryId:
                   type: integer
                   example: 0
@@ -1852,7 +1973,7 @@ paths:
         schema:
           type: integer
     get:
-      deprecated: true
+      deprecated: false
       tags:
         - item
       summary: get one item
@@ -1873,7 +1994,7 @@ paths:
                   payload:
                     $ref: '#/components/schemas/Item'
     delete:
-      deprecated: true
+      deprecated: false
       tags:
         - item
       responses:
@@ -1884,14 +2005,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/StatusCode200'
     patch:
-      deprecated: true
+      deprecated: false
+      summary: FORM-DATA HERE!!! all fields are optional
       tags:
         - item
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              type: object
               properties:
                 name:
                   type: string
@@ -1900,6 +2021,9 @@ paths:
                   type: string
                   example: Новое описание
                 price:
+                  type: integer
+                  example: 2500
+                priceDeposit:
                   type: integer
                   example: 2500
                 categoryId:
@@ -2288,15 +2412,24 @@ components:
           type: string
           example: delivering
           enum:
-            - pendingConfirmation
-            - cancelled
-            - needsRevision
             - awaitingPayment
             - accepted
+            - awaitingRejection
+            - awaitingMoneyBack
+            - rejected
+            - readyToPickup
             - readyToDelivery
             - delivering
-            - readyForPickup
-            - received
+            - rent
+            - shouldBeReturned
+            - expired
+            - extensionRequest
+            - extended
+            - problem
+            - deliveryBack
+            - returned
+            - itemsCheck
+            - awaitingRepairPayment
             - closed
         totalPrice:
           type: integer
@@ -2395,21 +2528,25 @@ components:
               type: string
               example: delivering
               enum:
-                - pendingConfirmation
-                - pendingRejected
-                - rejected
-                - needsRevision
                 - awaitingPayment
                 - accepted
+                - awaitingRejection
+                - awaitingMoneyBack
+                - rejected
+                - readyToPickup
                 - readyToDelivery
                 - delivering
-                - readyForPickup
-                - received
-                - closed
+                - rent
                 - shouldBeReturned
-                - returned
+                - expired
                 - extensionRequest
                 - extended
+                - problem
+                - deliveryBack
+                - returned
+                - itemsCheck
+                - awaitingRepairPayment
+                - closed
             totalPrice:
               type: integer
               example: 5000
@@ -2455,21 +2592,25 @@ components:
               type: string
               example: delivering
               enum:
-                - pendingConfirmation
-                - pendingRejected
-                - rejected
-                - needsRevision
                 - awaitingPayment
                 - accepted
+                - awaitingRejection
+                - awaitingMoneyBack
+                - rejected
+                - readyToPickup
                 - readyToDelivery
                 - delivering
-                - readyForPickup
-                - received
-                - closed
+                - rent
                 - shouldBeReturned
-                - returned
+                - expired
                 - extensionRequest
                 - extended
+                - problem
+                - deliveryBack
+                - returned
+                - itemsCheck
+                - awaitingRepairPayment
+                - closed
             totalPrice:
               type: integer
               example: 5000

@@ -40,7 +40,7 @@ type Delivery interface {
 
 type Admin interface {
 	MakeClustering() ([]model.DeliveriesForDeliveryMan, error)
-	GetActualDeliveries() ([]model.DeliveriesForDeliveryMan, error)
+	GetDeliveriesToSort() (int, []model.DeliveriesForDeliveryMan, error)
 	ChangeDeliveryman(deliveryId int, deliverymanId int) error
 }
 

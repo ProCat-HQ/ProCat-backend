@@ -54,20 +54,6 @@ type Order struct {
 	UserId            int
 }
 
-type OrderAndDeliveryInfo struct {
-	Id            int       `json:"id" db:"id"`
-	TimeStart     time.Time `json:"timeStart" db:"time_start"`
-	TimeEnd       time.Time `json:"timeEnd" db:"time_end"`
-	Method        string    `json:"method" db:"method"`
-	DeliveryManId int       `json:"deliveryManId" db:"deliveryman_id"`
-	OrderId       int       `json:"orderId" db:"order_id"`
-	Status        string    `json:"status" db:"status"`
-	TotalPrice    int       `json:"totalPrice" db:"total_price"`
-	Address       string    `json:"address" db:"address"`
-	Latitude      string    `json:"latitude" db:"latitude"`
-	Longitude     string    `json:"longitude" db:"longitude"`
-}
-
 type DeliveryWithOrder struct {
 	Id            int       `json:"id" db:"id"`
 	TimeStart     time.Time `json:"timeStart" db:"time_start"`
@@ -93,24 +79,6 @@ type OrderSmall struct {
 	Address    string `json:"address" db:"address"`
 	Latitude   string `json:"latitude" db:"latitude"`
 	Longitude  string `json:"longitude" db:"longitude"`
-}
-
-type DeliveryFullInfo struct {
-	Id            int        `json:"id" db:"id"`
-	TimeStart     time.Time  `json:"timeStart" db:"time_start"`
-	TimeEnd       time.Time  `json:"timeEnd" db:"time_end"`
-	Method        string     `json:"method" db:"method"`
-	DeliveryManId int        `json:"deliveryManId" db:"deliveryman_id"`
-	Order         OrderSmall `json:"order"`
-}
-
-type Delivery struct {
-	Id            int       `json:"id"`
-	TimeStart     time.Time `json:"timeStart"`
-	TimeEnd       time.Time `json:"timeEnd"`
-	Method        string    `json:"method"`
-	OrderId       int
-	DeliveryManId int
 }
 
 type DeliveryAddress struct {

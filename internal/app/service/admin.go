@@ -42,28 +42,12 @@ func (s *AdminService) MakeClustering() ([]model.DeliveriesForDeliveryMan, error
 	return result, nil
 }
 
-func (s *AdminService) GetActualDeliveries() ([]model.DeliveriesForDeliveryMan, error) {
-	deliveries, deliverymen, err := s.repo.GetActualDeliveries()
+func (s *AdminService) GetDeliveriesToSort() (int, []model.DeliveriesForDeliveryMan, error) {
+	count, rows, err := s.repo.GetDeliveriesToSort()
 	if err != nil {
-		return nil, err
+		return 0, nil, err
 	}
-	var result []model.DeliveriesForDeliveryMan
-	for _, deliveryman := range deliverymen {
-		result = append(result, model.DeliveriesForDeliveryMan{DeliverymanId: deliveryman.Id, Deliveries: make([]model.Point, 0)})
-	}
-	for _, delivery := range deliveries {
-		for i, man := range result {
-			if man.DeliverymanId == delivery.DeliverymanId {
-				result[i].Deliveries = append(result[i].Deliveries, model.Point{
-					Address:    delivery.Address,
-					Longitude:  delivery.Longitude,
-					Latitude:   delivery.Latitude,
-					DeliveryId: delivery.DeliveryId,
-				})
-			}
-		}
-	}
-	return result, nil
+	return count, rows, nil
 }
 
 func (s *AdminService) ChangeDeliveryman(deliveryId int, deliverymanId int) error {

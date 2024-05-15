@@ -9,7 +9,7 @@ import (
 )
 
 func (h *Handler) GetAllDeliveriesToSort(c *gin.Context) {
-	payload, err := h.services.GetActualDeliveries()
+	count, rows, err := h.services.GetDeliveriesToSort()
 	if err != nil {
 		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -17,7 +17,10 @@ func (h *Handler) GetAllDeliveriesToSort(c *gin.Context) {
 	c.JSON(http.StatusOK, model.Response{
 		Status:  http.StatusOK,
 		Message: "ok",
-		Payload: payload,
+		Payload: gin.H{
+			"count": count,
+			"rows":  rows,
+		},
 	})
 }
 

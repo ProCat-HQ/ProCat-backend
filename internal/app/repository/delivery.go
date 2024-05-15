@@ -31,7 +31,7 @@ func (r *DeliveryPostgres) GetDeliveriesOrdersForDeliveryman(deliverymanId int) 
                                                                WHERE o.status = $1 AND d.deliveryman_id = $2`, deliveriesTable, ordersTable)
 
 	var deliveries []model.DeliveryAndOrder
-	err := r.db.Select(&deliveries, query, "readyToDelivery", deliverymanId)
+	err := r.db.Select(&deliveries, query, model.ReadyToDelivery, deliverymanId)
 	if err != nil {
 		return nil, err
 	}
@@ -111,16 +111,12 @@ func (r *DeliveryPostgres) GetDelivery(id int) (model.DeliveryWithOrder, error) 
 }
 
 func (r *DeliveryPostgres) ChangeDeliveryStatus(id int, newStatus string) error {
-	query := fmt.Sprintf(`UPDATE %s
-								SET status = $1
+	query := fmt.Sprintf(`UPDATE %s SET status = $1
 								WHERE id
-										  IN (SELECT order_id
-											  FROM %s
-											  WHERE order_id = $2)`, ordersTable, deliveriesTable)
+								IN (SELECT order_id FROM %s WHERE id = $2)`, ordersTable, deliveriesTable)
 	_, err := r.db.Exec(query, newStatus, id)
 	if err != nil {
 		return err
 	}
-	fmt.Println(newStatus)
 	return nil
 }
