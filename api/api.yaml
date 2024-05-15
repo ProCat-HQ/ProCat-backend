@@ -1100,6 +1100,7 @@ paths:
       tags:
         - admin
       summary: change status of corresponding order to 'readyToDelivery' and maybe changes 'deliveryman_id'
+      description: if want change deliveryman -> send deliverymanId, otherwise - do not
       requestBody:
         content:
           application/json:

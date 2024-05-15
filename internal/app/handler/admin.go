@@ -26,7 +26,7 @@ func (h *Handler) GetAllDeliveriesToSort(c *gin.Context) {
 
 func (h *Handler) ChangeDeliveryData(c *gin.Context) {
 	var input struct {
-		DeliveryId    int `json:"deliveryId"`
+		DeliveryId    int `json:"deliveryId" binding:"required"`
 		DeliverymanId int `json:"deliverymanId"`
 	}
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -40,6 +40,7 @@ func (h *Handler) ChangeDeliveryData(c *gin.Context) {
 	c.JSON(http.StatusOK, model.Response{
 		Status:  http.StatusOK,
 		Message: "ok",
+		Payload: nil,
 	})
 }
 

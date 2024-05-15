@@ -79,11 +79,28 @@ func (r *AdminPostgres) GetDeliveriesToSort() (int, []model.DeliveriesForDeliver
 	return len(response), response, nil
 }
 
-func (r *AdminPostgres) ChangeDeliveryman(delivery int, deliverymanId int) error {
-	query := fmt.Sprintf(`UPDATE %s SET deliveryman_id = $1 WHERE id = $2`, deliveriesTable)
-	_, err := r.db.Exec(query, deliverymanId, delivery)
+func (r *AdminPostgres) ChangeDeliveryman(deliveryId int, deliverymanId int) error {
+	tx, err := r.db.Beginx()
 	if err != nil {
 		return err
 	}
-	return nil
+	defer tx.Rollback()
+
+	queryChangeStatus := fmt.Sprintf(`UPDATE %s AS o SET status=$1
+											FROM %s AS d WHERE o.id = d.order_id
+											AND d.id=$2`, ordersTable, deliveriesTable)
+
+	_, err = tx.Exec(queryChangeStatus, model.ReadyToDelivery, deliveryId)
+	if err != nil {
+		return err
+	}
+	if deliverymanId != 0 {
+		query := fmt.Sprintf(`UPDATE %s SET deliveryman_id = $1 WHERE id = $2`, deliveriesTable)
+		_, err = r.db.Exec(query, deliverymanId, deliveryId)
+		if err != nil {
+			return err
+		}
+	}
+	err = tx.Commit()
+	return err
 }

@@ -52,8 +52,5 @@ func (s *AdminService) GetDeliveriesToSort() (int, []model.DeliveriesForDelivery
 
 func (s *AdminService) ChangeDeliveryman(deliveryId int, deliverymanId int) error {
 	err := s.repo.ChangeDeliveryman(deliveryId, deliverymanId)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
