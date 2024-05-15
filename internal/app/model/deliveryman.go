@@ -29,7 +29,6 @@ type DeliveryManInfoCreate struct {
 	CarId             string `json:"carId" db:"car_id"`
 }
 
-// DeliveriesForDeliveryMan переместить
 type DeliveriesForDeliveryMan struct {
 	DeliverymanId int     `json:"deliverymanId"`
 	Deliveries    []Point `json:"deliveries"`

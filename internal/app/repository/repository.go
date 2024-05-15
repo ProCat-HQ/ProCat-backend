@@ -24,13 +24,16 @@ type Deliveryman interface {
 type Delivery interface {
 	GetDeliverymanId(userId int) (int, error)
 	GetDeliveriesOrdersForDeliveryman(deliverymanId int) ([]model.DeliveryAndOrder, error)
-	GetAllDeliveries(limit int, offset int) ([]model.DeliveryFullInfo, int, error)
+	GetAllDeliveries(statuses []string, limit int, offset int, id int) ([]model.OrderAndDeliveryInfo, int, error)
+	GetDelivery(id int) (*model.OrderAndDeliveryInfo, error)
 	ChangeDeliveryStatus(id int, newStatus string) error
 }
 
 type Admin interface {
 	GetDeliveries() ([]model.DeliveryAndOrder, []model.DeliveryMan, error)
 	SetDeliveries(map[model.Point]int) error
+	GetActualDeliveries() ([]model.DeliveryAddress, []model.Id, error)
+	ChangeDeliveryman(delivery int, deliverymanId int) error
 }
 
 type Cart interface {

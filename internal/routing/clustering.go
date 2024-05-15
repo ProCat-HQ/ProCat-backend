@@ -9,7 +9,9 @@ import (
 
 func ClusterOrders(deliveries []model.DeliveryAndOrder, deliveryMen []model.DeliveryMan) (map[model.Point]int, error) {
 	var coordinates clusters.Observations
+
 	mapId := make(map[model.Point]int)
+	mapAddress := make(map[model.Point]string)
 	for i := 0; i < len(deliveries); i++ {
 		x, err := strconv.ParseFloat(deliveries[i].Latitude, 64)
 		if err != nil {
@@ -23,7 +25,8 @@ func ClusterOrders(deliveries []model.DeliveryAndOrder, deliveryMen []model.Deli
 			x,
 			y,
 		})
-		mapId[model.Point{x, y, 0}] = deliveries[i].Id
+		mapId[model.Point{Longitude: y, Latitude: x}] = deliveries[i].Id
+		mapAddress[model.Point{Longitude: y, Latitude: x}] = deliveries[i].Address
 	}
 	//km, err := kmeans.NewWithOptions(0.01, plotter.SimplePlotter{})
 	//if err != nil {
@@ -37,10 +40,13 @@ func ClusterOrders(deliveries []model.DeliveryAndOrder, deliveryMen []model.Deli
 	answer := make(map[model.Point]int)
 	for i, c := range partition {
 		for _, k := range c.Observations {
-			answer[model.Point{Latitude: k.Coordinates()[0], Longitude: k.Coordinates()[1],
-				DeliveryId: mapId[model.Point{Latitude: k.Coordinates()[0], Longitude: k.Coordinates()[1]}]}] = deliveryMen[i].Id
+			answer[model.Point{
+				Address:    mapAddress[model.Point{Latitude: k.Coordinates()[0], Longitude: k.Coordinates()[1]}],
+				Latitude:   k.Coordinates()[0],
+				Longitude:  k.Coordinates()[1],
+				DeliveryId: mapId[model.Point{Latitude: k.Coordinates()[0], Longitude: k.Coordinates()[1]}],
+			}] = deliveryMen[i].Id
 		}
 	}
-
 	return answer, nil
 }

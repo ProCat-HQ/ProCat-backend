@@ -24,10 +24,15 @@ type Deliveryman interface {
 
 type Delivery interface {
 	GetDeliveriesForDeliveryman(userId int) (*model.MapRequest, error)
+	GetAllDeliveries(statuses []string, limit string, page string, idStr string) ([]model.DeliveryFullInfo, int, error)
+	GetDelivery(idStr string) (*model.DeliveryFullInfo, error)
+	ChangeDeliveryStatus(id string, newStatus string) error
 }
 
 type Admin interface {
 	MakeClustering() ([]model.DeliveriesForDeliveryMan, error)
+	GetActualDeliveries() ([]model.DeliveriesForDeliveryMan, error)
+	ChangeDeliveryman(deliveryId int, deliverymanId int) error
 }
 
 type Cart interface {

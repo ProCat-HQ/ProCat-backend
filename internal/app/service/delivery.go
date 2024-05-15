@@ -52,3 +52,67 @@ func (s *DeliveryService) GetDeliveriesForDeliveryman(userId int) (*model.MapReq
 
 	return req, nil
 }
+
+func (s *DeliveryService) GetAllDeliveries(statuses []string, limit string, page string, idStr string) ([]model.DeliveryFullInfo, int, error) {
+	lim, err := strconv.Atoi(limit)
+	if err != nil {
+		return nil, 0, err
+	}
+	pag, err := strconv.Atoi(page)
+	if err != nil {
+		return nil, 0, err
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return nil, 0, err
+	}
+	deliveries, count, err := s.repo.GetAllDeliveries(statuses, lim, lim*pag, id)
+	if err != nil {
+		return nil, 0, err
+	}
+	payload := make([]model.DeliveryFullInfo, len(deliveries))
+	for i, delivery := range deliveries {
+		makeDeliveryNote(&payload[i], delivery)
+	}
+	return payload, count, nil
+}
+
+func (s *DeliveryService) GetDelivery(idStr string) (*model.DeliveryFullInfo, error) {
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return nil, err
+	}
+	delivery, err := s.repo.GetDelivery(id)
+	if err != nil {
+		return nil, err
+	}
+	var payload model.DeliveryFullInfo
+	makeDeliveryNote(&payload, *delivery)
+	return &payload, nil
+}
+
+func makeDeliveryNote(note *model.DeliveryFullInfo, info model.OrderAndDeliveryInfo) {
+	note.Id = info.Id
+	note.TimeStart = info.TimeStart
+	note.TimeEnd = info.TimeEnd
+	note.Method = info.Method
+	note.DeliveryManId = info.DeliveryManId
+	note.Order.Id = info.OrderId
+	note.Order.Status = info.Status
+	note.Order.TotalPrice = info.TotalPrice
+	note.Order.Address = info.Address
+	note.Order.Latitude = info.Latitude
+	note.Order.Longitude = info.Longitude
+}
+
+func (s *DeliveryService) ChangeDeliveryStatus(idStr string, newStatus string) error {
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return err
+	}
+	err = s.repo.ChangeDeliveryStatus(id, newStatus)
+	if err != nil {
+		return err
+	}
+	return nil
+}

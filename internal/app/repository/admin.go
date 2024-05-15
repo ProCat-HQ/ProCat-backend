@@ -41,3 +41,28 @@ func (a *AdminPostgres) SetDeliveries(answerMap map[model.Point]int) error {
 	}
 	return nil
 }
+
+func (a *AdminPostgres) GetActualDeliveries() ([]model.DeliveryAddress, []model.Id, error) {
+	query := fmt.Sprintf(`SELECT d.id, o.address, o.latitude, o.longitude, d.deliveryman_id
+								 FROM %s d INNER JOIN %s o ON d.order_id = o.id WHERE o.status = $1`, deliveriesTable, ordersTable)
+	queryDeliverymen := fmt.Sprintf(`SELECT id FROM %s`, deliverymanTable)
+	var deliveries []model.DeliveryAddress
+	if err := a.db.Select(&deliveries, query, "to_delivery"); err != nil {
+		return nil, nil, err
+	}
+	var ids []model.Id
+	err := a.db.Select(&ids, queryDeliverymen)
+	if err != nil {
+		return nil, nil, err
+	}
+	return deliveries, ids, nil
+}
+
+func (a *AdminPostgres) ChangeDeliveryman(delivery int, deliverymanId int) error {
+	query := fmt.Sprintf(`UPDATE %s SET deliveryman_id = $1 WHERE id = $2`, deliveriesTable)
+	_, err := a.db.Exec(query, deliverymanId, delivery)
+	if err != nil {
+		return err
+	}
+	return nil
+}

@@ -31,21 +31,94 @@ func (r *DeliveryPostgres) GetDeliveriesOrdersForDeliveryman(deliverymanId int) 
                                                                WHERE o.status = $1 AND d.deliveryman_id = $2`, deliveriesTable, ordersTable)
 
 	var deliveries []model.DeliveryAndOrder
-	err := r.db.Select(&deliveries, query, "to_delivery", deliverymanId)
+	err := r.db.Select(&deliveries, query, "readyToDelivery", deliverymanId)
 	if err != nil {
 		return nil, err
 	}
 	return deliveries, nil
 }
 
-func (r *DeliveryPostgres) GetAllDeliveries(limit int, offset int) ([]model.DeliveryFullInfo, int, error) {
-	return nil, 0, nil
+func (r *DeliveryPostgres) GetAllDeliveries(statuses []string, limit int, offset int, id int) ([]model.OrderAndDeliveryInfo, int, error) {
+	query := fmt.Sprintf(`SELECT d.id, time_start, time_end, method, coalesce(deliveryman_id, -1) as deliveryman_id, order_id, status, total_price, address, latitude, longitude
+								FROM %s d
+									JOIN %s o
+										ON o.id = d.order_id`, deliveriesTable, ordersTable)
+	if len(statuses) > 0 || id >= 0 {
+		query = query + ` WHERE`
+	}
+	if id >= 0 {
+		query += ` deliveryman_id = $1`
+		if len(statuses) > 0 {
+			query += ` AND`
+		}
+	}
+	if len(statuses) > 0 {
+		query += ` status IN (`
+		for i, status := range statuses {
+			query = query + fmt.Sprintf(`'%s'`, status)
+			if i != len(statuses)-1 {
+				query = query + `, `
+			} else {
+				query += `)`
+			}
+
+		}
+	}
+	var count int
+	queryCount := fmt.Sprintf(`SELECT COUNT(*) FROM %s`, deliveriesTable)
+	var err error
+	if id == -1 {
+		err = r.db.Get(&count, queryCount)
+	} else {
+		queryCount += ` WHERE deliveryman_id = $1`
+		err = r.db.Get(&count, queryCount, id)
+	}
+
+	if err != nil {
+		return nil, 0, err
+	}
+
+	var deliveries []model.OrderAndDeliveryInfo
+	if id == -1 {
+		query = query + ` LIMIT $1 OFFSET $2`
+		err = r.db.Select(&deliveries, query, limit, offset)
+	} else {
+		query = query + ` LIMIT $2 OFFSET $3`
+		err = r.db.Select(&deliveries, query, id, limit, offset)
+	}
+
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return deliveries, count, nil
 }
 
-func (r *DeliveryPostgres) GetAllDeliveriesForOneDeliveryman(id int, limit int, offset int) (*model.DeliveryFullInfo, error) {
-	return nil, nil
+func (r *DeliveryPostgres) GetDelivery(id int) (*model.OrderAndDeliveryInfo, error) {
+	query := fmt.Sprintf(`SELECT d.id, time_start, time_end, method, coalesce(deliveryman_id, -1) as deliveryman_id, order_id, status, total_price, address, latitude, longitude
+								FROM %s d
+									JOIN %s o
+										ON o.id = d.order_id
+										WHERE d.id = $1`, deliveriesTable, ordersTable)
+	var delivery model.OrderAndDeliveryInfo
+	err := r.db.Get(&delivery, query, id)
+	if err != nil {
+		return nil, err
+	}
+	return &delivery, nil
 }
 
 func (r *DeliveryPostgres) ChangeDeliveryStatus(id int, newStatus string) error {
+	query := fmt.Sprintf(`UPDATE %s
+								SET status = $1
+								WHERE id
+										  IN (SELECT order_id
+											  FROM %s
+											  WHERE order_id = $2)`, ordersTable, deliveriesTable)
+	_, err := r.db.Exec(query, newStatus, id)
+	if err != nil {
+		return err
+	}
+	fmt.Println(newStatus)
 	return nil
 }

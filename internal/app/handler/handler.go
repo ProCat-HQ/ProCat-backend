@@ -54,10 +54,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 			deliveries := deliverymen.Group("/deliveries")
 			{
-				deliveries.GET("/", h.CheckRole("admin"), h.GetAllDeliveries) // TODO
-				deliveries.GET("/:id", h.GetAllDeliveriesForOneDeliveryman)   // TODO
-				deliveries.PATCH("/:id", h.ChangeDeliveryStatus)              // TODO
-				deliveries.POST("/create-route", h.CreateRoute)               // TODO
+				deliveries.GET("/", h.CheckRole("admin"), h.GetAllDeliveries)
+				deliveries.GET("/:id", h.GetAllDeliveriesForOneDeliveryman)
+				deliveries.GET("/delivery/:id", h.GetDelivery)
+				deliveries.PATCH("/:id", h.ChangeDeliveryStatus)
+				deliveries.POST("/create-route", h.CreateRoute)
 			}
 		}
 
