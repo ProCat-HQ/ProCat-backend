@@ -41,6 +41,7 @@ services:
 
 volumes:
   procat_db_tmp:
+  procat_assets:
 
 networks:
   internet:
