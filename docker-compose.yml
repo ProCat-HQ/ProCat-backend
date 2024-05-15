@@ -10,7 +10,7 @@ services:
     depends_on:
       - procat-db
     volumes:
-      - procat_assets:/procat/assets
+      - procat_assets:/go/assets
     ports:
       - "${BIND_ADDR}:${BIND_ADDR}"
     networks:
