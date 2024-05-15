@@ -30,14 +30,14 @@ func (s *DeliverymanService) GetAllDeliverymen(limit string, page string) ([]mod
 	return deliverymen, count, nil
 }
 
-func (s *DeliverymanService) GetDeliveryman(deliveryId string) (*model.DeliveryManInfoCreate, error) {
-	id, err := strconv.Atoi(deliveryId)
+func (s *DeliverymanService) GetDeliveryman(userId string) (model.DeliveryManInfoCreate, error) {
+	id, err := strconv.Atoi(userId)
 	if err != nil {
-		return nil, err
+		return model.DeliveryManInfoCreate{}, err
 	}
 	deliveryman, err := s.repo.GetDeliveryman(id)
 	if err != nil {
-		return nil, err
+		return model.DeliveryManInfoCreate{}, err
 	}
 	return deliveryman, nil
 }

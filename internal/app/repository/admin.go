@@ -18,7 +18,7 @@ func (a *AdminPostgres) GetDeliveries() ([]model.DeliveryAndOrder, []model.Deliv
 	query := fmt.Sprintf(`SELECT d.id, d.time_start, d.time_end, d.method, o.address, o.latitude, o.longitude, d.order_id, d.deliveryman_id
 								 FROM %s d INNER JOIN %s o ON d.order_id = o.id WHERE o.status = $1`, deliveriesTable, ordersTable)
 
-	queryDeliveryMan := fmt.Sprintf(`SELECT id, car_capacity, working_hours_start, working_hours_end  FROM %s`, deliverymanTable)
+	queryDeliveryMan := fmt.Sprintf(`SELECT id, car_capacity, working_hours_start, working_hours_end  FROM %s`, deliverymenTable)
 
 	var deliveries []model.DeliveryAndOrder
 	var deliverymen []model.DeliveryMan
@@ -45,7 +45,7 @@ func (a *AdminPostgres) SetDeliveries(answerMap map[model.Point]int) error {
 func (a *AdminPostgres) GetActualDeliveries() ([]model.DeliveryAddress, []model.Id, error) {
 	query := fmt.Sprintf(`SELECT d.id, o.address, o.latitude, o.longitude, d.deliveryman_id
 								 FROM %s d INNER JOIN %s o ON d.order_id = o.id WHERE o.status = $1`, deliveriesTable, ordersTable)
-	queryDeliverymen := fmt.Sprintf(`SELECT id FROM %s`, deliverymanTable)
+	queryDeliverymen := fmt.Sprintf(`SELECT id FROM %s`, deliverymenTable)
 	var deliveries []model.DeliveryAddress
 	if err := a.db.Select(&deliveries, query, "to_delivery"); err != nil {
 		return nil, nil, err

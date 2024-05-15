@@ -9,6 +9,8 @@ services:
     restart: unless-stopped
     depends_on:
       - procat-db
+    volumes:
+      - procat_assets:/go/assets
     ports:
       - "${BIND_ADDR}:${BIND_ADDR}"
     networks:
@@ -21,23 +23,25 @@ services:
     restart: unless-stopped
     volumes:
       - procat_db_tmp:/var/lib/postgresql/data
-    ports:
-      - "2200:${DB_PORT}"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME}"]
-      interval: 5s
+      test: ["CMD", "pg_isready", "-U", "${DB_USERNAME}", "-d", "${DB_NAME}", "-p", "${DB_PORT}"]
+      interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 15s
     environment:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
+    expose:
+      - "${DB_PORT}"
     command: -p ${DB_PORT}
     networks:
       - appnet
 
 volumes:
   procat_db_tmp:
+  procat_assets:
 
 networks:
   internet:

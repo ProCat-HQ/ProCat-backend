@@ -1,17 +1,32 @@
-DELETE FROM users WHERE email = 'admin@gmail.com';
-DELETE FROM users WHERE email = 'deliveryman1@gmail.com';
-DELETE FROM users WHERE email = 'deliveryman2@gmail.com';
-DELETE FROM users WHERE email = 'user@gmail.com';
+DELETE FROM message_images;
+DELETE FROM messages;
+DELETE FROM chats;
 
-DELETE FROM items WHERE name = 'Молоток';
-DELETE FROM items WHERE name = 'Пила';
-DELETE FROM items WHERE name = 'Отвёртка';
+DELETE FROM notifications;
 
-DELETE FROM orders WHERE id = 56;
-DELETE FROM orders WHERE id = 57;
-DELETE FROM orders WHERE id = 58;
-DELETE FROM orders WHERE id = 59;
-DELETE FROM orders WHERE id = 60;
-DELETE FROM orders WHERE id = 61;
-DELETE FROM orders WHERE id = 62;
-DELETE FROM orders WHERE id = 63;
+DELETE FROM subscriptions_items;
+DELETE FROM subscriptions;
+
+DELETE FROM carts_items;
+DELETE FROM carts;
+
+DELETE FROM infos;
+DELETE FROM orders_items;
+DELETE FROM item_images;
+DELETE FROM item_stores;
+DELETE FROM stores;
+
+DELETE FROM items;
+
+DELETE FROM categories;
+
+DELETE FROM payments;
+DELETE FROM deliveries;
+DELETE FROM coordinates;
+DELETE FROM routes;
+
+DELETE FROM orders;
+DELETE FROM verifications;
+DELETE FROM deliverymen;
+DELETE FROM refresh_sessions;
+DELETE FROM users;

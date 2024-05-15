@@ -5,6 +5,40 @@ import (
 	"time"
 )
 
+type OrderCreation struct {
+	RentalPeriodStart string `json:"rentalPeriodStart" binding:"required"`
+	RentalPeriodEnd   string `json:"rentalPeriodEnd" binding:"required"`
+	Address           string `json:"address" binding:"required"`
+	CompanyName       string `json:"companyName"`
+	DeliveryMethod    string `json:"deliveryMethod" binding:"required"`
+	TimeStart         string `json:"deliveryTimeStart" binding:"required"`
+	TimeEnd           string `json:"deliveryTimeEnd" binding:"required"`
+}
+
+type OrderCreationWithTime struct {
+	RentalPeriodStart time.Time `json:"rentalPeriodStart"`
+	RentalPeriodEnd   time.Time `json:"rentalPeriodEnd"`
+	Address           string    `json:"address"`
+	CompanyName       string    `json:"companyName"`
+	DeliveryMethod    string    `json:"deliveryMethod"`
+	TimeStart         time.Time `json:"deliveryTimeStart"`
+	TimeEnd           time.Time `json:"deliveryTimeEnd"`
+}
+
+type ItemCheque struct {
+	Name         string `json:"name" db:"name"`
+	Count        int    `json:"count" db:"count"`
+	Price        int    `json:"price" db:"price"`
+	PriceDeposit int    `json:"priceDeposit" db:"price_deposit"`
+}
+
+type OrderCheque struct {
+	OrderId      int          `json:"orderId"`
+	TotalPrice   int          `json:"totalPrice"`
+	TotalDeposit int          `json:"totalDeposit"`
+	Items        []ItemCheque `json:"items"`
+}
+
 type Order struct {
 	Id                int       `json:"id"`
 	Status            string    `json:"status"`
@@ -32,6 +66,24 @@ type OrderAndDeliveryInfo struct {
 	Address       string    `json:"address" db:"address"`
 	Latitude      string    `json:"latitude" db:"latitude"`
 	Longitude     string    `json:"longitude" db:"longitude"`
+}
+
+type DeliveryWithOrder struct {
+	Id            int       `json:"id" db:"id"`
+	TimeStart     time.Time `json:"timeStart" db:"time_start"`
+	TimeEnd       time.Time `json:"timeEnd" db:"time_end"`
+	Method        string    `json:"method" db:"method"`
+	DeliveryManId int       `json:"deliveryManId" db:"deliveryman_id"`
+	SmallOrder    `json:"order"`
+}
+
+type SmallOrder struct {
+	OrderId    int    `json:"id" db:"order_id"`
+	Status     string `json:"status" db:"status"`
+	TotalPrice int    `json:"totalPrice" db:"total_price"`
+	Address    string `json:"address" db:"address"`
+	Latitude   string `json:"latitude" db:"latitude"`
+	Longitude  string `json:"longitude" db:"longitude"`
 }
 
 type OrderSmall struct {

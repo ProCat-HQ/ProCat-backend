@@ -16,3 +16,10 @@ type Point struct {
 type Id struct {
 	Id int `json:"id" db:"id"`
 }
+
+type KZGovResponse struct {
+	IinBin      string  `json:"iinBin"`
+	NameKk      string  `json:"nameKk"`
+	NameRu      string  `json:"nameRu"`
+	TotalArrear float64 `json:"totalArrear"`
+}

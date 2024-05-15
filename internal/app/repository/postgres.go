@@ -7,7 +7,10 @@ import (
 
 const (
 	usersTable              = "users"
-	deliverymanTable        = "deliverymen"
+	refreshSessionsTable    = "refresh_sessions"
+	deliverymenTable        = "deliverymen"
+	routesTable             = "routes"
+	coordinatesTable        = "coordinates"
 	verificationsTable      = "verifications"
 	ordersTable             = "orders"
 	deliveriesTable         = "deliveries"

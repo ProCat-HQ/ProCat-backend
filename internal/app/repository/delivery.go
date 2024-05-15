@@ -15,7 +15,7 @@ func NewDeliveryPostgres(db *sqlx.DB) *DeliveryPostgres {
 }
 
 func (r *DeliveryPostgres) GetDeliverymanId(userId int) (int, error) {
-	query := fmt.Sprintf(`SELECT id FROM %s WHERE user_id = $1`, deliverymanTable)
+	query := fmt.Sprintf(`SELECT id FROM %s WHERE user_id = $1`, deliverymenTable)
 	row := r.db.QueryRow(query, userId)
 
 	var id int
@@ -38,11 +38,12 @@ func (r *DeliveryPostgres) GetDeliveriesOrdersForDeliveryman(deliverymanId int) 
 	return deliveries, nil
 }
 
-func (r *DeliveryPostgres) GetAllDeliveries(statuses []string, limit int, offset int, id int) ([]model.OrderAndDeliveryInfo, int, error) {
-	query := fmt.Sprintf(`SELECT d.id, time_start, time_end, method, coalesce(deliveryman_id, -1) as deliveryman_id, order_id, status, total_price, address, latitude, longitude
+func (r *DeliveryPostgres) GetAllDeliveries(statuses []string, limit int, offset int, id int) ([]model.DeliveryWithOrder, int, error) {
+	query := fmt.Sprintf(`SELECT d.id, time_start, time_end, method, COALESCE(deliveryman_id, -1) AS deliveryman_id,
+       							order_id, status, total_price, address, COALESCE(latitude, '') AS latitude,
+       							COALESCE(longitude, '') AS longitude
 								FROM %s d
-									JOIN %s o
-										ON o.id = d.order_id`, deliveriesTable, ordersTable)
+								JOIN %s o ON o.id = d.order_id`, deliveriesTable, ordersTable)
 	if len(statuses) > 0 || id >= 0 {
 		query = query + ` WHERE`
 	}
@@ -78,7 +79,7 @@ func (r *DeliveryPostgres) GetAllDeliveries(statuses []string, limit int, offset
 		return nil, 0, err
 	}
 
-	var deliveries []model.OrderAndDeliveryInfo
+	var deliveries []model.DeliveryWithOrder
 	if id == -1 {
 		query = query + ` LIMIT $1 OFFSET $2`
 		err = r.db.Select(&deliveries, query, limit, offset)
@@ -94,18 +95,19 @@ func (r *DeliveryPostgres) GetAllDeliveries(statuses []string, limit int, offset
 	return deliveries, count, nil
 }
 
-func (r *DeliveryPostgres) GetDelivery(id int) (*model.OrderAndDeliveryInfo, error) {
-	query := fmt.Sprintf(`SELECT d.id, time_start, time_end, method, coalesce(deliveryman_id, -1) as deliveryman_id, order_id, status, total_price, address, latitude, longitude
+func (r *DeliveryPostgres) GetDelivery(id int) (model.DeliveryWithOrder, error) {
+	query := fmt.Sprintf(`SELECT d.id, time_start, time_end, method, COALESCE(deliveryman_id, -1) AS deliveryman_id,
+       							order_id, status, total_price, address, COALESCE(latitude, '') AS latitude,
+       							COALESCE(longitude, '') AS longitude
 								FROM %s d
-									JOIN %s o
-										ON o.id = d.order_id
-										WHERE d.id = $1`, deliveriesTable, ordersTable)
-	var delivery model.OrderAndDeliveryInfo
+								JOIN %s o ON o.id = d.order_id
+								WHERE d.id = $1`, deliveriesTable, ordersTable)
+	var delivery model.DeliveryWithOrder
 	err := r.db.Get(&delivery, query, id)
 	if err != nil {
-		return nil, err
+		return model.DeliveryWithOrder{}, err
 	}
-	return &delivery, nil
+	return delivery, nil
 }
 
 func (r *DeliveryPostgres) ChangeDeliveryStatus(id int, newStatus string) error {

@@ -34,22 +34,14 @@ func (h *Handler) GetAllDeliverymen(c *gin.Context) {
 }
 
 func (h *Handler) GetDeliveryman(c *gin.Context) {
-	deliverymanId := c.Param("id")
+	userId := c.Param("id")
 
-	payload, err := h.services.Deliveryman.GetDeliveryman(deliverymanId)
+	payload, err := h.services.Deliveryman.GetDeliveryman(userId)
 	if err != nil {
 		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	if payload == nil {
-		c.JSON(http.StatusOK, model.Response{
-			Status:  http.StatusOK,
-			Message: "ok",
-			Payload: nil,
-		})
-		return
-	}
 	c.JSON(http.StatusOK, model.Response{
 		Status:  http.StatusOK,
 		Message: "ok",
@@ -97,6 +89,7 @@ func (h *Handler) ChangeDeliverymanData(c *gin.Context) {
 	c.JSON(http.StatusOK, model.Response{
 		Status:  http.StatusOK,
 		Message: "ok",
+		Payload: nil,
 	})
 }
 
@@ -112,5 +105,6 @@ func (h *Handler) DeleteDeliveryman(c *gin.Context) {
 	c.JSON(http.StatusOK, model.Response{
 		Status:  http.StatusOK,
 		Message: "ok",
+		Payload: nil,
 	})
 }

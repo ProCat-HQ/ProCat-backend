@@ -11,6 +11,15 @@ CREATE TABLE IF NOT EXISTS users
     created_at            TIMESTAMP                   DEFAULT now()
 );
 
+CREATE TABLE IF NOT EXISTS refresh_sessions
+(
+    id            SERIAL PRIMARY KEY,
+    refresh_token VARCHAR NOT NULL,
+    fingerprint   VARCHAR NOT NULL,
+    user_id       INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS deliverymen
 (
     id                  SERIAL PRIMARY KEY,
@@ -20,23 +29,6 @@ CREATE TABLE IF NOT EXISTS deliverymen
     car_id              VARCHAR(30),
     user_id             INTEGER UNIQUE NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS routes
-(
-    id             SERIAL PRIMARY KEY,
-    deliveryman_id INTEGER,
-    FOREIGN KEY (deliveryman_id) REFERENCES deliverymen (id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS coordinates
-(
-    id              SERIAL PRIMARY KEY,
-    latitude        INTEGER NOT NULL,
-    longitude       INTEGER NOT NULL,
-    sequence_number INTEGER NOT NULL,
-    route_id        INTEGER NOT NULL,
-    FOREIGN KEY (route_id) REFERENCES routes (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS verifications
@@ -67,6 +59,23 @@ CREATE TABLE IF NOT EXISTS orders
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS routes
+(
+    id             SERIAL PRIMARY KEY,
+    deliveryman_id INTEGER,
+    FOREIGN KEY (deliveryman_id) REFERENCES deliverymen (id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS coordinates
+(
+    id              SERIAL PRIMARY KEY,
+    sequence_number INTEGER NOT NULL,
+    order_id        INTEGER NOT NULL,
+    route_id        INTEGER NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE SET NULL,
+    FOREIGN KEY (route_id) REFERENCES routes (id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS deliveries
 (
     id             SERIAL PRIMARY KEY,
@@ -83,7 +92,7 @@ CREATE TABLE IF NOT EXISTS payments
 (
     id         SERIAL PRIMARY KEY,
     paid       INTEGER     NOT NULL DEFAULT 0,
-    method     VARCHAR(50) NOT NULL,
+    method     VARCHAR(50),
     price      INTEGER     NOT NULL,
     created_at TIMESTAMP            DEFAULT now(),
     order_id   INTEGER     NOT NULL,
@@ -100,12 +109,13 @@ CREATE TABLE IF NOT EXISTS categories
 
 CREATE TABLE IF NOT EXISTS items
 (
-    id          SERIAL PRIMARY KEY,
-    name        VARCHAR(255) NOT NULL,
-    description VARCHAR,
-    price       INTEGER      NOT NULL,
-    is_in_stock BOOLEAN      NOT NULL DEFAULT FALSE,
-    category_id INTEGER,
+    id            SERIAL PRIMARY KEY,
+    name          VARCHAR(255) NOT NULL,
+    description   VARCHAR,
+    price         INTEGER      NOT NULL,
+    price_deposit INTEGER      NOT NULL,
+    is_in_stock   BOOLEAN      NOT NULL DEFAULT FALSE,
+    category_id   INTEGER,
     FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE SET NULL
 --     similar_to INTEGER[],
 --     FOREIGN KEY (EACH ELEMENT OF similar_to) REFERENCES items
@@ -129,7 +139,7 @@ CREATE TABLE IF NOT EXISTS item_stores
     store_id        INTEGER,
     item_id         INTEGER NOT NULL,
     FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE,
-    FOREIGN KEY (store_id) REFERENCES stores (id) ON DELETE SET NULL
+    FOREIGN KEY (store_id) REFERENCES stores (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS item_images
@@ -162,7 +172,7 @@ CREATE TABLE IF NOT EXISTS infos
 CREATE TABLE IF NOT EXISTS carts
 (
     id      SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
+    user_id INTEGER UNIQUE NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
@@ -179,7 +189,7 @@ CREATE TABLE IF NOT EXISTS carts_items
 CREATE TABLE IF NOT EXISTS subscriptions
 (
     id      SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
+    user_id INTEGER UNIQUE NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
@@ -203,12 +213,12 @@ CREATE TABLE IF NOT EXISTS notifications
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
---Нужно created_at
 CREATE TABLE IF NOT EXISTS chats
 (
     id             SERIAL PRIMARY KEY,
     name           VARCHAR(255) NOT NULL,
     is_solved      BOOLEAN      NOT NULL DEFAULT FALSE,
+    created_at     TIMESTAMP             DEFAULT now(),
     first_user_id  INTEGER,
     second_user_id INTEGER,
     order_id       INTEGER,
@@ -235,3 +245,8 @@ CREATE TABLE IF NOT EXISTS message_images
     message_id INTEGER NOT NULL,
     FOREIGN KEY (message_id) REFERENCES messages (id) ON DELETE CASCADE
 );
+
+CREATE UNIQUE INDEX unique_index_carts_items ON carts_items (cart_id, item_id);
+CREATE UNIQUE INDEX unique_index_subscriptions_items ON subscriptions_items (subscription_id, item_id);
+CREATE UNIQUE INDEX unique_index_orders_items ON orders_items (order_id, item_id);
+CREATE UNIQUE INDEX unique_index_item_stores ON item_stores (store_id, item_id);

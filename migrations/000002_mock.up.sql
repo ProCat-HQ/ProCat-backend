@@ -15,11 +15,37 @@ INSERT INTO deliverymen (car_capacity, working_hours_start, working_hours_end, c
 VALUES ('big', '10:00', '16:00', 'A123BC', 101),
        ('medium', '12:00', '20:00', 'X777XX', 102);
 
-INSERT INTO items (name, description, price, is_in_stock, category_id)
-VALUES ('Молоток', 'Хороший молоток, крепкий', 2000, true, null),
-       ('Пила', 'Хорошо пилит, мощно', 3000, true, null),
-       ('Отвёртка', 'Хорошо крутит, отлично', 4000, false, null);
+INSERT INTO categories (id, name, parent_id)
+VALUES (0, 'root', NULL), -- THIS CATEGORY ALWAYS MUST BE!!!
+       (1, 'cat1', 0),
+       (2, 'cat2', 1);
 
+INSERT INTO items (name, description, price, price_deposit, is_in_stock, category_id)
+VALUES ('Молоток', 'Хороший молоток, крепкий', 2000, 20000, true, 2),
+       ('Пила', 'Хорошо пилит, мощно', 3000, 30000, true, null),
+       ('Отвёртка', 'Хорошо крутит, отлично', 4000, 40000, false, 1);
+
+INSERT INTO infos (name, description, item_id)
+VALUES ('ВЕС', 'большой', 1),
+       ('gabariti', 'like a closet', 1),
+       ('eshcho cho-ta', 'property', 1),
+       ('eshcho cho-ta', 'property', 2);
+
+INSERT INTO item_images (image, item_id)
+VALUES ('first1', 1),
+       ('second1', 1),
+       ('third1', 1),
+       ('first3', 3);
+
+INSERT INTO stores (name, address, working_hours_start, working_hours_end)
+VALUES ('1', '1', '8:00', '20:00'),
+       ('2', '2', '7:30', '21:00');
+
+INSERT INTO item_stores (in_stock_number, store_id, item_id)
+VALUES (2, 1, 1),
+       (3, 2, 1),
+       (0, 1, 2),
+       (1, 2, 3);
 
 INSERT INTO orders (id, status, total_price, deposit, rental_period_start, rental_period_end, address, latitude,
                     longitude, company_name, user_id)

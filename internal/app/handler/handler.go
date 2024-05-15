@@ -16,16 +16,21 @@ func NewHandler(services *service.Service) *Handler {
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
+	router.StaticFS("/assets", gin.Dir("./assets", false))
+
 	users := router.Group("/users")
 	{
 		usersAuthenticatedGroup := users.Group("", h.UserIdentify)
 		{
-			usersAuthenticatedGroup.GET("/", h.CheckRole("admin"), h.GetAllUsers)      // TODO
-			usersAuthenticatedGroup.GET("/:id", h.GetUser)                             // TODO need to check that the user has id equals to ":"id"
+			usersAuthenticatedGroup.GET("", h.CheckRole("admin"), h.GetAllUsers)
+			usersAuthenticatedGroup.GET("/:id", h.MustBelongsToUser, h.GetUser)
 			usersAuthenticatedGroup.DELETE("/:id", h.CheckRole("admin"), h.DeleteUser) // TODO
+
+			users.POST("/logout", h.Logout)
 		}
 		users.POST("/sign-in", h.SignIn)
 		users.POST("/sign-up", h.SignUp)
+		users.POST("/refresh", h.RefreshToken)
 
 		verification := users.Group("/verification", h.UserIdentify)
 		{
@@ -46,15 +51,15 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		deliverymen := users.Group("/deliverymen", h.UserIdentify, h.CheckRole("deliveryman"))
 		{
-			deliverymen.GET("/", h.GetAllDeliverymen)
-			deliverymen.GET("/:id", h.GetDeliveryman)
+			deliverymen.GET("", h.GetAllDeliverymen)
+			deliverymen.GET("/:id", h.MustBelongsToUser, h.GetDeliveryman)
 			deliverymen.POST("/:id", h.CheckRole("admin"), h.CreateDeliveryman)
 			deliverymen.PATCH("/:id", h.CheckRole("admin"), h.ChangeDeliverymanData)
 			deliverymen.DELETE("/:id", h.CheckRole("admin"), h.DeleteDeliveryman)
 
 			deliveries := deliverymen.Group("/deliveries")
 			{
-				deliveries.GET("/", h.CheckRole("admin"), h.GetAllDeliveries)
+				deliveries.GET("", h.CheckRole("admin"), h.GetAllDeliveries)
 				deliveries.GET("/:id", h.GetAllDeliveriesForOneDeliveryman)
 				deliveries.GET("/delivery/:id", h.GetDelivery)
 				deliveries.PATCH("/:id", h.ChangeDeliveryStatus)
@@ -64,23 +69,23 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		admin := users.Group("/admin", h.UserIdentify, h.CheckRole("admin"))
 		{
-			admin.POST("/cluster", h.Cluster)                          // TODO
-			admin.GET("/deliveries-to-sort", h.GetAllDeliveriesToSort) // TODO
-			admin.PATCH("/change-delivery", h.ChangeDeliveryData)      // TODO
+			admin.POST("/cluster", h.Cluster)
+			admin.GET("/deliveries-to-sort", h.GetAllDeliveriesToSort)
+			admin.PATCH("/change-delivery", h.ChangeDeliveryData)
 		}
 
 		cart := users.Group("/cart", h.UserIdentify)
 		{
-			cart.GET("/", h.GetCartItems)           // TODO
-			cart.POST("/", h.AddItemsToCart)        // TODO
-			cart.DELETE("/", h.DeleteItemsFromCart) // TODO
+			cart.GET("", h.GetCartItems)
+			cart.POST("", h.AddItemsToCart)
+			cart.DELETE("/:id", h.DeleteItemsFromCart)
 		}
 
 		orders := users.Group("/orders", h.UserIdentify)
 		{
-			orders.GET("/", h.GetAllOrders)                                        // TODO
-			orders.GET("/:id", h.GetOrder)                                         // TODO
-			orders.POST("/", h.CreateOrder)                                        // TODO
+			orders.GET("", h.GetAllOrders) // TODO
+			orders.GET("/:id", h.GetOrder) // TODO
+			orders.POST("", h.CreateOrder)
 			orders.POST("/cancel/:id", h.CancelOrder)                              // TODO
 			orders.PATCH("/status/:id", h.CheckRole("admin"), h.ChangeOrderStatus) // TODO
 
@@ -93,14 +98,14 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		subscriptions := users.Group("/subscriptions", h.UserIdentify)
 		{
-			subscriptions.GET("/", h.GetAllSubscriptions)               // TODO
-			subscriptions.POST("/", h.SubscribeToItem)                  // TODO
+			subscriptions.GET("", h.GetAllSubscriptions)                // TODO
+			subscriptions.POST("", h.SubscribeToItem)                   // TODO
 			subscriptions.DELETE("/:id", h.DeleteItemFromSubscriptions) // TODO
 		}
 
 		notifications := users.Group("/notifications", h.UserIdentify)
 		{
-			notifications.GET("/", h.GetAllNotifications)                            // TODO
+			notifications.GET("", h.GetAllNotifications)                             // TODO
 			notifications.POST("/:id", h.CheckRole("admin"), h.SendNotification)     // TODO
 			notifications.PATCH("/:id", h.ViewNotification)                          // TODO
 			notifications.DELETE("/:id", h.CheckRole("admin"), h.DeleteNotification) // TODO
@@ -119,11 +124,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	items := router.Group("/items")
 	{
-		items.GET("/", h.GetAllItems)                                            // TODO
-		items.GET("/:id", h.GetItem)                                             // TODO
-		items.POST("/", h.UserIdentify, h.CheckRole("admin"), h.CreateItem)      // TODO
-		items.PATCH("/:id", h.UserIdentify, h.CheckRole("admin"), h.ChangeItem)  // TODO
-		items.DELETE("/:id", h.UserIdentify, h.CheckRole("admin"), h.DeleteItem) // TODO
+		items.GET("", h.GetAllItems)
+		items.GET("/:id", h.GetItem)
+		items.POST("", h.UserIdentify, h.CheckRole("admin"), h.CreateItem)
+		items.PATCH("/:id", h.UserIdentify, h.CheckRole("admin"), h.ChangeItem)
+		items.DELETE("/:id", h.UserIdentify, h.CheckRole("admin"), h.DeleteItem)
 
 		stock := items.Group("/stock", h.UserIdentify, h.CheckRole("admin"))
 		{
@@ -146,8 +151,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	stores := router.Group("/stores")
 	{
-		stores.GET("/", h.GetAllStores)                                            // TODO
-		stores.POST("/", h.UserIdentify, h.CheckRole("admin"), h.CreateStore)      // TODO
+		stores.GET("", h.GetAllStores)                                             // TODO
+		stores.POST("", h.UserIdentify, h.CheckRole("admin"), h.CreateStore)       // TODO
 		stores.PATCH("/:id", h.UserIdentify, h.CheckRole("admin"), h.ChangeStore)  // TODO
 		stores.DELETE("/:id", h.UserIdentify, h.CheckRole("admin"), h.DeleteStore) // TODO
 	}
