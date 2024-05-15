@@ -51,26 +51,27 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		deliverymen := users.Group("/deliverymen", h.UserIdentify, h.CheckRole("deliveryman"))
 		{
-			deliverymen.GET("", h.GetAllDeliverymen)                                 // TODO
-			deliverymen.GET("/:id", h.GetDeliveryman)                                // TODO
-			deliverymen.POST("/:id", h.CheckRole("admin"), h.CreateDeliveryman)      // TODO
-			deliverymen.PATCH("/:id", h.CheckRole("admin"), h.ChangeDeliverymanData) // TODO
-			deliverymen.DELETE("/:id", h.CheckRole("admin"), h.DeleteDeliveryman)    // TODO
+			deliverymen.GET("", h.GetAllDeliverymen)
+			deliverymen.GET("/:id", h.MustBelongsToUser, h.GetDeliveryman)
+			deliverymen.POST("/:id", h.CheckRole("admin"), h.CreateDeliveryman)
+			deliverymen.PATCH("/:id", h.CheckRole("admin"), h.ChangeDeliverymanData)
+			deliverymen.DELETE("/:id", h.CheckRole("admin"), h.DeleteDeliveryman)
 
 			deliveries := deliverymen.Group("/deliveries")
 			{
-				deliveries.GET("", h.CheckRole("admin"), h.GetAllDeliveries) // TODO
-				deliveries.GET("/:id", h.GetAllDeliveriesForOneDeliveryman)  // TODO
-				deliveries.PATCH("/:id", h.ChangeDeliveryStatus)             // TODO
-				deliveries.POST("/create-route", h.CreateRoute)              // TODO
+				deliveries.GET("", h.CheckRole("admin"), h.GetAllDeliveries)
+				deliveries.GET("/:id", h.GetAllDeliveriesForOneDeliveryman)
+				deliveries.GET("/delivery/:id", h.GetDelivery)
+				deliveries.PATCH("/:id", h.ChangeDeliveryStatus)
+				deliveries.POST("/create-route", h.CreateRoute) // TODO
 			}
 		}
 
 		admin := users.Group("/admin", h.UserIdentify, h.CheckRole("admin"))
 		{
-			admin.POST("/cluster", h.Cluster)                          // TODO
-			admin.GET("/deliveries-to-sort", h.GetAllDeliveriesToSort) // TODO
-			admin.PATCH("/change-delivery", h.ChangeDeliveryData)      // TODO
+			admin.POST("/cluster", h.Cluster) // TODO
+			admin.GET("/deliveries-to-sort", h.GetAllDeliveriesToSort)
+			admin.PATCH("/change-delivery", h.ChangeDeliveryData)
 		}
 
 		cart := users.Group("/cart", h.UserIdentify)

@@ -15,26 +15,11 @@ type User struct {
 	CreatedAt            time.Time `json:"createdAt" db:"created_at"`
 }
 
-type DeliveryMan struct {
-	Id                int       `json:"id" db:"id"`
-	CarCapacity       string    `json:"carCapacity" db:"car_capacity"`
-	WorkingHoursStart time.Time `json:"workingHoursStart" db:"working_hours_start"`
-	WorkingHoursEnd   time.Time `json:"workingHoursEnd" db:"working_hours_end"`
-	CarId             string    `json:"carId" db:"car_id"`
-	UserId            int       `db:"user_id"`
-}
-
 type RefreshSession struct {
 	Id           int    `json:"id" db:"id"`
 	RefreshToken string `json:"refreshToken" db:"refresh_token"`
 	Fingerprint  string `json:"fingerprint" db:"fingerprint"`
 	UserId       int    `json:"userId" db:"user_id"`
-}
-
-// DeliveriesForDeliveryMan переместить
-type DeliveriesForDeliveryMan struct {
-	DeliverymanId int     `json:"deliverymanId"`
-	Deliveries    []Point `json:"deliveries"`
 }
 
 type SignUpInput struct {

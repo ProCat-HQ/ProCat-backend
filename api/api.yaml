@@ -566,7 +566,6 @@ paths:
                 $ref: '#/components/schemas/StatusCode200'
   /users/deliverymen:
     get:
-      deprecated: true
       tags:
         - deliveryman
       summary: get all deliverymen
@@ -574,15 +573,16 @@ paths:
         - name: limit
           in: query
           required: false
+
           schema:
             type: integer
-            example: 10
+            default: 10
         - name: page
           in: query
           required: false
           schema:
             type: integer
-            example: 1
+            default: 0
       responses:
         200:
           description: successful operation
@@ -618,11 +618,11 @@ paths:
                             workingHoursStart:
                               type: string
                               format: time
-                              example: 2006-01-02T20:30:00Z
+                              example: 08:00:00
                             workingHoursEnd:
                               type: string
                               format: time
-                              example: 2006-01-02T20:30:00Z
+                              example: 16:00:00
                             carId:
                               type: string
                               example: P425YB154
@@ -637,7 +637,6 @@ paths:
                               example: +79163125366
   /users/deliverymen/{deliveryId}:
     get:
-      deprecated: true
       tags:
         - deliveryman
       summary: for simple user to get his deliveryman page
@@ -669,10 +668,10 @@ paths:
                         example: big
                       workingHoursStart:
                         type: string
-                        example: 2006-01-02T20:30:00Z
+                        example: 08:00:00
                       workingHoursEnd:
                         type: string
-                        example: 2006-01-02T20:30:00Z
+                        example: 16:00:00
                       carId:
                         type: string
                         example: P425YB154
@@ -685,7 +684,6 @@ paths:
           type: integer
           example: 856
     post:
-      deprecated: true
       tags:
         - deliveryman
       summary: create new deliveryman
@@ -700,7 +698,7 @@ paths:
                   example: big
                 workingHoursStart:
                   type: string
-                  example: 08:00:00
+                  example: 8:00:00
                 workingHoursEnd:
                   type: string
                   example: 16:00:00
@@ -729,7 +727,6 @@ paths:
                         type: integer
                         example: 533
     patch:
-      deprecated: true
       tags:
         - deliveryman
       summary: to change data
@@ -744,10 +741,10 @@ paths:
                   example: big
                 workingHoursStart:
                   type: string
-                  example: 08:00:00
+                  example: 8:00
                 workingHoursEnd:
                   type: string
-                  example: 16:00:00
+                  example: 16:00
                 carId:
                   type: string
                   example: HT236O154
@@ -768,7 +765,6 @@ paths:
           type: integer
           example: 858
     delete:
-      deprecated: true
       tags:
         - deliveryman
       summary: to delete deliveryman
@@ -781,7 +777,6 @@ paths:
                 $ref: '#/components/schemas/StatusCode200'
   /users/deliverymen/deliveries:
     get:
-      deprecated: true
       tags:
         - delivery
       summary: to get list of all deliveries for ADMIN
@@ -791,13 +786,26 @@ paths:
           required: false
           schema:
             type: integer
-            example: 4
+            default: 10
         - name: page
           in: query
           required: false
           schema:
             type: integer
-            example: 4
+            default: 0
+        - name: status
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+          explode: false
+          style: form
+          examples:
+            oneTag:
+              value: [ "awaitingPayment" ]
+            multipleTags:
+              value: [ "readyToDelivery", "readyForPickup" ]
       responses:
         200:
           description: successful operation
@@ -824,7 +832,6 @@ paths:
                           $ref: '#/components/schemas/DeliveryAdmin'
   /users/deliverymen/deliveries/{deliverymanId}:
     get:
-      deprecated: true
       tags:
         - delivery
       summary: GET - to get all deliveries for {deliverymanId}
@@ -839,13 +846,26 @@ paths:
           required: false
           schema:
             type: integer
-            example: 15
+            default: 10
         - name: page
           in: query
           required: false
           schema:
             type: integer
-            example: 2
+            default: 0
+        - name: status
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+          explode: false
+          style: form
+          examples:
+            oneTag:
+              value: [ "awaitingPayment" ]
+            multipleTags:
+              value: [ "readyToDelivery", "readyForPickup" ]
       responses:
         200:
           description: successful operation
@@ -870,6 +890,33 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/Delivery'
+  /users/deliverymen/deliveries/delivery/{deliveryId}:
+    parameters:
+      - name: deliveryId
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags:
+        - delivery
+      summary: GET - get delivery by deliveryId
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: ok
+                  payload:
+                    $ref: '#/components/schemas/Delivery'
   /users/deliverymen/deliveries/{deliveryId}:
     parameters:
       - name: deliveryId
@@ -878,7 +925,6 @@ paths:
         schema:
           type: integer
     patch:
-      deprecated: true
       tags:
         - delivery
       summary: change status
@@ -925,7 +971,7 @@ paths:
         - delivery
       summary: build a route from deliveryman's deliveries
       responses:
-        default:
+        200:
           description: successful operation
           content:
             application/json:
@@ -988,6 +1034,9 @@ paths:
                               type: array
                               items:
                                 properties:
+                                  address:
+                                    type: string
+                                    example: адрес
                                   latitude:
                                     type: string
                                     example: 55.072470687600536
@@ -1000,7 +1049,6 @@ paths:
 
   /users/admin/deliveries-to-sort:
     get:
-      deprecated: true
       tags:
         - admin
       summary: GET all deliveries that are needed to be sorted
@@ -1021,7 +1069,10 @@ paths:
                   payload:
                     type: object
                     properties:
-                      result:
+                      count:
+                        type: integer
+                        example: 10
+                      rows:
                         type: array
                         items:
                           properties:
@@ -1032,18 +1083,24 @@ paths:
                               type: array
                               items:
                                 properties:
+                                  address:
+                                    type: string
+                                    example: адрес
                                   latitude:
                                     type: string
                                     example: 55.072470687600536
                                   longitude:
                                     type: string
                                     example: 83.04634094238281
+                                  deliveryId:
+                                    type: integer
+                                    example: 45
   /users/admin/change-delivery:
     patch:
-      deprecated: true
       tags:
         - admin
-      summary: change status of corresponding order of the delivery and maybe change deliveryman to it
+      summary: change status of corresponding order to 'readyToDelivery' and maybe changes 'deliveryman_id'
+      description: if want change deliveryman -> send deliverymanId, otherwise - do not
       requestBody:
         content:
           application/json:
@@ -1053,7 +1110,7 @@ paths:
                 deliveryId:
                   type: integer
                   example: 564
-                deliveryManId:
+                deliverymanId:
                   type: integer
                   example: 58
       responses:
@@ -1262,7 +1319,6 @@ paths:
                             priceDeposit:
                               type: integer
                               example: 10000
-
   /users/orders/{orderId}:
     parameters:
       - name: orderId
@@ -2213,10 +2269,10 @@ paths:
                           example: 123.32131
                         workingHoursStart:
                           type: string
-                          example: 2006-01-02T20:30:00Z
+                          example: 8:00
                         workingHoursEnd:
                           type: string
-                          example: 2006-01-02T20:30:00Z
+                          example: 20:00
     post:
       deprecated: true
       tags:
@@ -2236,10 +2292,10 @@ paths:
                   example: name
                 workingHoursStart:
                   type: string
-                  example: 08:00:00
+                  example: 8:00
                 workingHoursEnd:
                   type: string
-                  example: 20:00:00
+                  example: 20:00
       responses:
         200:
           description: successful operation
@@ -2287,10 +2343,10 @@ paths:
                   example: name
                 workingHoursStart:
                   type: string
-                  example: 08:00:00
+                  example: 8:00
                 workingHoursEnd:
                   type: string
-                  example: 20:00:00
+                  example: 20:00
       responses:
         200:
           description: successful operation
@@ -2344,7 +2400,7 @@ components:
         createdAt:
           type: string
           format: date-time
-          example: 2006-01-02T20:30:00Z
+          example: 2023-10-19 10:23:54+03
 
     Order:
       type: object
@@ -2382,11 +2438,11 @@ components:
         rentalPeriodStart:
           type: string
           format: date-time
-          example: 2006-01-02T20:30:00Z
+          example: 2023-10-19
         rentalPeriodEnd:
           type: string
           format: date-time
-          example: 2006-01-02T20:30:00Z
+          example: 2023-11-04
         address:
           type: string
           example: ул. Пушкина д. 7 кв. 587
@@ -2402,7 +2458,7 @@ components:
         createdAt:
           type: string
           format: date-time
-          example: 2006-01-02T20:30:00Z
+          example: 2023-10-19 10:00:00+03
         items:
           type: array
           items:
@@ -2454,11 +2510,11 @@ components:
         timeStart:
           type: string
           format: date-time
-          example: 2006-01-02T20:30:00Z
+          example: 2023-10-19 10:00:00+03
         timeEnd:
           type: string
           format: date-time
-          example: 2006-01-02T20:30:00Z
+          example: 2023-10-19 12:00:00+03
         method:
           type: string
           example: car
@@ -2515,11 +2571,11 @@ components:
         timeStart:
           type: string
           format: date-time
-          example: 2006-01-02T20:30:00Z
+          example: 2023-10-19 10:00:00+03
         timeEnd:
           type: string
           format: date-time
-          example: 2006-01-02T20:30:00Z
+          example: 2023-10-19 12:00:00+03
         method:
           type: string
           example: car
@@ -2641,10 +2697,10 @@ components:
           example: ул. Хорошая, д. 12
         workingHoursStart:
           type: string
-          example: 2006-01-02T20:30:00Z
+          example: 8:00
         workingHoursEnd:
           type: string
-          example: 2006-01-02T20:30:00Z
+          example: 20:00
 
 
     ItemImage:
@@ -2690,7 +2746,7 @@ components:
           example: true
         createdAt:
           format: date-time
-          example: 2006-01-02T20:30:00Z
+          example: 2023-10-19 12:00:00+03
 
     StatusCode200:
       type: object

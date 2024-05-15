@@ -14,15 +14,90 @@ import (
 )
 
 func (h *Handler) GetAllDeliveries(c *gin.Context) {
-
+	statuses := c.QueryArray("status")
+	limit := c.Query("limit")
+	if limit == "" {
+		limit = "10"
+	}
+	page := c.Query("page")
+	if page == "" {
+		page = "0"
+	}
+	deliveries, count, err := h.services.GetAllDeliveries(statuses, limit, page, "-1")
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: gin.H{
+			"count": count,
+			"rows":  deliveries,
+		},
+	})
 }
 
 func (h *Handler) GetAllDeliveriesForOneDeliveryman(c *gin.Context) {
+	statuses := c.QueryArray("status")
+	limit := c.Query("limit")
+	if limit == "" {
+		limit = "10"
+	}
+	page := c.Query("page")
+	if page == "" {
+		page = "0"
+	}
+	id := c.Param("id")
+	deliveries, count, err := h.services.GetAllDeliveries(statuses, limit, page, id)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: gin.H{
+			"count": count,
+			"rows":  deliveries,
+		},
+	})
+}
 
+func (h *Handler) GetDelivery(c *gin.Context) {
+	id := c.Param("id")
+	delivery, err := h.services.GetDelivery(id)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusUnauthorized, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: delivery,
+	})
 }
 
 func (h *Handler) ChangeDeliveryStatus(c *gin.Context) {
-
+	id := c.Param("id")
+	var statusStruct struct {
+		Status string `json:"status" binding:"required"`
+	}
+	err := c.ShouldBindJSON(&statusStruct)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	err = h.services.ChangeDeliveryStatus(id, statusStruct.Status)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusUnauthorized, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: nil,
+	})
 }
 
 func (h *Handler) CreateRoute(c *gin.Context) {

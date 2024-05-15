@@ -23,12 +23,25 @@ type User interface {
 type Verification interface {
 }
 
+type Deliveryman interface {
+	GetAllDeliverymen(limit string, page string) ([]model.DeliveryManInfoDB, int, error)
+	GetDeliveryman(userId string) (model.DeliveryManInfoCreate, error)
+	CreateDeliveryman(newDeliveryman model.DeliveryManInfoCreate, userId string) (int, error)
+	ChangeDeliverymanData(newData model.DeliveryManInfoCreate, deliverymanId string) error
+	DeleteDeliveryman(deliverymanId string) error
+}
+
 type Delivery interface {
 	GetDeliveriesForDeliveryman(userId int) (*model.MapRequest, error)
+	GetAllDeliveries(statuses []string, limit string, page string, idStr string) ([]model.DeliveryWithOrder, int, error)
+	GetDelivery(idStr string) (model.DeliveryWithOrder, error)
+	ChangeDeliveryStatus(id string, newStatus string) error
 }
 
 type Admin interface {
 	MakeClustering() ([]model.DeliveriesForDeliveryMan, error)
+	GetDeliveriesToSort() (int, []model.DeliveriesForDeliveryMan, error)
+	ChangeDeliveryman(deliveryId int, deliverymanId int) error
 }
 
 type Cart interface {
@@ -64,6 +77,7 @@ type Store interface {
 type Service struct {
 	User
 	Verification
+	Deliveryman
 	Delivery
 	Admin
 	Cart
@@ -77,11 +91,12 @@ type Service struct {
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
-		User:     NewUserService(repos.User),
-		Item:     NewItemService(repos.Item),
-		Admin:    NewAdminService(repos.Admin),
-		Delivery: NewDeliveryService(repos.Delivery),
-		Cart:     NewCartService(repos.Cart),
-		Order:    NewOrderService(repos.Order),
+		User:        NewUserService(repos.User),
+		Item:        NewItemService(repos.Item),
+		Admin:       NewAdminService(repos.Admin),
+		Delivery:    NewDeliveryService(repos.Delivery),
+		Deliveryman: NewDeliverymanService(repos.Deliveryman),
+		Cart:        NewCartService(repos.Cart),
+		Order:       NewOrderService(repos.Order),
 	}
 }

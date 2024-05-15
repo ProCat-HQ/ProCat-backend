@@ -24,14 +24,27 @@ type User interface {
 type Verification interface {
 }
 
+type Deliveryman interface {
+	GetAllDeliverymen(limit int, offset int) ([]model.DeliveryManInfoDB, int, error)
+	GetDeliveryman(userId int) (model.DeliveryManInfoCreate, error)
+	CreateDeliveryman(newDeliveryman model.DeliveryManInfoCreate, userId int) (int, error)
+	ChangeDeliverymanData(newData model.DeliveryManInfoCreate, deliverymanId int) error
+	DeleteDeliveryman(deliverymanId int) error
+}
+
 type Delivery interface {
 	GetDeliverymanId(userId int) (int, error)
 	GetDeliveriesOrdersForDeliveryman(deliverymanId int) ([]model.DeliveryAndOrder, error)
+	GetAllDeliveries(statuses []string, limit int, offset int, id int) ([]model.DeliveryWithOrder, int, error)
+	GetDelivery(id int) (model.DeliveryWithOrder, error)
+	ChangeDeliveryStatus(id int, newStatus string) error
 }
 
 type Admin interface {
 	GetDeliveries() ([]model.DeliveryAndOrder, []model.DeliveryMan, error)
 	SetDeliveries(map[model.Point]int) error
+	GetDeliveriesToSort() (int, []model.DeliveriesForDeliveryMan, error)
+	ChangeDeliveryman(deliveryId int, deliverymanId int) error
 }
 
 type Cart interface {
@@ -76,6 +89,7 @@ type Store interface {
 type Repository struct {
 	User
 	Verification
+	Deliveryman
 	Delivery
 	Admin
 	Cart
@@ -89,11 +103,12 @@ type Repository struct {
 
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
-		User:     NewUserPostgres(db),
-		Item:     NewItemPostgres(db),
-		Admin:    NewAdminPostgres(db),
-		Delivery: NewDeliveryPostgres(db),
-		Cart:     NewCartPostgres(db),
-		Order:    NewOrderPostgres(db),
+		User:        NewUserPostgres(db),
+		Item:        NewItemPostgres(db),
+		Admin:       NewAdminPostgres(db),
+		Deliveryman: NewDeliverymanPostgres(db),
+		Delivery:    NewDeliveryPostgres(db),
+		Cart:        NewCartPostgres(db),
+		Order:       NewOrderPostgres(db),
 	}
 }

@@ -41,3 +41,16 @@ func (s *AdminService) MakeClustering() ([]model.DeliveriesForDeliveryMan, error
 
 	return result, nil
 }
+
+func (s *AdminService) GetDeliveriesToSort() (int, []model.DeliveriesForDeliveryMan, error) {
+	count, rows, err := s.repo.GetDeliveriesToSort()
+	if err != nil {
+		return 0, nil, err
+	}
+	return count, rows, nil
+}
+
+func (s *AdminService) ChangeDeliveryman(deliveryId int, deliverymanId int) error {
+	err := s.repo.ChangeDeliveryman(deliveryId, deliverymanId)
+	return err
+}

@@ -54,13 +54,36 @@ type Order struct {
 	UserId            int
 }
 
-type Delivery struct {
-	Id            int       `json:"id"`
-	TimeStart     time.Time `json:"timeStart"`
-	TimeEnd       time.Time `json:"timeEnd"`
-	Method        string    `json:"method"`
-	OrderId       int
-	DeliveryManId int
+type DeliveryWithOrder struct {
+	Id            int       `json:"id" db:"id"`
+	TimeStart     time.Time `json:"timeStart" db:"time_start"`
+	TimeEnd       time.Time `json:"timeEnd" db:"time_end"`
+	Method        string    `json:"method" db:"method"`
+	DeliveryManId int       `json:"deliveryManId" db:"deliveryman_id"`
+	SmallOrder    `json:"order"`
+}
+
+type SmallOrder struct {
+	OrderId    int    `json:"id" db:"order_id"`
+	Status     string `json:"status" db:"status"`
+	TotalPrice int    `json:"totalPrice" db:"total_price"`
+	Address    string `json:"address" db:"address"`
+	Latitude   string `json:"latitude" db:"latitude"`
+	Longitude  string `json:"longitude" db:"longitude"`
+}
+
+type OrderSmall struct {
+	Id         int    `json:"id" db:"id"`
+	Status     string `json:"status" db:"status"`
+	TotalPrice int    `json:"totalPrice" db:"total_price"`
+	Address    string `json:"address" db:"address"`
+	Latitude   string `json:"latitude" db:"latitude"`
+	Longitude  string `json:"longitude" db:"longitude"`
+}
+
+type DeliveryAddress struct {
+	Point
+	DeliverymanId int `json:"deliverymanId" db:"deliveryman_id"`
 }
 
 type LatLon struct {

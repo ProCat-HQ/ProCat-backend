@@ -52,3 +52,47 @@ func (s *DeliveryService) GetDeliveriesForDeliveryman(userId int) (*model.MapReq
 
 	return req, nil
 }
+
+func (s *DeliveryService) GetAllDeliveries(statuses []string, limit string, page string, idStr string) ([]model.DeliveryWithOrder, int, error) {
+	lim, err := strconv.Atoi(limit)
+	if err != nil {
+		return nil, 0, err
+	}
+	pag, err := strconv.Atoi(page)
+	if err != nil {
+		return nil, 0, err
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return nil, 0, err
+	}
+	deliveries, count, err := s.repo.GetAllDeliveries(statuses, lim, lim*pag, id)
+	if err != nil {
+		return nil, 0, err
+	}
+	return deliveries, count, nil
+}
+
+func (s *DeliveryService) GetDelivery(idStr string) (model.DeliveryWithOrder, error) {
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return model.DeliveryWithOrder{}, err
+	}
+	delivery, err := s.repo.GetDelivery(id)
+	if err != nil {
+		return model.DeliveryWithOrder{}, err
+	}
+	return delivery, nil
+}
+
+func (s *DeliveryService) ChangeDeliveryStatus(idStr string, newStatus string) error {
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return err
+	}
+	err = s.repo.ChangeDeliveryStatus(id, newStatus)
+	if err != nil {
+		return err
+	}
+	return nil
+}

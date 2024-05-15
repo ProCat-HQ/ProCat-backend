@@ -7,9 +7,14 @@ type Response struct {
 }
 
 type Point struct {
-	Latitude   float64 `json:"latitude"`
-	Longitude  float64 `json:"longitude"`
-	DeliveryId int     `json:"deliveryId"`
+	Address    string  `json:"address" db:"address"`
+	Latitude   float64 `json:"latitude" db:"latitude"`
+	Longitude  float64 `json:"longitude" db:"longitude"`
+	DeliveryId int     `json:"deliveryId" db:"id"`
+}
+
+type Id struct {
+	Id int `json:"id" db:"id"`
 }
 
 type KZGovResponse struct {
