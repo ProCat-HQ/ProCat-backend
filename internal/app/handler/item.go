@@ -83,6 +83,11 @@ func (h *Handler) CreateItem(c *gin.Context) {
 		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "No 'price' field included")
 		return
 	}
+	priceDeposit, ok := form.Value["priceDeposit"]
+	if !ok || priceDeposit[0] == "" {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "No 'priceDeposit' field included")
+		return
+	}
 	categoryId, ok := form.Value["categoryId"]
 	if !ok || categoryId[0] == "" {
 		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "No 'categoryId' field included")
@@ -94,7 +99,7 @@ func (h *Handler) CreateItem(c *gin.Context) {
 		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "No files included")
 		return
 	}
-	id, err := h.services.Item.CreateItem(name[0], description, price[0], categoryId[0], files)
+	id, err := h.services.Item.CreateItem(name[0], description, price[0], priceDeposit[0], categoryId[0], files)
 	if err != nil {
 		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -122,8 +127,8 @@ func (h *Handler) ChangeItem(c *gin.Context) {
 		return
 	}
 
-	var name, description, price, categoryId *string
-	name, description, price, categoryId = nil, nil, nil, nil
+	var name, description, price, priceDeposit, categoryId *string
+	name, description, price, priceDeposit, categoryId = nil, nil, nil, nil, nil
 
 	n, ok := form.Value["name"]
 	if ok {
@@ -137,12 +142,16 @@ func (h *Handler) ChangeItem(c *gin.Context) {
 	if ok {
 		price = &p[0]
 	}
+	pd, ok := form.Value["priceDeposit"]
+	if ok {
+		priceDeposit = &pd[0]
+	}
 	ca, ok := form.Value["categoryId"]
 	if ok {
 		categoryId = &ca[0]
 	}
 
-	err = h.services.Item.ChangeItem(itemId, name, description, price, categoryId)
+	err = h.services.Item.ChangeItem(itemId, name, description, price, priceDeposit, categoryId)
 	if err != nil {
 		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

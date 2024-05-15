@@ -172,6 +172,7 @@ func (s *UserService) RegenerateTokens(userId int, refreshToken, fingerprint str
 	refreshSession, err := s.repo.GetRefreshSession(refreshToken, userId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
+			// here i need to delete all sessions
 			err := s.repo.WipeRefreshSessions(userId)
 			if err != nil {
 				return "", "", errors.New("suspicious activity detected, but: " + err.Error())
@@ -181,7 +182,12 @@ func (s *UserService) RegenerateTokens(userId int, refreshToken, fingerprint str
 		return "", "", err
 	}
 	if refreshSession.Fingerprint != fingerprint {
-		return "", "", errors.New("invalid refresh session")
+		// but here only one with certain refresh token
+		_, err := s.repo.DeleteUserRefreshSession(refreshToken, userId)
+		if err != nil {
+			return "", "", errors.New("invalid refresh session: suspicious activity detected, but: " + err.Error())
+		}
+		return "", "", errors.New("invalid refresh session: suspicious activity detected")
 	}
 
 	user, err := s.repo.GetUserById(userId)

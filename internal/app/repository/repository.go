@@ -3,6 +3,7 @@ package repository
 import (
 	"github.com/jmoiron/sqlx"
 	"github.com/procat-hq/procat-backend/internal/app/model"
+	"time"
 )
 
 type User interface {
@@ -41,6 +42,13 @@ type Cart interface {
 }
 
 type Order interface {
+	GetUserById(userId int) (model.User, error)
+	GetUsersCartId(userId int) (int, error)
+	GetTotalCartPrices(cartId int) (int, int, error)
+	GetItemCheque(cartId int) ([]model.ItemCheque, error)
+	CreateOrder(status string, deposit bool, rpStart, rpEnd time.Time,
+		address string, lat, lon float64, companyName string, userId int,
+		deliveryMethod string, tStart, tEnd time.Time) (model.OrderCheque, error)
 }
 
 type Subscription interface {
@@ -56,10 +64,10 @@ type Item interface {
 	GetCategoryChildren(categoryId int) ([]int, error)
 	GetAllItems(limit, offset, categoryId int, stock bool, search string) (int, []model.PieceOfItem, error)
 	GetItem(itemId int) (model.Item, error)
-	CreateItem(name, description string, price, categoryId int) (int, error)
+	CreateItem(name, description string, price, priceDeposit, categoryId int) (int, error)
 	SaveFilenames(itemId int, filenames []string) error
 	DeleteItem(itemId int) error
-	ChangeItem(itemId int, name, description, price, categoryId *string) error
+	ChangeItem(itemId int, name, description, price, priceDeposit, categoryId *string) error
 }
 
 type Store interface {
@@ -86,5 +94,6 @@ func NewRepository(db *sqlx.DB) *Repository {
 		Admin:    NewAdminPostgres(db),
 		Delivery: NewDeliveryPostgres(db),
 		Cart:     NewCartPostgres(db),
+		Order:    NewOrderPostgres(db),
 	}
 }

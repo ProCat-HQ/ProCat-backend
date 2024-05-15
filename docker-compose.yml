@@ -9,6 +9,8 @@ services:
     restart: unless-stopped
     depends_on:
       - procat-db
+    volumes:
+      - procat_assets:/procat/assets
     ports:
       - "${BIND_ADDR}:${BIND_ADDR}"
     networks:

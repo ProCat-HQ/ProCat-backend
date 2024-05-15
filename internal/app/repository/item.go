@@ -162,12 +162,12 @@ func (r *ItemPostgres) GetItem(itemId int) (model.Item, error) {
 	return item, nil
 }
 
-func (r *ItemPostgres) CreateItem(name, description string, price, categoryId int) (int, error) {
-	query := fmt.Sprintf(`INSERT INTO %s (name, description, price, category_id)
-								VALUES ($1, CASE WHEN LENGTH($2)=0 THEN NULL ELSE $3 END, $4, $5) RETURNING id`, itemsTable)
+func (r *ItemPostgres) CreateItem(name, description string, price, priceDeposit, categoryId int) (int, error) {
+	query := fmt.Sprintf(`INSERT INTO %s (name, description, price, price_deposit, category_id)
+								VALUES ($1, CASE WHEN LENGTH($2)=0 THEN NULL ELSE $3 END, $4, $5, $6) RETURNING id`, itemsTable)
 
 	var id int
-	err := r.db.Get(&id, query, name, description, description, price, categoryId)
+	err := r.db.Get(&id, query, name, description, description, price, priceDeposit, categoryId)
 	if err != nil {
 		return 0, err
 	}
@@ -193,7 +193,7 @@ func (r *ItemPostgres) DeleteItem(itemId int) error {
 }
 
 // ChangeItem TODO: SQL Injections sensitive
-func (r *ItemPostgres) ChangeItem(itemId int, name, description, price, categoryId *string) error {
+func (r *ItemPostgres) ChangeItem(itemId int, name, description, price, priceDeposit, categoryId *string) error {
 	query := fmt.Sprintf(`UPDATE %s SET `, itemsTable)
 	argCounter := 0
 	if name != nil {
@@ -212,6 +212,13 @@ func (r *ItemPostgres) ChangeItem(itemId int, name, description, price, category
 			query += `, `
 		}
 		query += fmt.Sprintf(` price = %s`, *price)
+		argCounter += 1
+	}
+	if priceDeposit != nil {
+		if argCounter != 0 {
+			query += `, `
+		}
+		query += fmt.Sprintf(` price_deposit = %s`, *priceDeposit)
 		argCounter += 1
 	}
 	if categoryId != nil {

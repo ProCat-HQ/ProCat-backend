@@ -11,3 +11,10 @@ type Point struct {
 	Longitude  float64 `json:"longitude"`
 	DeliveryId int     `json:"deliveryId"`
 }
+
+type KZGovResponse struct {
+	IinBin      string  `json:"iinBin"`
+	NameKk      string  `json:"nameKk"`
+	NameRu      string  `json:"nameRu"`
+	TotalArrear float64 `json:"totalArrear"`
+}
