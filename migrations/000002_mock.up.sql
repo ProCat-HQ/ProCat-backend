@@ -11,6 +11,12 @@ VALUES (100, 'Админ Админович', 'admin@gmail.com', '+79998887766',
        (103, 'User Usernamovich', 'user@gmail.com', '+72998887766', '345',
         '6e77446d383649393b4c6534287344564f61d67813c5a1818322c1cf96890b8b7934f97f', 'user');
 
+INSERT INTO carts (user_id)
+VALUES (100),
+       (101),
+       (102),
+       (103);
+
 INSERT INTO deliverymen (car_capacity, working_hours_start, working_hours_end, car_id, user_id)
 VALUES ('big', '10:00', '16:00', 'A123BC', 101),
        ('medium', '12:00', '20:00', 'X777XX', 102);
