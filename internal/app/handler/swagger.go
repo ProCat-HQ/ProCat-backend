@@ -11,6 +11,6 @@ const (
 )
 
 func (h *Handler) HandleSwagger(c *gin.Context) {
-	url := swaggerUI + "http://79.137.205.181:" + os.Getenv("bind_addr") + "/swagger/docs/" + "api.json"
+	url := swaggerUI + "http://79.137.205.181:" + os.Getenv("BIND_ADDR") + "/swagger/docs/" + "api.json"
 	c.Redirect(http.StatusTemporaryRedirect, url)
 }
