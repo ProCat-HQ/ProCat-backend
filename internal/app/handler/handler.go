@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/procat-hq/procat-backend/internal/app/service"
+	v3 "github.com/swaggest/swgui/v3"
 )
 
 type Handler struct {
@@ -17,9 +18,12 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
 	router.StaticFS("/assets", gin.Dir("./assets", false))
-	router.StaticFS("/swagger/docs", gin.Dir("./api", false))
+	router.StaticFS("/docs", gin.Dir("./api", false))
 
-	router.GET("/swagger", h.HandleSwagger)
+	swaggerHandler := v3.NewHandler("ProCat API", "/docs/api.json",
+		"/swagger")
+
+	router.GET("/swagger/*any", gin.WrapH(swaggerHandler))
 
 	users := router.Group("/users")
 	{
