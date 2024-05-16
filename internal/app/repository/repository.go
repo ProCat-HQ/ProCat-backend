@@ -56,6 +56,7 @@ type Cart interface {
 
 type Order interface {
 	GetAllOrders(limit, offset, userId int, statuses []string) (int, []model.Order, error)
+	GetOrder(orderId int) (model.Order, error)
 	GetUserById(userId int) (model.User, error)
 	GetUsersCartId(userId int) (int, error)
 	GetTotalCartPrices(cartId int) (int, int, error)
@@ -63,6 +64,9 @@ type Order interface {
 	CreateOrder(status string, deposit bool, rpStart, rpEnd time.Time,
 		address string, lat, lon float64, companyName string, userId int,
 		deliveryMethod string, tStart, tEnd time.Time, rentPeriodDays int) (model.OrderCheque, error)
+	ChangeOrderStatus(orderId int, status string) error
+	GetPaymentsForOrder(orderId int) ([]model.Payment, error)
+	ChangePaymentStatus(paymentId, paid int, method string) error
 }
 
 type Subscription interface {

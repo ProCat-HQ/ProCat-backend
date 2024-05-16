@@ -16,6 +16,43 @@ func NewOrderPostgres(db *sqlx.DB) *OrderPostgres {
 	return &OrderPostgres{db: db}
 }
 
+func (r *OrderPostgres) GetOrder(orderId int) (model.Order, error) {
+	queryOrder := fmt.Sprintf(`SELECT id, status, total_price, COALESCE(deposit, 0) AS deposit,
+       								   rental_period_start, rental_period_end, address, COALESCE(latitude, '') AS latitude,
+       								   COALESCE(longitude, '') AS longitude, COALESCE(company_name, '') AS company_name,
+       								   created_at, user_id FROM %s
+       								   WHERE id=$1`, ordersTable)
+	queryItems := fmt.Sprintf(`SELECT o.item_id, i.name, i.price, i.price_deposit, o.items_number as count, COALESCE(im.image, '') AS image
+									  FROM %s o
+									  LEFT JOIN %s i on i.id = o.item_id
+									  LEFT JOIN (SELECT DISTINCT ON (item_id) * FROM %s) im ON i.id = im.item_id
+									  WHERE o.order_id=$1`, ordersItemsTable, itemsTable, itemsImagesTable)
+
+	tx, err := r.db.Beginx()
+	if err != nil {
+		return model.Order{}, err
+	}
+	defer tx.Rollback()
+
+	var order model.Order
+	err = tx.Get(&order, queryOrder, orderId)
+	if err != nil {
+		return model.Order{}, err
+	}
+	var items []model.OrderSmallItem
+	err = tx.Select(&items, queryItems, orderId)
+	if err != nil {
+		return model.Order{}, err
+	}
+	order.Items = items
+
+	err = tx.Commit()
+	if err != nil {
+		return model.Order{}, err
+	}
+	return order, nil
+}
+
 func (r *OrderPostgres) GetAllOrders(limit, offset, userId int, statuses []string) (int, []model.Order, error) {
 	queryCount := fmt.Sprintf(`SELECT COUNT(*) FROM %s`, ordersTable)
 
@@ -221,4 +258,27 @@ func (r *OrderPostgres) GetItemCheque(cartId int) ([]model.ItemCheque, error) {
 	var itemCheque []model.ItemCheque
 	err := r.db.Select(&itemCheque, query, cartId)
 	return itemCheque, err
+}
+
+func (r *OrderPostgres) ChangeOrderStatus(orderId int, status string) error {
+	query := fmt.Sprintf(`UPDATE %s SET status=$1 WHERE id=$2`, ordersTable)
+	_, err := r.db.Exec(query, status, orderId)
+	return err
+}
+
+func (r *OrderPostgres) GetPaymentsForOrder(orderId int) ([]model.Payment, error) {
+	query := fmt.Sprintf(`SELECT id, paid, COALESCE(method, '') AS method, price, created_at
+								 FROM %s WHERE order_id=$1`, paymentsTable)
+	var payments []model.Payment
+	err := r.db.Select(&payments, query, orderId)
+	return payments, err
+}
+
+func (r *OrderPostgres) ChangePaymentStatus(paymentId, paid int, method string) error {
+	query := fmt.Sprintf(`UPDATE %s SET paid = paid + $1,
+                    			 method = COALESCE(method, '') || $2 || ';'
+                				 WHERE id=$3`, paymentsTable)
+
+	_, err := r.db.Exec(query, paid, method, paymentId)
+	return err
 }

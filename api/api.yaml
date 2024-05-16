@@ -1427,7 +1427,7 @@ paths:
         schema:
           type: integer
     get:
-      deprecated: true
+      deprecated: false
       tags:
         - order
       summary: get certain order
@@ -1540,11 +1540,11 @@ paths:
         schema:
           type: integer
           example: 54
-    post:
-      deprecated: true
+    patch:
+      deprecated: false
       tags:
         - order
-      summary: set status to "pending rejected", waits till admin do some stuff and then set status of order to "rejected"
+      summary: set status to "awaitingRejection", waits till admin do some stuff and then set status of order to "rejected"
       responses:
         200:
           description: successful operation
@@ -1561,7 +1561,7 @@ paths:
           type: integer
           example: 542
     patch:
-      deprecated: true
+      deprecated: false
       tags:
         - order
       summary: for ADMIN to change status
@@ -1603,7 +1603,7 @@ paths:
 
   /users/orders/payment/{orderId}:
     get:
-      deprecated: true
+      deprecated: false
       tags:
         - payment
       summary: to get info about order's payments (only for owner user or ADMIN)
@@ -1661,7 +1661,7 @@ paths:
           type: integer
           example: 56
     patch:
-      deprecated: true
+      deprecated: false
       tags:
         - payment
       summary: update payment info (for deliveryman (maybe ADMIN?) or higher)

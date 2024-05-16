@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/procat-hq/procat-backend/internal/app/service"
+	v3 "github.com/swaggest/swgui/v3"
 )
 
 type Handler struct {
@@ -17,6 +18,12 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
 	router.StaticFS("/assets", gin.Dir("./assets", false))
+	router.StaticFS("/docs", gin.Dir("./api", false))
+
+	swaggerHandler := v3.NewHandler("ProCat API", "/docs/api.json",
+		"/swagger")
+
+	router.GET("/swagger/*any", gin.WrapH(swaggerHandler))
 
 	users := router.Group("/users")
 	{
@@ -24,9 +31,9 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		{
 			usersAuthenticatedGroup.GET("", h.CheckRole("admin"), h.GetAllUsers)
 			usersAuthenticatedGroup.GET("/:id", h.MustBelongsToUser, h.GetUser)
-			usersAuthenticatedGroup.DELETE("/:id", h.CheckRole("admin"), h.DeleteUser) // TODO
+			usersAuthenticatedGroup.DELETE("/:id", h.CheckRole("admin"), h.DeleteUser)
 
-			users.POST("/logout", h.Logout)
+			usersAuthenticatedGroup.POST("/logout", h.Logout)
 		}
 		users.POST("/sign-in", h.SignIn)
 		users.POST("/sign-up", h.SignUp)
@@ -84,15 +91,15 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		orders := users.Group("/orders", h.UserIdentify)
 		{
 			orders.GET("", h.GetAllOrders)
-			orders.GET("/:id", h.MustBelongsToUser, h.GetOrder) // TODO
+			orders.GET("/:id", h.GetOrder)
 			orders.POST("", h.CreateOrder)
-			orders.POST("/cancel/:id", h.CancelOrder)                              // TODO
-			orders.PATCH("/status/:id", h.CheckRole("admin"), h.ChangeOrderStatus) // TODO
+			orders.PATCH("/cancel/:id", h.CancelOrder)
+			orders.PATCH("/status/:id", h.CheckRole("admin"), h.ChangeOrderStatus)
 
 			payment := orders.Group("/payment")
 			{
-				payment.GET("/:id", h.GetPaymentData)                              // TODO
-				payment.PATCH("/:id", h.CheckRole("admin"), h.ChangePaymentStatus) // TODO
+				payment.GET("/:id", h.GetPaymentData)
+				payment.PATCH("/:id", h.CheckRole("admin"), h.ChangePaymentStatus)
 			}
 		}
 
