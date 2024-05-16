@@ -17,6 +17,9 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
 	router.StaticFS("/assets", gin.Dir("./assets", false))
+	router.StaticFS("/swagger/docs", gin.Dir("./api", false))
+
+	router.GET("/swagger", h.HandleSwagger)
 
 	users := router.Group("/users")
 	{
@@ -24,9 +27,9 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		{
 			usersAuthenticatedGroup.GET("", h.CheckRole("admin"), h.GetAllUsers)
 			usersAuthenticatedGroup.GET("/:id", h.MustBelongsToUser, h.GetUser)
-			usersAuthenticatedGroup.DELETE("/:id", h.CheckRole("admin"), h.DeleteUser) // TODO
+			usersAuthenticatedGroup.DELETE("/:id", h.CheckRole("admin"), h.DeleteUser)
 
-			users.POST("/logout", h.Logout)
+			usersAuthenticatedGroup.POST("/logout", h.Logout)
 		}
 		users.POST("/sign-in", h.SignIn)
 		users.POST("/sign-up", h.SignUp)
