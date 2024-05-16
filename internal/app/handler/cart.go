@@ -72,7 +72,18 @@ func (h *Handler) DeleteItemsFromCart(c *gin.Context) {
 		return
 	}
 
-	err = h.services.Cart.DeleteItemFromCart(userData.UserId, itemIdInt)
+	count := c.Query("count")
+	if count == "" {
+		count = "1"
+	}
+
+	countInt, err := strconv.Atoi(count)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	err = h.services.Cart.DeleteItemFromCart(userData.UserId, itemIdInt, countInt)
 	if err != nil {
 		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

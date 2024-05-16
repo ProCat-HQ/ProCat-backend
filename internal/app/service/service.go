@@ -46,11 +46,12 @@ type Admin interface {
 
 type Cart interface {
 	AddItemsToCart(userId, itemId, count int) error
-	DeleteItemFromCart(userId, itemId int) error
+	DeleteItemFromCart(userId, itemId, count int) error
 	GetCartItems(userId int) ([]model.CartItem, error)
 }
 
 type Order interface {
+	GetAllOrders(limit, page, userId int, statuses []string) (int, []model.Order, error)
 	CreateOrder(userId int, order model.OrderCreationWithTime) (model.OrderCheque, error)
 }
 

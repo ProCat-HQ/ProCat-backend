@@ -29,7 +29,7 @@ func (s *CartService) AddItemsToCart(userId, itemId, count int) error {
 	return err
 }
 
-func (s *CartService) DeleteItemFromCart(userId, itemId int) error {
+func (s *CartService) DeleteItemFromCart(userId, itemId, count int) error {
 	cartId, err := s.repo.GetUsersCartId(userId)
 	if err != nil {
 		return err
@@ -38,8 +38,11 @@ func (s *CartService) DeleteItemFromCart(userId, itemId int) error {
 	if itemId <= 0 {
 		return errors.New("itemId must be positive")
 	}
+	if count <= 0 {
+		return errors.New("count must be positive")
+	}
 
-	err = s.repo.DeleteItemFromCart(cartId, itemId)
+	err = s.repo.DeleteItemFromCart(cartId, itemId, count)
 	return err
 }
 

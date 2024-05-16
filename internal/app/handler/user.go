@@ -54,6 +54,7 @@ func (h *Handler) GetUser(c *gin.Context) {
 	user, err := h.services.User.GetUserById(paramUserId)
 	if err != nil {
 		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	c.JSON(http.StatusOK, model.Response{

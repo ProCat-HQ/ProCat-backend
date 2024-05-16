@@ -50,18 +50,19 @@ type Admin interface {
 type Cart interface {
 	GetUsersCartId(userId int) (int, error)
 	AddItemToCart(cartId, itemId, count int) error
-	DeleteItemFromCart(cartId, itemId int) error
+	DeleteItemFromCart(cartId, itemId, count int) error
 	GetCartItems(cartId int) ([]model.CartItem, error)
 }
 
 type Order interface {
+	GetAllOrders(limit, offset, userId int, statuses []string) (int, []model.Order, error)
 	GetUserById(userId int) (model.User, error)
 	GetUsersCartId(userId int) (int, error)
 	GetTotalCartPrices(cartId int) (int, int, error)
 	GetItemCheque(cartId int) ([]model.ItemCheque, error)
 	CreateOrder(status string, deposit bool, rpStart, rpEnd time.Time,
 		address string, lat, lon float64, companyName string, userId int,
-		deliveryMethod string, tStart, tEnd time.Time) (model.OrderCheque, error)
+		deliveryMethod string, tStart, tEnd time.Time, rentPeriodDays int) (model.OrderCheque, error)
 }
 
 type Subscription interface {

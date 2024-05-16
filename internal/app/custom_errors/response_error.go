@@ -7,7 +7,7 @@ import (
 )
 
 func NewErrorResponse(c *gin.Context, statusCode int, message string) {
-	logrus.Error(message)
+	logrus.Error("method: ", c.Request.Method, ", url: ", c.Request.URL, ", statusCode: ", statusCode, ", msg: ", message)
 
 	c.AbortWithStatusJSON(statusCode, model.Response{
 		Status:  statusCode,

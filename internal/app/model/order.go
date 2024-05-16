@@ -33,25 +33,35 @@ type ItemCheque struct {
 }
 
 type OrderCheque struct {
-	OrderId      int          `json:"orderId"`
-	TotalPrice   int          `json:"totalPrice"`
-	TotalDeposit int          `json:"totalDeposit"`
-	Items        []ItemCheque `json:"items"`
+	OrderId    int          `json:"orderId"`
+	TotalPrice int          `json:"totalPrice"`
+	Deposit    int          `json:"deposit"`
+	Items      []ItemCheque `json:"items"`
 }
 
 type Order struct {
-	Id                int       `json:"id"`
-	Status            string    `json:"status"`
-	TotalPrice        int       `json:"totalPrice"`
-	Deposit           int       `json:"deposit"`
-	RentalPeriodStart time.Time `json:"rentalPeriodStart"`
-	RentalPeriodEnd   time.Time `json:"rentalPeriodEnd"`
-	Address           string    `json:"address"`
-	Latitude          string    `json:"latitude"`
-	Longitude         string    `json:"longitude"`
-	CompanyName       string    `json:"companyName"`
-	CreatedAt         time.Time `json:"createdAt"`
-	UserId            int
+	Id                int              `json:"id" db:"id"`
+	Status            string           `json:"status" db:"status"`
+	TotalPrice        int              `json:"totalPrice" db:"total_price"`
+	Deposit           int              `json:"deposit" db:"deposit"`
+	RentalPeriodStart time.Time        `json:"rentalPeriodStart" db:"rental_period_start"`
+	RentalPeriodEnd   time.Time        `json:"rentalPeriodEnd" db:"rental_period_end"`
+	Address           string           `json:"address" db:"address"`
+	Latitude          string           `json:"latitude" db:"latitude"`
+	Longitude         string           `json:"longitude" db:"longitude"`
+	CompanyName       string           `json:"companyName" db:"company_name"`
+	CreatedAt         time.Time        `json:"createdAt" db:"created_at"`
+	UserId            int              `json:"userId" db:"user_id"`
+	Items             []OrderSmallItem `json:"items"`
+}
+
+type OrderSmallItem struct {
+	Id           int    `json:"id" db:"item_id"`
+	Name         string `json:"name" db:"name"`
+	Price        int    `json:"price" db:"price"`
+	PriceDeposit int    `json:"priceDeposit" db:"price_deposit"`
+	Count        int    `json:"count" db:"count"`
+	Image        string `json:"image" db:"image"`
 }
 
 type DeliveryWithOrder struct {
@@ -116,11 +126,4 @@ type Payment struct {
 	Price     int       `json:"price"`
 	CreatedAt time.Time `json:"createdAt"`
 	OrderId   int
-}
-
-type OrderItem struct {
-	Id          int
-	ItemsNumber int
-	OrderId     int
-	ItemId      int
 }
