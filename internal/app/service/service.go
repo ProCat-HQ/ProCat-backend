@@ -52,7 +52,11 @@ type Cart interface {
 
 type Order interface {
 	GetAllOrders(limit, page, userId int, statuses []string) (int, []model.Order, error)
+	GetOrder(orderId int) (model.Order, error)
 	CreateOrder(userId int, order model.OrderCreationWithTime) (model.OrderCheque, error)
+	ChangeOrderStatus(orderId int, status string) error
+	GetPaymentsForOrder(orderId int) ([]model.Payment, error)
+	ChangePaymentStatus(paymentId, paid int, method string) error
 }
 
 type Subscription interface {

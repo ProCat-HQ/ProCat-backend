@@ -120,10 +120,9 @@ type DeliveryAndOrder struct {
 }
 
 type Payment struct {
-	Id        int       `json:"id"`
-	Paid      int       `json:"paid"`
-	Method    string    `json:"method"`
-	Price     int       `json:"price"`
-	CreatedAt time.Time `json:"createdAt"`
-	OrderId   int
+	Id        int       `json:"id" db:"id"`
+	Paid      int       `json:"paid" db:"paid"`
+	Method    string    `json:"method" db:"method"`
+	Price     int       `json:"price" db:"price"`
+	CreatedAt time.Time `json:"createdAt" db:"created_at"`
 }

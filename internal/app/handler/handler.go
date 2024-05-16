@@ -84,15 +84,15 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		orders := users.Group("/orders", h.UserIdentify)
 		{
 			orders.GET("", h.GetAllOrders)
-			orders.GET("/:id", h.MustBelongsToUser, h.GetOrder) // TODO
+			orders.GET("/:id", h.GetOrder)
 			orders.POST("", h.CreateOrder)
-			orders.POST("/cancel/:id", h.CancelOrder)                              // TODO
-			orders.PATCH("/status/:id", h.CheckRole("admin"), h.ChangeOrderStatus) // TODO
+			orders.PATCH("/cancel/:id", h.CancelOrder)
+			orders.PATCH("/status/:id", h.CheckRole("admin"), h.ChangeOrderStatus)
 
 			payment := orders.Group("/payment")
 			{
-				payment.GET("/:id", h.GetPaymentData)                              // TODO
-				payment.PATCH("/:id", h.CheckRole("admin"), h.ChangePaymentStatus) // TODO
+				payment.GET("/:id", h.GetPaymentData)
+				payment.PATCH("/:id", h.CheckRole("admin"), h.ChangePaymentStatus)
 			}
 		}
 

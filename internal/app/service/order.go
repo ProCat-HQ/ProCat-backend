@@ -72,3 +72,20 @@ func (s *OrderService) GetAllOrders(limit, page, userId int, statuses []string) 
 	}
 	return count, rows, nil
 }
+
+func (s *OrderService) GetOrder(orderId int) (model.Order, error) {
+	order, err := s.repo.GetOrder(orderId)
+	return order, err
+}
+
+func (s *OrderService) ChangeOrderStatus(orderId int, status string) error {
+	return s.repo.ChangeOrderStatus(orderId, status)
+}
+
+func (s *OrderService) GetPaymentsForOrder(orderId int) ([]model.Payment, error) {
+	return s.repo.GetPaymentsForOrder(orderId)
+}
+
+func (s *OrderService) ChangePaymentStatus(paymentId, paid int, method string) error {
+	return s.repo.ChangePaymentStatus(paymentId, paid, method)
+}

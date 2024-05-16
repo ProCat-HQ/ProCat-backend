@@ -83,7 +83,39 @@ func (h *Handler) GetAllOrders(c *gin.Context) {
 }
 
 func (h *Handler) GetOrder(c *gin.Context) {
+	orderId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
 
+	userData, err := h.GetUserContext(c)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	rolePriority, err := getRolePriority(userData.UserRole)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	order, err := h.services.Order.GetOrder(orderId)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if userData.UserId != order.UserId && rolePriority < 4 {
+		custom_errors.NewErrorResponse(c, http.StatusForbidden, "Forbidden")
+		return
+	}
+
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: order,
+	})
 }
 
 func (h *Handler) CreateOrder(c *gin.Context) {
@@ -149,17 +181,149 @@ func (h *Handler) CreateOrder(c *gin.Context) {
 }
 
 func (h *Handler) CancelOrder(c *gin.Context) {
+	orderId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
 
+	userData, err := h.GetUserContext(c)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	rolePriority, err := getRolePriority(userData.UserRole)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	order, err := h.services.Order.GetOrder(orderId)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if userData.UserId != order.UserId && rolePriority < 4 {
+		custom_errors.NewErrorResponse(c, http.StatusForbidden, "Forbidden")
+		return
+	}
+
+	err = h.services.Order.ChangeOrderStatus(orderId, model.AwaitingRejection)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: nil,
+	})
 }
 
 func (h *Handler) ChangeOrderStatus(c *gin.Context) {
+	orderId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	var req struct {
+		Status string `json:"status" binding:"required"`
+	}
 
+	if err := c.ShouldBindJSON(&req); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	err = h.services.Order.ChangeOrderStatus(orderId, req.Status)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: nil,
+	})
 }
 
 func (h *Handler) GetPaymentData(c *gin.Context) {
+	orderId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
 
+	userData, err := h.GetUserContext(c)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	rolePriority, err := getRolePriority(userData.UserRole)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	order, err := h.services.Order.GetOrder(orderId)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if userData.UserId != order.UserId && rolePriority < 4 {
+		custom_errors.NewErrorResponse(c, http.StatusForbidden, "Forbidden")
+		return
+	}
+
+	payments, err := h.services.Order.GetPaymentsForOrder(orderId)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: gin.H{
+			"payments": payments,
+		},
+	})
 }
 
 func (h *Handler) ChangePaymentStatus(c *gin.Context) {
+	paymentId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
 
+	var req struct {
+		Paid   int    `json:"paid" binding:"required"`
+		Method string `json:"method" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if req.Paid <= 0 {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "'paid' field must be greater than zero")
+		return
+	}
+
+	err = h.services.Order.ChangePaymentStatus(paymentId, req.Paid, req.Method)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: nil,
+	})
 }
