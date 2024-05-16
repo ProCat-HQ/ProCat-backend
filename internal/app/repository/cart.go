@@ -70,9 +70,9 @@ func (r *CartPostgres) AddItemToCart(cartId, itemId, count int) error {
 	return err
 }
 
-func (r *CartPostgres) DeleteItemFromCart(cartId, itemId int) error {
-	queryDecrease := fmt.Sprintf(`UPDATE %s SET items_number = items_number - 1
-          								WHERE item_id=$1 AND cart_id=$2 RETURNING items_number`, cartsItemsTable)
+func (r *CartPostgres) DeleteItemFromCart(cartId, itemId, count int) error {
+	queryDecrease := fmt.Sprintf(`UPDATE %s SET items_number = items_number - $1
+          								WHERE item_id=$2 AND cart_id=$3 RETURNING items_number`, cartsItemsTable)
 
 	tx, err := r.db.Beginx()
 	if err != nil {
@@ -81,11 +81,11 @@ func (r *CartPostgres) DeleteItemFromCart(cartId, itemId int) error {
 	defer tx.Rollback()
 
 	var itemsNumber int
-	err = tx.Get(&itemsNumber, queryDecrease, itemId, cartId)
+	err = tx.Get(&itemsNumber, queryDecrease, count, itemId, cartId)
 	if err != nil {
 		return err
 	}
-	if itemsNumber == 0 {
+	if itemsNumber <= 0 {
 		queryToDelete := fmt.Sprintf(`DELETE FROM %s WHERE item_id=$1 AND cart_id=$2`, cartsItemsTable)
 		_, err = tx.Exec(queryToDelete, itemId, cartId)
 		if err != nil {

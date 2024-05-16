@@ -33,6 +33,7 @@ func (r *ItemPostgres) GetCategoryChildren(categoryId int) ([]int, error) {
 	return ids, nil
 }
 
+// GetAllItems TODO someday: it returns overall items count, but have to return count of filtered items
 func (r *ItemPostgres) GetAllItems(limit, offset, categoryId int, stock bool, search string) (int, []model.PieceOfItem, error) {
 	queryCount := fmt.Sprintf(`SELECT COUNT(*) FROM %s`, itemsTable)
 	var count int

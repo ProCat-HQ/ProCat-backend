@@ -50,12 +50,17 @@ func (h *Handler) MustBelongsToUser(c *gin.Context) {
 		return
 	}
 
-	userId, ok := c.Get("userId") // int
-	if !ok {
-		custom_errors.NewErrorResponse(c, http.StatusUnauthorized, "userId field not found in context")
+	userData, err := h.GetUserContext(c)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	if userId != paramUserId {
+	rolePriority, err := getRolePriority(userData.UserRole)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	if userData.UserId != paramUserId && rolePriority < 4 {
 		custom_errors.NewErrorResponse(c, http.StatusForbidden, "Forbidden")
 		return
 	}

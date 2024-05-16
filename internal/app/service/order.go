@@ -24,6 +24,13 @@ func (s *OrderService) CreateOrder(userId int, order model.OrderCreationWithTime
 		return model.OrderCheque{}, errors.New("time wrong period order")
 	}
 
+	duration := order.RentalPeriodEnd.Sub(order.RentalPeriodStart).Hours()
+	if duration <= 0 {
+		return model.OrderCheque{}, errors.New("rental period of order less or equals to zero")
+	}
+
+	rentPeriodDays := int(duration/24) + 1
+
 	user, err := s.repo.GetUserById(userId)
 	if err != nil {
 		return model.OrderCheque{}, err
@@ -52,7 +59,16 @@ func (s *OrderService) CreateOrder(userId int, order model.OrderCreationWithTime
 
 	orderCheque, err := s.repo.CreateOrder(defaultStatus, deposit, order.RentalPeriodStart, order.RentalPeriodEnd,
 		order.Address, lat, lon, order.CompanyName, userId, order.DeliveryMethod,
-		order.TimeStart, order.TimeEnd)
+		order.TimeStart, order.TimeEnd, rentPeriodDays)
 
 	return orderCheque, err
+}
+
+func (s *OrderService) GetAllOrders(limit, page, userId int, statuses []string) (int, []model.Order, error) {
+	offset := limit * page
+	count, rows, err := s.repo.GetAllOrders(limit, offset, userId, statuses)
+	if err != nil {
+		return 0, nil, err
+	}
+	return count, rows, nil
 }

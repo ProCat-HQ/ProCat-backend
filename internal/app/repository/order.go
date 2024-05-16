@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/procat-hq/procat-backend/internal/app/model"
+	"strconv"
 	"time"
 )
 
@@ -13,6 +14,88 @@ type OrderPostgres struct {
 
 func NewOrderPostgres(db *sqlx.DB) *OrderPostgres {
 	return &OrderPostgres{db: db}
+}
+
+func (r *OrderPostgres) GetAllOrders(limit, offset, userId int, statuses []string) (int, []model.Order, error) {
+	queryCount := fmt.Sprintf(`SELECT COUNT(*) FROM %s`, ordersTable)
+
+	queryOrders := fmt.Sprintf(`SELECT id, status, total_price, COALESCE(deposit, 0) AS deposit,
+       								   rental_period_start, rental_period_end, address, COALESCE(latitude, '') AS latitude,
+       								   COALESCE(longitude, '') AS longitude,
+       								   COALESCE(company_name, '') AS company_name, created_at, user_id FROM %s`, ordersTable)
+
+	argCounter := 1
+	args := make([]interface{}, 0)
+	if userId != 0 {
+		queryOrders += ` WHERE user_id = $` + strconv.Itoa(argCounter)
+		queryCount += ` WHERE user_id = $` + strconv.Itoa(argCounter)
+		argCounter += 1
+		args = append(args, userId)
+	}
+	if statuses != nil {
+		if argCounter == 1 {
+			queryOrders += ` WHERE `
+			queryCount += ` WHERE `
+		} else {
+			queryOrders += ` AND `
+			queryCount += ` AND `
+		}
+		queryOrders += ` status IN (`
+		queryCount += ` status IN (`
+		for i := range statuses {
+			queryOrders += fmt.Sprintf("$%d", argCounter)
+			queryCount += fmt.Sprintf("$%d", argCounter)
+			if i != len(statuses)-1 {
+				queryOrders += ", "
+				queryCount += ", "
+			}
+			args = append(args, statuses[i])
+			argCounter += 1
+		}
+		queryOrders += `)`
+		queryCount += `)`
+	}
+	queryOrders += ` LIMIT $` + strconv.Itoa(argCounter) + ` OFFSET $` + strconv.Itoa(argCounter+1)
+	args = append(args, limit, offset)
+
+	queryItems := fmt.Sprintf(`SELECT o.item_id, i.name, i.price, i.price_deposit, o.items_number as count, COALESCE(im.image, '') AS image
+									  FROM %s o
+									  LEFT JOIN %s i on i.id = o.item_id
+									  LEFT JOIN (SELECT DISTINCT ON (item_id) * FROM %s) im ON i.id = im.item_id
+									  WHERE o.order_id=$1`, ordersItemsTable, itemsTable, itemsImagesTable)
+
+	tx, err := r.db.Beginx()
+	if err != nil {
+		return 0, nil, err
+	}
+	defer tx.Rollback()
+
+	var orders []model.Order
+	var count int
+
+	err = tx.Get(&count, queryCount, args[:len(args)-2]...)
+	if err != nil {
+		return 0, nil, err
+	}
+	err = tx.Select(&orders, queryOrders, args...)
+	if err != nil {
+		return 0, nil, err
+	}
+	for i := range orders {
+		var items []model.OrderSmallItem
+		err = tx.Select(&items, queryItems, orders[i].Id)
+		if err != nil {
+			return 0, nil, err
+		}
+		orders[i].Items = items
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return 0, nil, err
+	}
+
+	return count, orders, nil
 }
 
 func (r *OrderPostgres) GetUserById(userId int) (model.User, error) {
@@ -28,7 +111,7 @@ func (r *OrderPostgres) GetUserById(userId int) (model.User, error) {
 
 func (r *OrderPostgres) CreateOrder(status string, deposit bool, rpStart, rpEnd time.Time,
 	address string, lat, lon float64, companyName string, userId int,
-	deliveryMethod string, tStart, tEnd time.Time) (model.OrderCheque, error) {
+	deliveryMethod string, tStart, tEnd time.Time, rentPeriodDays int) (model.OrderCheque, error) {
 
 	cartId, err := r.GetUsersCartId(userId)
 	if err != nil {
@@ -38,6 +121,7 @@ func (r *OrderPostgres) CreateOrder(status string, deposit bool, rpStart, rpEnd 
 	if err != nil {
 		return model.OrderCheque{}, err
 	}
+	totalPrice *= rentPeriodDays
 
 	itemsCheque, err := r.GetItemCheque(cartId)
 	if err != nil {
@@ -100,10 +184,10 @@ func (r *OrderPostgres) CreateOrder(status string, deposit bool, rpStart, rpEnd 
 	}
 
 	orderCheque := model.OrderCheque{
-		OrderId:      orderId,
-		TotalPrice:   totalPrice,
-		TotalDeposit: depositPrice,
-		Items:        itemsCheque,
+		OrderId:    orderId,
+		TotalPrice: totalPrice,
+		Deposit:    depositPrice,
+		Items:      itemsCheque,
 	}
 
 	return orderCheque, nil
