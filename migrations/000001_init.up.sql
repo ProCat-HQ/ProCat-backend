@@ -59,6 +59,18 @@ CREATE TABLE IF NOT EXISTS orders
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS deliveries
+(
+    id             SERIAL PRIMARY KEY,
+    time_start     TIMESTAMP   NOT NULL,
+    time_end       TIMESTAMP   NOT NULL,
+    method         VARCHAR(50) NOT NULL,
+    order_id       INTEGER     NOT NULL,
+    deliveryman_id INTEGER,
+    FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE,
+    FOREIGN KEY (deliveryman_id) REFERENCES deliverymen (id) ON DELETE SET NULL
+);
+
 CREATE TABLE IF NOT EXISTS routes
 (
     id             SERIAL PRIMARY KEY,
@@ -70,22 +82,10 @@ CREATE TABLE IF NOT EXISTS coordinates
 (
     id              SERIAL PRIMARY KEY,
     sequence_number INTEGER NOT NULL,
-    order_id        INTEGER NOT NULL,
+    delivery_id        INTEGER NOT NULL,
     route_id        INTEGER NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE SET NULL,
+    FOREIGN KEY (delivery_id) REFERENCES deliveries (id) ON DELETE SET NULL,
     FOREIGN KEY (route_id) REFERENCES routes (id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS deliveries
-(
-    id             SERIAL PRIMARY KEY,
-    time_start     TIMESTAMP   NOT NULL,
-    time_end       TIMESTAMP   NOT NULL,
-    method         VARCHAR(50) NOT NULL,
-    order_id       INTEGER     NOT NULL,
-    deliveryman_id INTEGER,
-    FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE,
-    FOREIGN KEY (deliveryman_id) REFERENCES deliverymen (id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS payments
