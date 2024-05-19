@@ -23,6 +23,10 @@ type User interface {
 	GetUserWithPasswordById(userId int) (model.UserPassword, error)
 	ChangeFullName(userId int, fullName string) error
 	ChangeIdentificationNumber(userId int, identificationNumber string) error
+	ChangePassword(userId int, passwordHash string) error
+	ChangePhoneNumber(userId int, phoneNumber, passwordHash string) error
+	ChangeEmail(userId int, email string) error
+	ChangeUserRole(userId int, role string) error
 }
 
 type Verification interface {
@@ -90,9 +94,14 @@ type Item interface {
 	SaveFilenames(itemId int, filenames []string) error
 	DeleteItem(itemId int) error
 	ChangeItem(itemId int, name, description, price, priceDeposit, categoryId *string) error
+	ChangeStockOfItem(itemId, storeId, inStockNumber int) error
 }
 
 type Store interface {
+	CreateStore(store model.Store) (int, error)
+	GetAllStores() ([]model.StoreFromDB, error)
+	ChangeStore(storeId int, store model.StoreChangeDB) error
+	DeleteStore(storeId int) error
 }
 
 type Repository struct {
@@ -119,5 +128,6 @@ func NewRepository(db *sqlx.DB) *Repository {
 		Delivery:    NewDeliveryPostgres(db),
 		Cart:        NewCartPostgres(db),
 		Order:       NewOrderPostgres(db),
+		Store:       NewStorePostgres(db),
 	}
 }

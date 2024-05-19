@@ -28,8 +28,8 @@ VALUES (0, 'root', NULL), -- THIS CATEGORY ALWAYS MUST BE!!!
 
 INSERT INTO items (name, description, price, price_deposit, is_in_stock, category_id)
 VALUES ('Молоток', 'Хороший молоток, крепкий', 2000, 20000, true, 2),
-       ('Пила', 'Хорошо пилит, мощно', 3000, 30000, true, null),
-       ('Отвёртка', 'Хорошо крутит, отлично', 4000, 40000, false, 1);
+       ('Пила', 'Хорошо пилит, мощно', 3000, 30000, false, null),
+       ('Отвёртка', 'Хорошо крутит, отлично', 4000, 40000, true, 1);
 
 INSERT INTO infos (name, description, item_id)
 VALUES ('ВЕС', 'большой', 1),
@@ -44,14 +44,12 @@ VALUES ('first1', 1),
        ('first3', 3);
 
 INSERT INTO stores (name, address, working_hours_start, working_hours_end)
-VALUES ('1', '1', '8:00', '20:00'),
-       ('2', '2', '7:30', '21:00');
+VALUES ('1', '1', '8:00', '20:00');
 
 INSERT INTO item_stores (in_stock_number, store_id, item_id)
 VALUES (2, 1, 1),
-       (3, 2, 1),
        (0, 1, 2),
-       (1, 2, 3);
+       (1, 1, 3);
 
 INSERT INTO orders (id, status, total_price, deposit, rental_period_start, rental_period_end, address, latitude,
                     longitude, company_name, user_id)

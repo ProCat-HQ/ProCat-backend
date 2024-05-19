@@ -22,6 +22,10 @@ type User interface {
 	CheckPassword(password string, userId int) (bool, error)
 	ChangeFullName(userId int, fullName string) error
 	ChangeIdentificationNumber(userId int, identificationNumber string) error
+	ChangePassword(userId int, password string) error
+	ChangePhoneNumber(userId int, phoneNumber, password string) error
+	ChangeEmail(userId int, email string) error
+	ChangeUserRole(userId int, role string) error
 }
 
 type Verification interface {
@@ -78,9 +82,15 @@ type Item interface {
 	CreateItem(name, description, price, priceDeposit, categoryId string, files []*multipart.FileHeader) (int, error)
 	DeleteItem(itemId int) error
 	ChangeItem(itemId int, name, description, price, priceDeposit, categoryId *string) error
+
+	ChangeStockOfItem(itemId, storeId, inStockNumber int) error
 }
 
 type Store interface {
+	CreateStore(store model.Store) (int, error)
+	GetAllStores() ([]model.StoreFromDB, error)
+	ChangeStore(storeId int, store model.StoreChange) error
+	DeleteStore(storeId int) error
 }
 
 type Service struct {
@@ -107,5 +117,6 @@ func NewService(repos *repository.Repository) *Service {
 		Deliveryman: NewDeliverymanService(repos.Deliveryman),
 		Cart:        NewCartService(repos.Cart),
 		Order:       NewOrderService(repos.Order),
+		Store:       NewStoreService(repos.Store),
 	}
 }

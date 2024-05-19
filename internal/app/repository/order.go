@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/procat-hq/procat-backend/internal/app/model"
@@ -181,13 +182,25 @@ func (r *OrderPostgres) CreateOrder(status string, deposit bool, rpStart, rpEnd 
 	}
 	defer tx.Rollback()
 
+	var isOkCartItems int
+	queryCheckCartStock := fmt.Sprintf(`SELECT MIN(CAST(in_stock_number - items_number >= 0 AS INTEGER)) FROM %s i
+												JOIN %s c ON i.item_id = c.item_id WHERE c.cart_id=$1`, itemsStoresTable, cartsItemsTable)
+
+	err = tx.Get(&isOkCartItems, queryCheckCartStock, cartId)
+	if err != nil {
+		return model.OrderCheque{}, err
+	}
+
+	if isOkCartItems == 0 {
+		return model.OrderCheque{}, errors.New("some items from the cart are out of stock")
+	}
+
 	var orderId int
 	err = tx.Get(&orderId, orderCreationQuery, status, totalPrice, depositPrice, rpStart, rpEnd, address, lat, lon, companyName, userId)
 	if err != nil {
 		return model.OrderCheque{}, err
 	}
 
-	// if it won't work change $1 to order_id using sprintf
 	queryMoveFromCartToOrder := fmt.Sprintf(`INSERT INTO %s (items_number, order_id, item_id)
 													SELECT c.items_number, $1 as order_id, i.id
 													FROM %s c
@@ -195,6 +208,24 @@ func (r *OrderPostgres) CreateOrder(status string, deposit bool, rpStart, rpEnd 
 													WHERE c.cart_id=$2`, ordersItemsTable, cartsItemsTable, itemsTable)
 
 	_, err = tx.Exec(queryMoveFromCartToOrder, orderId, cartId)
+	if err != nil {
+		return model.OrderCheque{}, err
+	}
+
+	defaultStoreId := 1
+
+	queryUpdateStockItems := fmt.Sprintf(`UPDATE %s i SET in_stock_number = in_stock_number - items_number
+												FROM %s c WHERE store_id=$1 AND c.cart_id=$2 AND c.item_id = i.item_id`, itemsStoresTable, cartsItemsTable)
+
+	_, err = tx.Exec(queryUpdateStockItems, defaultStoreId, cartId)
+	if err != nil {
+		return model.OrderCheque{}, err
+	}
+
+	queryUpdateItemBoolStock := fmt.Sprintf(`UPDATE %s it SET is_in_stock = i.in_stock_number > 0
+													FROM %s i WHERE it.id = i.item_id`, itemsTable, itemsStoresTable)
+
+	_, err = tx.Exec(queryUpdateItemBoolStock)
 	if err != nil {
 		return model.OrderCheque{}, err
 	}
@@ -277,8 +308,25 @@ func (r *OrderPostgres) GetPaymentsForOrder(orderId int) ([]model.Payment, error
 func (r *OrderPostgres) ChangePaymentStatus(paymentId, paid int, method string) error {
 	query := fmt.Sprintf(`UPDATE %s SET paid = paid + $1,
                     			 method = COALESCE(method, '') || $2 || ';'
-                				 WHERE id=$3`, paymentsTable)
+                				 WHERE id=$3 RETURNING paid, price, order_id`, paymentsTable)
 
-	_, err := r.db.Exec(query, paid, method, paymentId)
-	return err
+	queryUpdateOrderStatus := fmt.Sprintf(`UPDATE %s SET status = $1 WHERE id = $2`, ordersTable)
+
+	var money struct {
+		Paid    int `db:"paid"`
+		Price   int `db:"price"`
+		OrderId int `db:"order_id"`
+	}
+	err := r.db.Get(&money, query, paid, method, paymentId)
+	if err != nil {
+		return err
+	}
+	if money.Paid >= money.Price {
+		_, err = r.db.Exec(queryUpdateOrderStatus, model.Accepted, money.OrderId)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

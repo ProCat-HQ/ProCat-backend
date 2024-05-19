@@ -4,6 +4,13 @@ import (
 	"time"
 )
 
+const (
+	UserRole        = "user"
+	DeliverymanRole = "deliveryman"
+	ModeratorRole   = "moderator"
+	AdminRole       = "admin"
+)
+
 type User struct {
 	Id                   int       `json:"id" db:"id"`
 	FullName             string    `json:"fullName" db:"fullname"`

@@ -47,12 +47,12 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		change := users.Group("/change", h.UserIdentify)
 		{
-			change.POST("/iin-bin", h.ChangeIIN) // TODO
+			change.POST("/iin-bin", h.ChangeIIN)
 			change.POST("/fullname", h.ChangeFullName)
-			change.POST("/password", h.ChangePassword)                    // TODO
-			change.POST("/email", h.ChangeEmail)                          // TODO
-			change.POST("/phone", h.ChangePhone)                          // TODO
-			change.PATCH("/role/:id", h.CheckRole("admin"), h.ChangeRole) // TODO
+			change.POST("/password", h.ChangePassword)
+			change.POST("/phone", h.ChangePhone)
+			change.POST("/email", h.ChangeEmail)
+			change.PATCH("/role/:id", h.CheckRole("admin"), h.ChangeRole)
 		}
 
 		deliverymen := users.Group("/deliverymen", h.UserIdentify, h.CheckRole("deliveryman"))
@@ -138,7 +138,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		stock := items.Group("/stock", h.UserIdentify, h.CheckRole("admin"))
 		{
-			stock.PUT("/:id", h.ChangeStock) // TODO
+			stock.PUT("/:id", h.ChangeStock)
 		}
 
 		infos := items.Group("/infos", h.UserIdentify, h.CheckRole("admin"))
@@ -157,10 +157,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	stores := router.Group("/stores")
 	{
-		stores.GET("", h.GetAllStores)                                             // TODO
-		stores.POST("", h.UserIdentify, h.CheckRole("admin"), h.CreateStore)       // TODO
-		stores.PATCH("/:id", h.UserIdentify, h.CheckRole("admin"), h.ChangeStore)  // TODO
-		stores.DELETE("/:id", h.UserIdentify, h.CheckRole("admin"), h.DeleteStore) // TODO
+		stores.GET("", h.GetAllStores)
+		stores.POST("", h.UserIdentify, h.CheckRole("admin"), h.CreateStore)
+		stores.PATCH("/:id", h.UserIdentify, h.CheckRole("admin"), h.ChangeStore)
+		stores.DELETE("/:id", h.UserIdentify, h.CheckRole("admin"), h.DeleteStore)
 	}
 
 	return router

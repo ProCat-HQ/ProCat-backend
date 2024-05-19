@@ -58,11 +58,30 @@ func (r *DeliverymanPostgres) CreateDeliveryman(newDeliveryman model.DeliveryMan
 	query := fmt.Sprintf(`INSERT INTO %s (car_capacity, working_hours_start, working_hours_end, car_id, user_id) 
 								VALUES ($1, $2, $3, $4, $5) 
 								RETURNING id`, deliverymenTable)
-	var id int
-	err := r.db.Get(&id, query, newDeliveryman.CarCapacity, newDeliveryman.WorkingHoursStart, newDeliveryman.WorkingHoursEnd, newDeliveryman.CarId, userId)
+
+	queryChangeRole := fmt.Sprintf(`UPDATE %s SET role=$1 WHERE id=$2`, usersTable)
+
+	tx, err := r.db.Beginx()
 	if err != nil {
 		return 0, err
 	}
+	defer tx.Rollback()
+
+	var id int
+	err = tx.Get(&id, query, newDeliveryman.CarCapacity, newDeliveryman.WorkingHoursStart, newDeliveryman.WorkingHoursEnd, newDeliveryman.CarId, userId)
+	if err != nil {
+		return 0, err
+	}
+
+	_, err = tx.Exec(queryChangeRole, model.DeliverymanRole, userId)
+	if err != nil {
+		return 0, err
+	}
+
+	if err = tx.Commit(); err != nil {
+		return 0, err
+	}
+
 	return id, nil
 }
 
@@ -107,10 +126,25 @@ func (r *DeliverymanPostgres) ChangeDeliverymanData(newData model.DeliveryManInf
 }
 
 func (r *DeliverymanPostgres) DeleteDeliveryman(deliverymanId int) error {
-	query := fmt.Sprintf(`DELETE FROM %s WHERE id = $1`, deliverymenTable)
-	_, err := r.db.Exec(query, deliverymanId)
+	query := fmt.Sprintf(`DELETE FROM %s WHERE id = $1 RETURNING user_id`, deliverymenTable)
+	queryChangeRole := fmt.Sprintf(`UPDATE %s SET role=$1 WHERE id=$2`, usersTable)
+
+	tx, err := r.db.Beginx()
 	if err != nil {
 		return err
 	}
-	return nil
+	defer tx.Rollback()
+
+	var userId int
+
+	err = tx.Get(&userId, query, deliverymanId)
+	if err != nil {
+		return err
+	}
+	_, err = tx.Exec(queryChangeRole, model.UserRole, userId)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
 }

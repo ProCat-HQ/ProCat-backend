@@ -140,3 +140,10 @@ func (s *ItemService) ChangeItem(itemId int, name, description, price, priceDepo
 func (s *ItemService) DeleteItem(itemId int) error {
 	return s.repo.DeleteItem(itemId)
 }
+
+func (s *ItemService) ChangeStockOfItem(itemId, storeId, inStockNumber int) error {
+	if inStockNumber < 0 {
+		return errors.New("inStockNumber must be positive")
+	}
+	return s.repo.ChangeStockOfItem(itemId, storeId, inStockNumber)
+}
