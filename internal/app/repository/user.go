@@ -248,3 +248,27 @@ func (r *UserPostgres) ChangeIdentificationNumber(userId int, identificationNumb
 	_, err := r.db.Exec(queryChangeIin, identificationNumber, userId)
 	return err
 }
+
+func (r *UserPostgres) ChangePassword(userId int, passwordHash string) error {
+	query := fmt.Sprintf(`UPDATE %s SET password_hash=$1 WHERE id=$2`, usersTable)
+	_, err := r.db.Exec(query, passwordHash, userId)
+	return err
+}
+
+func (r *UserPostgres) ChangePhoneNumber(userId int, phoneNumber, passwordHash string) error {
+	query := fmt.Sprintf(`UPDATE %s SET phone_number=$1, password_hash=$2 WHERE id=$3`, usersTable)
+	_, err := r.db.Exec(query, phoneNumber, passwordHash, userId)
+	return err
+}
+
+func (r *UserPostgres) ChangeEmail(userId int, email string) error {
+	query := fmt.Sprintf(`UPDATE %s SET email=$1 WHERE id=$2`, usersTable)
+	_, err := r.db.Exec(query, email, userId)
+	return err
+}
+
+func (r *UserPostgres) ChangeUserRole(userId int, role string) error {
+	query := fmt.Sprintf(`UPDATE %s SET role=$1 WHERE id=$2`, usersTable)
+	_, err := r.db.Exec(query, role, userId)
+	return err
+}

@@ -47,12 +47,12 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		change := users.Group("/change", h.UserIdentify)
 		{
-			change.POST("/iin-bin", h.ChangeIIN) // TODO
+			change.POST("/iin-bin", h.ChangeIIN)
 			change.POST("/fullname", h.ChangeFullName)
-			change.POST("/password", h.ChangePassword)                    // TODO
-			change.POST("/email", h.ChangeEmail)                          // TODO
-			change.POST("/phone", h.ChangePhone)                          // TODO
-			change.PATCH("/role/:id", h.CheckRole("admin"), h.ChangeRole) // TODO
+			change.POST("/password", h.ChangePassword)
+			change.POST("/phone", h.ChangePhone)
+			change.POST("/email", h.ChangeEmail)
+			change.PATCH("/role/:id", h.CheckRole("admin"), h.ChangeRole)
 		}
 
 		deliverymen := users.Group("/deliverymen", h.UserIdentify, h.CheckRole("deliveryman"))

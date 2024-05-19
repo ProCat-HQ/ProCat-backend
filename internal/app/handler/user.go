@@ -14,6 +14,7 @@ import (
 
 const (
 	phoneRegex = "^\\+?[1-9]?[0-9]{7,14}$"
+	emailRegex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"
 )
 
 func (h *Handler) GetAllUsers(c *gin.Context) {
@@ -327,17 +328,162 @@ func (h *Handler) ChangeFullName(c *gin.Context) {
 }
 
 func (h *Handler) ChangePassword(c *gin.Context) {
+	userData, err := h.GetUserContext(c)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
 
+	var input struct {
+		OldPassword string `json:"oldPassword" binding:"required"`
+		NewPassword string `json:"newPassword" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	passwordMatch, err := h.services.User.CheckPassword(input.OldPassword, userData.UserId)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if !passwordMatch {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "password does not match")
+		return
+	}
+	if err = h.services.User.ChangePassword(userData.UserId, input.NewPassword); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: nil,
+	})
 }
 
 func (h *Handler) ChangePhone(c *gin.Context) {
+	userData, err := h.GetUserContext(c)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
 
+	var input struct {
+		Password    string `json:"password" binding:"required"`
+		PhoneNumber string `json:"phoneNumber" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if matched, _ := regexp.MatchString(phoneRegex, input.PhoneNumber); !matched {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "Invalid phoneNumber field")
+		return
+	}
+
+	passwordMatch, err := h.services.User.CheckPassword(input.Password, userData.UserId)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if !passwordMatch {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "password does not match")
+		return
+	}
+
+	if err = h.services.User.ChangePhoneNumber(userData.UserId, input.PhoneNumber, input.Password); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: nil,
+	})
 }
 
 func (h *Handler) ChangeEmail(c *gin.Context) {
+	userData, err := h.GetUserContext(c)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
 
+	var input struct {
+		Password string `json:"password" binding:"required"`
+		Email    string `json:"email" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if matched, _ := regexp.MatchString(emailRegex, input.Email); !matched {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "Invalid email format field")
+		return
+	}
+
+	passwordMatch, err := h.services.User.CheckPassword(input.Password, userData.UserId)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if !passwordMatch {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "password does not match")
+		return
+	}
+
+	if err = h.services.User.ChangeEmail(userData.UserId, input.Email); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: nil,
+	})
 }
 
 func (h *Handler) ChangeRole(c *gin.Context) {
+	paramUserId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "userId param is not a number: "+err.Error())
+		return
+	}
 
+	var input struct {
+		Role string `json:"role" binding:"required"`
+	}
+
+	if err = c.ShouldBindJSON(&input); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err = h.services.User.ChangeUserRole(paramUserId, input.Role); err != nil {
+		if err.Error() == "unknown role" {
+			custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+			return
+		}
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: nil,
+	})
 }

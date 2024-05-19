@@ -22,6 +22,10 @@ type User interface {
 	CheckPassword(password string, userId int) (bool, error)
 	ChangeFullName(userId int, fullName string) error
 	ChangeIdentificationNumber(userId int, identificationNumber string) error
+	ChangePassword(userId int, password string) error
+	ChangePhoneNumber(userId int, phoneNumber, password string) error
+	ChangeEmail(userId int, email string) error
+	ChangeUserRole(userId int, role string) error
 }
 
 type Verification interface {

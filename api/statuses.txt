@@ -20,6 +20,12 @@ b.  Админ сделал всё необходимое чтобы его от
 11. Ожидание оплаты за ремонт                       - awaitingRepairPayment
 12. Заказ закрыт                                    - closed
 
+Роли:
+"user"
+"deliveryman"
+"moderator" - не используется, просто вдруг потом нужен будет
+"admin"
+
 accepted - до Cluster
 accepted и у delivery появилася deliveryman_id - после Cluster, то, что возвращает deliveries-to-sort
 readyToDelivery - после согласия админа с кластером системы

@@ -707,7 +707,7 @@
     },
     "/users/change/password": {
       "post": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "userInfoChange"
         ],
@@ -747,7 +747,7 @@
     },
     "/users/change/phone": {
       "post": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "userInfoChange"
         ],
@@ -762,7 +762,7 @@
                     "type": "string",
                     "example": 12345678
                   },
-                  "phone": {
+                  "phoneNumber": {
                     "type": "string",
                     "example": 79000000000
                   }
@@ -787,7 +787,7 @@
     },
     "/users/change/email": {
       "post": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "userInfoChange"
         ],
@@ -838,7 +838,7 @@
         }
       ],
       "patch": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "userInfoChange"
         ],

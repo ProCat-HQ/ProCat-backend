@@ -461,7 +461,7 @@ paths:
                 $ref: '#/components/schemas/StatusCode200'
   /users/change/password:
     post:
-      deprecated: true
+      deprecated: false
       tags:
         - userInfoChange
       summary: check if old passwords match, then send confirmation code on current number
@@ -487,7 +487,7 @@ paths:
 
   /users/change/phone:
     post:
-      deprecated: true
+      deprecated: false
       tags:
         - userInfoChange
       summary: check password and send confirmation code on new number
@@ -500,7 +500,7 @@ paths:
                 password:
                   type: string
                   example: 12345678
-                phone:
+                phoneNumber:
                   type: string
                   example: +79000000000
       responses:
@@ -512,7 +512,7 @@ paths:
                 $ref: '#/components/schemas/StatusCode200'
   /users/change/email:
     post:
-      deprecated: true
+      deprecated: false
       tags:
         - userInfoChange
       summary: check password and send confirmation code on new email
@@ -544,7 +544,7 @@ paths:
           type: integer
           example: 56
     patch:
-      deprecated: true
+      deprecated: false
       tags:
         - userInfoChange
       summary: change role
