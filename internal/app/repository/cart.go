@@ -28,18 +28,31 @@ func (r *CartPostgres) GetUsersCartId(userId int) (int, error) {
 }
 
 func (r *CartPostgres) AddItemToCart(cartId, itemId, count int) error {
+	defaultStoreId := 1
+
 	getItemCountQuery := fmt.Sprintf(`SELECT items_number FROM %s WHERE cart_id=$1 AND item_id=$2`, cartsItemsTable)
 
+	getItemStockQuery := fmt.Sprintf(`SELECT in_stock_number FROM %s WHERE store_id=$1 AND item_id=$2`, itemsStoresTable)
+	// проверка на то, что желаемое количество товара <= того, что в наличии
 	tx, err := r.db.Beginx()
 	if err != nil {
 		return err
 	}
 	defer tx.Rollback()
 
+	var itemStock int
+	err = tx.Get(&itemStock, getItemStockQuery, defaultStoreId, itemId)
+	if err != nil {
+		return err
+	}
+
 	var itemsNumber int
 	err = tx.Get(&itemsNumber, getItemCountQuery, cartId, itemId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
+			if itemStock < count {
+				return errors.New("can't add more items than store have")
+			}
 			query := fmt.Sprintf(`INSERT INTO %s (items_number, cart_id, item_id) VALUES ($1, $2, $3)`, cartsItemsTable)
 			if count == 0 {
 				_, err = tx.Exec(query, 1, cartId, itemId)
@@ -53,6 +66,10 @@ func (r *CartPostgres) AddItemToCart(cartId, itemId, count int) error {
 			return err
 		}
 		return err
+	}
+
+	if itemStock < count+itemsNumber {
+		return errors.New("can't add more items than store have")
 	}
 
 	query := fmt.Sprintf(`UPDATE %s SET items_number=$1 WHERE cart_id=$2 AND item_id=$3`, cartsItemsTable)

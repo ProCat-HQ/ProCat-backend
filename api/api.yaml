@@ -547,7 +547,7 @@ paths:
       deprecated: false
       tags:
         - userInfoChange
-      summary: change role
+      summary: change role (TODO issues with deliveryMan (need to create/delete him if   this role was used))
       requestBody:
         content:
           application/json:
@@ -635,17 +635,19 @@ paths:
                             phoneNumber:
                               type: string
                               example: +79163125366
-  /users/deliverymen/{deliveryId}:
+
+  /users/deliverymen/{userId}:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 856
     get:
       tags:
         - deliveryman
       summary: for simple user to get his deliveryman page
-      parameters:
-        - name: deliveryId
-          in: path
-          required: true
-          schema:
-            type: integer
       responses:
         200:
           description: successful operation
@@ -675,14 +677,7 @@ paths:
                       carId:
                         type: string
                         example: P425YB154
-  /users/deliverymen/{userId}:
-    parameters:
-      - name: userId
-        in: path
-        required: true
-        schema:
-          type: integer
-          example: 856
+
     post:
       tags:
         - deliveryman
@@ -2230,7 +2225,7 @@ paths:
           type: integer
           example: 56
     put:
-      deprecated: true
+      deprecated: false
       tags:
         - stockOfItem
       summary: creates stock in some {storeId} or changes stock if relation exists

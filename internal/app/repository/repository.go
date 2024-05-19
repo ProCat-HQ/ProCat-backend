@@ -94,6 +94,7 @@ type Item interface {
 	SaveFilenames(itemId int, filenames []string) error
 	DeleteItem(itemId int) error
 	ChangeItem(itemId int, name, description, price, priceDeposit, categoryId *string) error
+	ChangeStockOfItem(itemId, storeId, inStockNumber int) error
 }
 
 type Store interface {

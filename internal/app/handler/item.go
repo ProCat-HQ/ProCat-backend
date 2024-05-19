@@ -205,5 +205,26 @@ func (h *Handler) DeleteImages(c *gin.Context) {
 }
 
 func (h *Handler) ChangeStock(c *gin.Context) {
+	itemIdInt, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
 
+	var input model.ChangeStock
+	if err = c.ShouldBindJSON(&input); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err = h.services.Item.ChangeStockOfItem(itemIdInt, input.StoreId, input.InStockNumber); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: nil,
+	})
 }

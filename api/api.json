@@ -842,7 +842,7 @@
         "tags": [
           "userInfoChange"
         ],
-        "summary": "change role",
+        "summary": "change role (TODO issues with deliveryMan (need to create/delete him if   this role was used))",
         "requestBody": {
           "content": {
             "application/json": {
@@ -974,22 +974,23 @@
         }
       }
     },
-    "/users/deliverymen/{deliveryId}": {
+    "/users/deliverymen/{userId}": {
+      "parameters": [
+        {
+          "name": "userId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "example": 856
+          }
+        }
+      ],
       "get": {
         "tags": [
           "deliveryman"
         ],
         "summary": "for simple user to get his deliveryman page",
-        "parameters": [
-          {
-            "name": "deliveryId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -1033,20 +1034,7 @@
             }
           }
         }
-      }
-    },
-    "/users/deliverymen/{userId}": {
-      "parameters": [
-        {
-          "name": "userId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "integer",
-            "example": 856
-          }
-        }
-      ],
+      },
       "post": {
         "tags": [
           "deliveryman"
@@ -3377,7 +3365,7 @@
         }
       ],
       "put": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "stockOfItem"
         ],

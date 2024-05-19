@@ -98,3 +98,8 @@ type StoreChangeDB struct {
 	WorkingHoursStart *time.Time
 	WorkingHoursEnd   *time.Time
 }
+
+type ChangeStock struct {
+	StoreId       int `json:"storeId" binding:"required"`
+	InStockNumber int `json:"inStockNumber" binding:"min=0"`
+}

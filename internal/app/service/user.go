@@ -297,13 +297,13 @@ func (s *UserService) ChangeEmail(userId int, email string) error {
 
 func getRolePriority(role string) (int, error) {
 	switch role {
-	case "user":
+	case model.UserRole:
 		return 1, nil
-	case "deliveryman":
+	case model.DeliverymanRole:
 		return 2, nil
-	case "moderator":
+	case model.ModeratorRole:
 		return 3, nil
-	case "admin":
+	case model.AdminRole:
 		return 4, nil
 	default:
 		return 0, errors.New("unknown role")

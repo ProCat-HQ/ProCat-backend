@@ -138,7 +138,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		stock := items.Group("/stock", h.UserIdentify, h.CheckRole("admin"))
 		{
-			stock.PUT("/:id", h.ChangeStock) // TODO
+			stock.PUT("/:id", h.ChangeStock)
 		}
 
 		infos := items.Group("/infos", h.UserIdentify, h.CheckRole("admin"))
@@ -159,8 +159,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		stores.GET("", h.GetAllStores)
 		stores.POST("", h.UserIdentify, h.CheckRole("admin"), h.CreateStore)
-		stores.PATCH("/:id", h.UserIdentify, h.CheckRole("admin"), h.ChangeStore)  // TODO
-		stores.DELETE("/:id", h.UserIdentify, h.CheckRole("admin"), h.DeleteStore) // TODO
+		stores.PATCH("/:id", h.UserIdentify, h.CheckRole("admin"), h.ChangeStore)
+		stores.DELETE("/:id", h.UserIdentify, h.CheckRole("admin"), h.DeleteStore)
 	}
 
 	return router

@@ -82,6 +82,8 @@ type Item interface {
 	CreateItem(name, description, price, priceDeposit, categoryId string, files []*multipart.FileHeader) (int, error)
 	DeleteItem(itemId int) error
 	ChangeItem(itemId int, name, description, price, priceDeposit, categoryId *string) error
+
+	ChangeStockOfItem(itemId, storeId, inStockNumber int) error
 }
 
 type Store interface {
