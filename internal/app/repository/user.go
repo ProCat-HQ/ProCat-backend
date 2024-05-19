@@ -40,6 +40,17 @@ func (r *UserPostgres) GetUserById(userId int) (model.User, error) {
 	return user, err
 }
 
+func (r *UserPostgres) GetUserWithPasswordById(userId int) (model.UserPassword, error) {
+	query := fmt.Sprintf(`SELECT id, fullname, COALESCE(email, '') AS email, phone_number,
+       							COALESCE(identification_number, '') AS identification_number, password_hash,
+       							is_confirmed, role, created_at
+								FROM %s WHERE id=$1`, usersTable)
+
+	var user model.UserPassword
+	err := r.db.Get(&user, query, userId)
+	return user, err
+}
+
 func (r *UserPostgres) CreateUser(user model.SignUpInput) (int, error) {
 	query := fmt.Sprintf("INSERT INTO %s (fullname, phone_number, password_hash) VALUES ($1, $2, $3) RETURNING id", usersTable)
 	queryCart := fmt.Sprintf(`INSERT INTO %s (user_id) VALUES ($1)`, cartsTable)
@@ -204,4 +215,36 @@ func (r *UserPostgres) DeleteUserById(userId int) error {
 		return sql.ErrNoRows
 	}
 	return nil
+}
+
+func (r *UserPostgres) ChangeFullName(userId int, fullName string) error {
+	queryChangeFullName := fmt.Sprintf(`UPDATE %s SET fullname=$1 WHERE id=$2`, usersTable)
+	queryClearIinBin := fmt.Sprintf(`UPDATE %s SET identification_number=NULL WHERE id=$1`, usersTable)
+
+	tx, err := r.db.Beginx()
+
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	_, err = tx.Exec(queryChangeFullName, fullName, userId)
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Exec(queryClearIinBin, userId)
+	if err != nil {
+		return err
+	}
+
+	err = tx.Commit()
+	return err
+}
+
+func (r *UserPostgres) ChangeIdentificationNumber(userId int, identificationNumber string) error {
+	queryChangeIin := fmt.Sprintf(`UPDATE %s SET identification_number=$1 WHERE id=$2`, usersTable)
+
+	_, err := r.db.Exec(queryChangeIin, identificationNumber, userId)
+	return err
 }

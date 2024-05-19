@@ -238,11 +238,92 @@ func (h *Handler) RefreshToken(c *gin.Context) {
 }
 
 func (h *Handler) ChangeIIN(c *gin.Context) {
+	userData, err := h.GetUserContext(c)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
 
+	var input struct {
+		Password             string `json:"password" binding:"required"`
+		IdentificationNumber string `json:"identificationNumber" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	passwordMatch, err := h.services.User.CheckPassword(input.Password, userData.UserId)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if !passwordMatch {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "password does not match")
+		return
+	}
+
+	if err = h.services.User.ChangeIdentificationNumber(userData.UserId, input.IdentificationNumber); err != nil {
+		if err.Error() == "wrong iinBin format" {
+			custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+			return
+		}
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: nil,
+	})
 }
 
 func (h *Handler) ChangeFullName(c *gin.Context) {
+	userData, err := h.GetUserContext(c)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
 
+	var input struct {
+		Password string `json:"password" binding:"required"`
+		FullName string `json:"fullName" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if len(strings.Split(input.FullName, " ")) < 2 {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "Invalid fullName field")
+		return
+	}
+
+	passwordMatch, err := h.services.User.CheckPassword(input.Password, userData.UserId)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if !passwordMatch {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "password does not match")
+		return
+	}
+
+	if err = h.services.User.ChangeFullName(userData.UserId, input.FullName); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: nil,
+	})
 }
 
 func (h *Handler) ChangePassword(c *gin.Context) {

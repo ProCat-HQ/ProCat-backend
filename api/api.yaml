@@ -410,7 +410,7 @@ paths:
                 $ref: '#/components/schemas/StatusCode200'
   /users/change/iin-bin:
     post:
-      deprecated: true
+      deprecated: false
       tags:
         - userInfoChange
       summary: check on iin correctness and matching with full name
@@ -423,7 +423,7 @@ paths:
                 password:
                   type: string
                   example: 12345678
-                iin-bin:
+                identificationNumber:
                   type: string
                   example: 68845645778
       responses:
@@ -436,7 +436,7 @@ paths:
 
   /users/change/fullname:
     post:
-      deprecated: true
+      deprecated: false
       tags:
         - userInfoChange
       summary: if success, then iin-bin := null, and it's needed to be filled
@@ -618,11 +618,11 @@ paths:
                             workingHoursStart:
                               type: string
                               format: time
-                              example: 08:00:00
+                              example: 2023-11-04T08:00:00Z
                             workingHoursEnd:
                               type: string
                               format: time
-                              example: 16:00:00
+                              example: 2023-11-04T16:00:00Z
                             carId:
                               type: string
                               example: P425YB154
@@ -668,10 +668,10 @@ paths:
                         example: big
                       workingHoursStart:
                         type: string
-                        example: 08:00:00
+                        example: 2023-11-04T08:00:00Z
                       workingHoursEnd:
                         type: string
-                        example: 16:00:00
+                        example: 2023-11-04T16:00:00Z
                       carId:
                         type: string
                         example: P425YB154
@@ -698,7 +698,7 @@ paths:
                   example: big
                 workingHoursStart:
                   type: string
-                  example: 8:00:00
+                  example: 08:00:00
                 workingHoursEnd:
                   type: string
                   example: 16:00:00
@@ -741,10 +741,10 @@ paths:
                   example: big
                 workingHoursStart:
                   type: string
-                  example: 8:00
+                  example: 08:00:00
                 workingHoursEnd:
                   type: string
-                  example: 16:00
+                  example: 16:00:00
                 carId:
                   type: string
                   example: HT236O154
@@ -1295,11 +1295,11 @@ paths:
                             rentalPeriodStart:
                               type: string
                               format: date-time
-                              example: 2023-10-19
+                              example: 2023-10-19T00:00:00Z
                             rentalPeriodEnd:
                               type: string
                               format: date-time
-                              example: 2023-11-04
+                              example: 2023-11-04T00:00:00Z
                             address:
                               type: string
                               example: ул. Пушкина д. 7 кв. 587
@@ -1315,7 +1315,7 @@ paths:
                             createdAt:
                               type: string
                               format: date-time
-                              example: 2023-10-19 10:00:00+03
+                              example: 2023-11-04T00:00:00Z
                             userId:
                               type: integer
                               example: 2
@@ -1371,10 +1371,10 @@ paths:
                   example: by car
                 deliveryTimeStart:
                   type: string
-                  example: 2023-10-18 18:00:00+03
+                  example: 2023-10-18 18:00:00
                 deliveryTimeEnd:
                   type: string
-                  example: 2023-10-18 20:00:00+03
+                  example: 2023-10-18 20:00:00
       responses:
         200:
           description: successful operation
@@ -1484,11 +1484,11 @@ paths:
                       rentalPeriodStart:
                         type: string
                         format: date-time
-                        example: 2023-10-19
+                        example: 2023-10-19T00:00:00Z
                       rentalPeriodEnd:
                         type: string
                         format: date-time
-                        example: 2023-11-04
+                        example: 2023-11-04T00:00:00Z
                       address:
                         type: string
                         example: ул. Пушкина д. 7 кв. 587
@@ -1504,7 +1504,7 @@ paths:
                       createdAt:
                         type: string
                         format: date-time
-                        example: 2023-10-19 10:00:00+03
+                        example: 2023-10-19T00:00:00Z
                       userId:
                         type: integer
                         example: 2
@@ -1651,7 +1651,7 @@ paths:
                               example: 4500
                             createdAt:
                               type: string
-                              example: 2023-10-19 10:23:54+03
+                              example: 2023-10-19T10:23:54Z
   /users/orders/payment/{paymentId}:
     parameters:
       - name: paymentId
@@ -2583,7 +2583,7 @@ components:
         createdAt:
           type: string
           format: date-time
-          example: 2023-10-19 10:23:54+03
+          example: 2004-10-19T18:00:00Z
 
     Order:
       type: object
@@ -2621,11 +2621,11 @@ components:
         rentalPeriodStart:
           type: string
           format: date-time
-          example: 2023-10-19
+          example: 2023-10-19T00:00:00Z
         rentalPeriodEnd:
           type: string
           format: date-time
-          example: 2023-11-04
+          example: 2023-11-04T00:00:00Z
         address:
           type: string
           example: ул. Пушкина д. 7 кв. 587
@@ -2641,7 +2641,7 @@ components:
         createdAt:
           type: string
           format: date-time
-          example: 2023-10-19 10:00:00+03
+          example: 2023-11-04T00:00:00Z
         items:
           type: array
           items:
@@ -2693,11 +2693,11 @@ components:
         timeStart:
           type: string
           format: date-time
-          example: 2023-10-19 10:00:00+03
+          example: 2023-10-19T10:00:00Z
         timeEnd:
           type: string
           format: date-time
-          example: 2023-10-19 12:00:00+03
+          example: 2023-10-19T12:00:00Z
         method:
           type: string
           example: car
@@ -2754,11 +2754,11 @@ components:
         timeStart:
           type: string
           format: date-time
-          example: 2023-10-19 10:00:00+03
+          example: 2023-10-19T10:00:00Z
         timeEnd:
           type: string
           format: date-time
-          example: 2023-10-19 12:00:00+03
+          example: 2023-10-19T12:00:00Z
         method:
           type: string
           example: car
@@ -2880,10 +2880,10 @@ components:
           example: ул. Хорошая, д. 12
         workingHoursStart:
           type: string
-          example: 8:00
+          example: 2023-11-04T08:00:00Z
         workingHoursEnd:
           type: string
-          example: 20:00
+          example: 2023-11-04T20:00:00Z
 
 
     ItemImage:
@@ -2929,7 +2929,7 @@ components:
           example: true
         createdAt:
           format: date-time
-          example: 2023-10-19 12:00:00+03
+          example: 2023-11-04T08:00:00Z
 
     StatusCode200:
       type: object

@@ -19,6 +19,10 @@ type User interface {
 
 	GetAllUsers(limit, offset int, role, isConfirmed string) (int, []model.User, error)
 	DeleteUserById(userId int) error
+
+	GetUserWithPasswordById(userId int) (model.UserPassword, error)
+	ChangeFullName(userId int, fullName string) error
+	ChangeIdentificationNumber(userId int, identificationNumber string) error
 }
 
 type Verification interface {

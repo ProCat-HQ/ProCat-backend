@@ -53,7 +53,7 @@ func (s *OrderService) CreateOrder(userId int, order model.OrderCreationWithTime
 		return model.OrderCheque{}, err
 	}
 
-	defaultStatus := "awaitingPayment"
+	defaultStatus := model.AwaitingPayment
 
 	deposit := arrearResponse.TotalArrear > 0
 
