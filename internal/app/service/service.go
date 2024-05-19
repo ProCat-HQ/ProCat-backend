@@ -85,6 +85,10 @@ type Item interface {
 }
 
 type Store interface {
+	CreateStore(store model.Store) (int, error)
+	GetAllStores() ([]model.StoreFromDB, error)
+	ChangeStore(storeId int, store model.StoreChange) error
+	DeleteStore(storeId int) error
 }
 
 type Service struct {
@@ -111,5 +115,6 @@ func NewService(repos *repository.Repository) *Service {
 		Deliveryman: NewDeliverymanService(repos.Deliveryman),
 		Cart:        NewCartService(repos.Cart),
 		Order:       NewOrderService(repos.Order),
+		Store:       NewStoreService(repos.Store),
 	}
 }

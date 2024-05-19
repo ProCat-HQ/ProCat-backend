@@ -2413,7 +2413,7 @@ paths:
                 $ref: '#/components/schemas/StatusCode200'
   /stores:
     get:
-      deprecated: true
+      deprecated: false
       tags:
         - store
       summary: to get all stores
@@ -2452,12 +2452,12 @@ paths:
                           example: 123.32131
                         workingHoursStart:
                           type: string
-                          example: 8:00
+                          example: 2004-10-19T09:00:00Z
                         workingHoursEnd:
                           type: string
-                          example: 20:00
+                          example: 2004-10-19T20:00:00Z
     post:
-      deprecated: true
+      deprecated: false
       tags:
         - store
       summary: creates new store and finds it's coordinates according to the address
@@ -2475,10 +2475,10 @@ paths:
                   example: name
                 workingHoursStart:
                   type: string
-                  example: 8:00
+                  example: 08:00:00
                 workingHoursEnd:
                   type: string
-                  example: 20:00
+                  example: 20:00:00
       responses:
         200:
           description: successful operation
@@ -2508,7 +2508,7 @@ paths:
           type: integer
           example: 56
     patch:
-      deprecated: true
+      deprecated: false
       tags:
         - store
       summary: updates latLon if address changes
@@ -2526,10 +2526,10 @@ paths:
                   example: name
                 workingHoursStart:
                   type: string
-                  example: 8:00
+                  example: 08:00:00
                 workingHoursEnd:
                   type: string
-                  example: 20:00
+                  example: 20:00:00
       responses:
         200:
           description: successful operation
@@ -2538,7 +2538,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/StatusCode200'
     delete:
-      deprecated: true
+      deprecated: false
       tags:
         - store
       responses:

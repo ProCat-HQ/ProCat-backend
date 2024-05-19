@@ -20,4 +20,6 @@ const (
 	ItemsCheck            = "itemsCheck"
 	AwaitingRepairPayment = "awaitingRepairPayment"
 	Closed                = "closed"
+	DeliveryMethodCar     = "car"
+	DeliveryMethodPickup  = "pickup"
 )

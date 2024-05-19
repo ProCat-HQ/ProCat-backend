@@ -157,8 +157,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	stores := router.Group("/stores")
 	{
-		stores.GET("", h.GetAllStores)                                             // TODO
-		stores.POST("", h.UserIdentify, h.CheckRole("admin"), h.CreateStore)       // TODO
+		stores.GET("", h.GetAllStores)
+		stores.POST("", h.UserIdentify, h.CheckRole("admin"), h.CreateStore)
 		stores.PATCH("/:id", h.UserIdentify, h.CheckRole("admin"), h.ChangeStore)  // TODO
 		stores.DELETE("/:id", h.UserIdentify, h.CheckRole("admin"), h.DeleteStore) // TODO
 	}

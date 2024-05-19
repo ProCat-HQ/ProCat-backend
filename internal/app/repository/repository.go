@@ -97,6 +97,10 @@ type Item interface {
 }
 
 type Store interface {
+	CreateStore(store model.Store) (int, error)
+	GetAllStores() ([]model.StoreFromDB, error)
+	ChangeStore(storeId int, store model.StoreChangeDB) error
+	DeleteStore(storeId int) error
 }
 
 type Repository struct {
@@ -123,5 +127,6 @@ func NewRepository(db *sqlx.DB) *Repository {
 		Delivery:    NewDeliveryPostgres(db),
 		Cart:        NewCartPostgres(db),
 		Order:       NewOrderPostgres(db),
+		Store:       NewStorePostgres(db),
 	}
 }

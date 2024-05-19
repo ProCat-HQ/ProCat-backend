@@ -277,8 +277,25 @@ func (r *OrderPostgres) GetPaymentsForOrder(orderId int) ([]model.Payment, error
 func (r *OrderPostgres) ChangePaymentStatus(paymentId, paid int, method string) error {
 	query := fmt.Sprintf(`UPDATE %s SET paid = paid + $1,
                     			 method = COALESCE(method, '') || $2 || ';'
-                				 WHERE id=$3`, paymentsTable)
+                				 WHERE id=$3 RETURNING paid, price, order_id`, paymentsTable)
 
-	_, err := r.db.Exec(query, paid, method, paymentId)
-	return err
+	queryUpdateOrderStatus := fmt.Sprintf(`UPDATE %s SET status = $1 WHERE id = $2`, ordersTable)
+
+	var money struct {
+		Paid    int `db:"paid"`
+		Price   int `db:"price"`
+		OrderId int `db:"order_id"`
+	}
+	err := r.db.Get(&money, query, paid, method, paymentId)
+	if err != nil {
+		return err
+	}
+	if money.Paid >= money.Price {
+		_, err = r.db.Exec(queryUpdateOrderStatus, model.Accepted, money.OrderId)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

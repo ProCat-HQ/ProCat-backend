@@ -20,6 +20,10 @@ b.  Админ сделал всё необходимое чтобы его от
 11. Ожидание оплаты за ремонт                       - awaitingRepairPayment
 12. Заказ закрыт                                    - closed
 
+Способы доставки:
+DeliveryMethodCar     = "car" - доставка
+DeliveryMethodPickup  = "pickup" - самовывоз
+
 Роли:
 "user"
 "deliveryman"

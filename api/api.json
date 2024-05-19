@@ -3678,7 +3678,7 @@
     },
     "/stores": {
       "get": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "store"
         ],
@@ -3725,11 +3725,11 @@
                           },
                           "workingHoursStart": {
                             "type": "string",
-                            "example": "8:00"
+                            "example": "2004-10-19T09:00:00.000Z"
                           },
                           "workingHoursEnd": {
                             "type": "string",
-                            "example": "20:00"
+                            "example": "2004-10-19T20:00:00.000Z"
                           }
                         }
                       }
@@ -3742,7 +3742,7 @@
         }
       },
       "post": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "store"
         ],
@@ -3763,11 +3763,11 @@
                   },
                   "workingHoursStart": {
                     "type": "string",
-                    "example": "8:00"
+                    "example": "08:00:00"
                   },
                   "workingHoursEnd": {
                     "type": "string",
-                    "example": "20:00"
+                    "example": "20:00:00"
                   }
                 }
               }
@@ -3820,7 +3820,7 @@
         }
       ],
       "patch": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "store"
         ],
@@ -3841,11 +3841,11 @@
                   },
                   "workingHoursStart": {
                     "type": "string",
-                    "example": "8:00"
+                    "example": "08:00:00"
                   },
                   "workingHoursEnd": {
                     "type": "string",
-                    "example": "20:00"
+                    "example": "20:00:00"
                   }
                 }
               }
@@ -3866,7 +3866,7 @@
         }
       },
       "delete": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "store"
         ],

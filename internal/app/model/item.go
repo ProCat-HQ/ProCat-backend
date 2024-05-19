@@ -57,11 +57,44 @@ type ItemStores struct {
 }
 
 type Store struct {
-	Id                int       `json:"id"`
-	Name              string    `json:"name"`
-	Address           string    `json:"address"`
-	Latitude          string    `json:"latitude"`
-	Longitude         string    `json:"longitude"`
-	WorkingHoursStart time.Time `json:"workingHoursStart"`
-	WorkingHoursEnd   time.Time `json:"workingHoursEnd"`
+	Id                int       `json:"id" db:"id"`
+	Name              string    `json:"name" db:"name" binding:"required"`
+	Address           string    `json:"address" db:"address" binding:"required"`
+	Latitude          float64   `json:"latitude" db:"latitude"`
+	Longitude         float64   `json:"longitude" db:"longitude"`
+	WorkingHoursStart time.Time `json:"workingHoursStart" db:"working_hours_start" binding:"required"`
+	WorkingHoursEnd   time.Time `json:"workingHoursEnd" db:"working_hours_end" binding:"required"`
+}
+
+type StoreFromDB struct {
+	Id                int       `json:"id" db:"id"`
+	Name              string    `json:"name" db:"name" binding:"required"`
+	Address           string    `json:"address" db:"address" binding:"required"`
+	Latitude          string    `json:"latitude" db:"latitude"`
+	Longitude         string    `json:"longitude" db:"longitude"`
+	WorkingHoursStart time.Time `json:"workingHoursStart" db:"working_hours_start" binding:"required"`
+	WorkingHoursEnd   time.Time `json:"workingHoursEnd" db:"working_hours_end" binding:"required"`
+}
+
+type StoreCreation struct {
+	Name              string `json:"name" binding:"required"`
+	Address           string `json:"address" binding:"required"`
+	WorkingHoursStart string `json:"workingHoursStart" binding:"required"`
+	WorkingHoursEnd   string `json:"workingHoursEnd" binding:"required"`
+}
+
+type StoreChange struct {
+	Name              string `json:"name"`
+	Address           string `json:"address"`
+	WorkingHoursStart string `json:"workingHoursStart"`
+	WorkingHoursEnd   string `json:"workingHoursEnd"`
+}
+
+type StoreChangeDB struct {
+	Name              string
+	Address           string
+	Latitude          float64
+	Longitude         float64
+	WorkingHoursStart *time.Time
+	WorkingHoursEnd   *time.Time
 }
