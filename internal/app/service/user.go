@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/procat-hq/procat-backend/internal/app/model"
 	"github.com/procat-hq/procat-backend/internal/app/repository"
+	"github.com/procat-hq/procat-backend/internal/kzgov"
 	"os"
 	"strconv"
 	"time"
@@ -241,4 +242,36 @@ func (s *UserService) GetUserById(userId int) (model.User, error) {
 
 func (s *UserService) DeleteUserById(userId int) error {
 	return s.repo.DeleteUserById(userId)
+}
+
+func (s *UserService) CheckPassword(password string, userId int) (bool, error) {
+	user, err := s.repo.GetUserWithPasswordById(userId)
+	if err != nil {
+		return false, err
+	}
+
+	passwordHash := generatePasswordHash(user.PhoneNumber, password)
+	return passwordHash == user.PasswordHash, nil
+}
+
+func (s *UserService) ChangeFullName(userId int, fullName string) error {
+	return s.repo.ChangeFullName(userId, fullName)
+}
+
+func (s *UserService) ChangeIdentificationNumber(userId int, identificationNumber string) error {
+	kzGovResponse, err := kzgov.GetArrear(identificationNumber)
+	if err != nil {
+		return err
+	}
+
+	user, err := s.repo.GetUserById(userId)
+	if err != nil {
+		return err
+	}
+
+	if !kzgov.CompareNames(kzGovResponse.NameKk, kzGovResponse.NameRu, user.FullName) {
+		return errors.New("fullname from kz.gov service doesn't match with user's fullname")
+	}
+
+	return s.repo.ChangeIdentificationNumber(userId, identificationNumber)
 }

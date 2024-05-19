@@ -627,7 +627,7 @@
     },
     "/users/change/iin-bin": {
       "post": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "userInfoChange"
         ],
@@ -642,7 +642,7 @@
                     "type": "string",
                     "example": 12345678
                   },
-                  "iin-bin": {
+                  "identificationNumber": {
                     "type": "string",
                     "example": 68845645778
                   }
@@ -667,7 +667,7 @@
     },
     "/users/change/fullname": {
       "post": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "userInfoChange"
         ],
@@ -938,12 +938,12 @@
                               "workingHoursStart": {
                                 "type": "string",
                                 "format": "time",
-                                "example": "08:00:00"
+                                "example": "2023-11-04T08:00:00.000Z"
                               },
                               "workingHoursEnd": {
                                 "type": "string",
                                 "format": "time",
-                                "example": "16:00:00"
+                                "example": "2023-11-04T16:00:00.000Z"
                               },
                               "carId": {
                                 "type": "string",
@@ -1015,11 +1015,11 @@
                         },
                         "workingHoursStart": {
                           "type": "string",
-                          "example": "08:00:00"
+                          "example": "2023-11-04T08:00:00.000Z"
                         },
                         "workingHoursEnd": {
                           "type": "string",
-                          "example": "16:00:00"
+                          "example": "2023-11-04T16:00:00.000Z"
                         },
                         "carId": {
                           "type": "string",
@@ -1064,7 +1064,7 @@
                   },
                   "workingHoursStart": {
                     "type": "string",
-                    "example": "8:00:00"
+                    "example": "08:00:00"
                   },
                   "workingHoursEnd": {
                     "type": "string",
@@ -1129,11 +1129,11 @@
                   },
                   "workingHoursStart": {
                     "type": "string",
-                    "example": "8:00"
+                    "example": "08:00:00"
                   },
                   "workingHoursEnd": {
                     "type": "string",
-                    "example": "16:00"
+                    "example": "16:00:00"
                   },
                   "carId": {
                     "type": "string",
@@ -2000,7 +2000,7 @@
                               "createdAt": {
                                 "type": "string",
                                 "format": "date-time",
-                                "example": "2023-10-19T07:00:00.000Z"
+                                "example": "2023-11-04T00:00:00.000Z"
                               },
                               "userId": {
                                 "type": "integer",
@@ -2084,11 +2084,11 @@
                   },
                   "deliveryTimeStart": {
                     "type": "string",
-                    "example": "2023-10-18T15:00:00.000Z"
+                    "example": "2023-10-18T18:00:00.000Z"
                   },
                   "deliveryTimeEnd": {
                     "type": "string",
-                    "example": "2023-10-18T17:00:00.000Z"
+                    "example": "2023-10-18T20:00:00.000Z"
                   }
                 }
               }
@@ -2264,7 +2264,7 @@
                         "createdAt": {
                           "type": "string",
                           "format": "date-time",
-                          "example": "2023-10-19T07:00:00.000Z"
+                          "example": "2023-10-19T00:00:00.000Z"
                         },
                         "userId": {
                           "type": "integer",
@@ -2473,7 +2473,7 @@
                               },
                               "createdAt": {
                                 "type": "string",
-                                "example": "2023-10-19T07:23:54.000Z"
+                                "example": "2023-10-19T10:23:54.000Z"
                               }
                             }
                           }
@@ -3928,7 +3928,7 @@
           "createdAt": {
             "type": "string",
             "format": "date-time",
-            "example": "2023-10-19T07:23:54.000Z"
+            "example": "2004-10-19T18:00:00.000Z"
           }
         }
       },
@@ -3998,7 +3998,7 @@
           "createdAt": {
             "type": "string",
             "format": "date-time",
-            "example": "2023-10-19T07:00:00.000Z"
+            "example": "2023-11-04T00:00:00.000Z"
           },
           "items": {
             "type": "array",
@@ -4067,12 +4067,12 @@
           "timeStart": {
             "type": "string",
             "format": "date-time",
-            "example": "2023-10-19T07:00:00.000Z"
+            "example": "2023-10-19T10:00:00.000Z"
           },
           "timeEnd": {
             "type": "string",
             "format": "date-time",
-            "example": "2023-10-19T09:00:00.000Z"
+            "example": "2023-10-19T12:00:00.000Z"
           },
           "method": {
             "type": "string",
@@ -4142,12 +4142,12 @@
           "timeStart": {
             "type": "string",
             "format": "date-time",
-            "example": "2023-10-19T07:00:00.000Z"
+            "example": "2023-10-19T10:00:00.000Z"
           },
           "timeEnd": {
             "type": "string",
             "format": "date-time",
-            "example": "2023-10-19T09:00:00.000Z"
+            "example": "2023-10-19T12:00:00.000Z"
           },
           "method": {
             "type": "string",
@@ -4304,11 +4304,11 @@
           },
           "workingHoursStart": {
             "type": "string",
-            "example": "8:00"
+            "example": "2023-11-04T08:00:00.000Z"
           },
           "workingHoursEnd": {
             "type": "string",
-            "example": "20:00"
+            "example": "2023-11-04T20:00:00.000Z"
           }
         }
       },
@@ -4366,7 +4366,7 @@
           },
           "createdAt": {
             "format": "date-time",
-            "example": "2023-10-19T09:00:00.000Z"
+            "example": "2023-11-04T08:00:00.000Z"
           }
         }
       },

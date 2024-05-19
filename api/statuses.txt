@@ -23,3 +23,10 @@ b.  Админ сделал всё необходимое чтобы его от
 accepted - до Cluster
 accepted и у delivery появилася deliveryman_id - после Cluster, то, что возвращает deliveries-to-sort
 readyToDelivery - после согласия админа с кластером системы
+
+
+Принимаем
+TimeOnly   = "15:04:05"
+DateTime   = "2006-01-02 15:04:05"
+
+Отдаём RFC3339 стандарт 2004-10-19T18:00:00Z

@@ -20,8 +20,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router.StaticFS("/assets", gin.Dir("./assets", false))
 	router.StaticFS("/docs", gin.Dir("./api", false))
 
-	swaggerHandler := v3.NewHandler("ProCat API", "/docs/api.json",
-		"/swagger")
+	swaggerHandler := v3.NewHandler("ProCat API", "/docs/api.json", "/swagger")
 
 	router.GET("/swagger/*any", gin.WrapH(swaggerHandler))
 
@@ -48,8 +47,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		change := users.Group("/change", h.UserIdentify)
 		{
-			change.POST("/iin-bin", h.ChangeIIN)                          // TODO
-			change.POST("/fullname", h.ChangeFullName)                    // TODO
+			change.POST("/iin-bin", h.ChangeIIN) // TODO
+			change.POST("/fullname", h.ChangeFullName)
 			change.POST("/password", h.ChangePassword)                    // TODO
 			change.POST("/email", h.ChangeEmail)                          // TODO
 			change.POST("/phone", h.ChangePhone)                          // TODO
