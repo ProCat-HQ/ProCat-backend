@@ -74,6 +74,11 @@ type Notification interface {
 }
 
 type Category interface {
+	CreateCategory(categoryParentId int, name string) (int, error)
+	ChangeCategory(categoryId int, name string) error
+	GetCategoriesForParent(categoryParentId int) ([]model.Category, error)
+	DeleteCategory(categoryId int) error
+	GetCategoryRoute(categoryId int) ([]model.Category, error)
 }
 
 type Item interface {
@@ -124,5 +129,6 @@ func NewService(repos *repository.Repository) *Service {
 		Cart:        NewCartService(repos.Cart),
 		Order:       NewOrderService(repos.Order),
 		Store:       NewStoreService(repos.Store),
+		Category:    NewCategoryService(repos.Category),
 	}
 }

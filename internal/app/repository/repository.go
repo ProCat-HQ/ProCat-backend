@@ -84,6 +84,11 @@ type Notification interface {
 }
 
 type Category interface {
+	CreateCategory(categoryParentId int, name string) (int, error)
+	ChangeCategory(categoryId int, name string) error
+	GetCategoriesForParent(categoryParentId int) ([]model.Category, error)
+	DeleteCategory(categoryId int) error
+	GetCategoryRoute(categoryId int) ([]model.Category, error)
 }
 
 type Item interface {
@@ -136,5 +141,6 @@ func NewRepository(db *sqlx.DB) *Repository {
 		Cart:        NewCartPostgres(db),
 		Order:       NewOrderPostgres(db),
 		Store:       NewStorePostgres(db),
+		Category:    NewCategoryPostgres(db),
 	}
 }

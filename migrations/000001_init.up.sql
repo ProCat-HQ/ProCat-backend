@@ -250,3 +250,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS unique_index_carts_items ON carts_items (cart_
 CREATE UNIQUE INDEX IF NOT EXISTS unique_index_subscriptions_items ON subscriptions_items (subscription_id, item_id);
 CREATE UNIQUE INDEX IF NOT EXISTS unique_index_orders_items ON orders_items (order_id, item_id);
 CREATE UNIQUE INDEX IF NOT EXISTS unique_index_item_stores ON item_stores (store_id, item_id);
+
+INSERT INTO categories (id, name, parent_id)
+VALUES (0, 'root', NULL); -- THIS CATEGORY ALWAYS MUST BE!!!
+SELECT setval(pg_get_serial_sequence('categories', 'id'), (SELECT MAX(id) FROM categories) + 2);

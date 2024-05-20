@@ -1877,7 +1877,7 @@ paths:
           type: integer
           example: 0
     post:
-      deprecated: true
+      deprecated: false
       tags:
         - category
       summary: create category with parent id equals to{categoryId}, 0 - root category
@@ -1911,7 +1911,7 @@ paths:
                         type: integer
                         example: 20
     get:
-      deprecated: true
+      deprecated: false
       tags:
         - category
       summary: get all categories with {categoryId} parent id
@@ -1937,7 +1937,7 @@ paths:
                         items:
                           $ref: '#/components/schemas/Category'
     patch:
-      deprecated: true
+      deprecated: false
       tags:
         - category
       summary: edit name
@@ -1959,7 +1959,7 @@ paths:
                 $ref: '#/components/schemas/StatusCode200'
 
     delete:
-      deprecated: true
+      deprecated: false
       tags:
         - category
       summary: delete all route if it's not a leaf in the category tree
@@ -1981,7 +1981,7 @@ paths:
           type: integer
           example: 547
     get:
-      deprecated: true
+      deprecated: false
       tags:
         - category
       summary: get category route
