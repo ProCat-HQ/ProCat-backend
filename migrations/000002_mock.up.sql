@@ -29,7 +29,7 @@ VALUES (0, 'root', NULL), -- THIS CATEGORY ALWAYS MUST BE!!!
 INSERT INTO items (name, description, price, price_deposit, is_in_stock, category_id)
 VALUES ('Молоток', 'Хороший молоток, крепкий', 2000, 20000, true, 2),
        ('Пила', 'Хорошо пилит, мощно', 3000, 30000, false, null),
-       ('Отвёртка', 'Хорошо крутит, отлично', 4000, 40000, true, 1);
+       ('Плоскогубцы', 'Хорошо сжимает, крепкая хватка', 4000, 40000, true, 1);
 
 INSERT INTO infos (name, description, item_id)
 VALUES ('ВЕС', 'большой', 1),
@@ -38,10 +38,9 @@ VALUES ('ВЕС', 'большой', 1),
        ('eshcho cho-ta', 'property', 2);
 
 INSERT INTO item_images (image, item_id)
-VALUES ('first1', 1),
-       ('second1', 1),
-       ('third1', 1),
-       ('first3', 3);
+VALUES ('hammer.jpg', 1),
+       ('hammer.jpg', 1),
+       ('set.jpg', 3);
 
 INSERT INTO stores (name, address, working_hours_start, working_hours_end)
 VALUES ('1', '1', '8:00', '20:00');
