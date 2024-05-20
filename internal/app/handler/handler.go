@@ -121,11 +121,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	categories := router.Group("/categories")
 	{
-		categories.GET("/:id", h.GetCategory)                                             // TODO
-		categories.GET("/route/:id", h.GetCategoryRoute)                                  // TODO
-		categories.POST("/:id", h.UserIdentify, h.CheckRole("admin"), h.CreateCategory)   // TODO
-		categories.PATCH("/:id", h.UserIdentify, h.CheckRole("admin"), h.ChangeCategory)  // TODO
-		categories.DELETE("/:id", h.UserIdentify, h.CheckRole("admin"), h.DeleteCategory) // TODO
+		categories.GET("/:id", h.GetCategoriesForParent)
+		categories.GET("/route/:id", h.GetCategoryRoute)
+		categories.POST("/:id", h.UserIdentify, h.CheckRole("admin"), h.CreateCategory)
+		categories.PATCH("/:id", h.UserIdentify, h.CheckRole("admin"), h.ChangeCategory)
+		categories.DELETE("/:id", h.UserIdentify, h.CheckRole("admin"), h.DeleteCategory)
 	}
 
 	items := router.Group("/items")
@@ -143,15 +143,15 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		infos := items.Group("/infos", h.UserIdentify, h.CheckRole("admin"))
 		{
-			infos.POST("/:id", h.AddInfo)      // TODO
-			infos.PATCH("/:id", h.ChangeInfo)  // TODO
-			infos.DELETE("/:id", h.DeleteInfo) // TODO
+			infos.POST("/:id", h.AddInfo)
+			infos.PATCH("/:id", h.ChangeInfo)
+			infos.DELETE("/:id", h.DeleteInfo)
 		}
 
 		images := items.Group("/images", h.UserIdentify, h.CheckRole("admin"))
 		{
-			images.POST("/:id", h.AddImages)      // TODO
-			images.DELETE("/:id", h.DeleteImages) // TODO
+			images.POST("/:id", h.AddImages)
+			images.DELETE("/:id", h.DeleteImages)
 		}
 	}
 

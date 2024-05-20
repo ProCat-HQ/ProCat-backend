@@ -84,6 +84,11 @@ type Notification interface {
 }
 
 type Category interface {
+	CreateCategory(categoryParentId int, name string) (int, error)
+	ChangeCategory(categoryId int, name string) error
+	GetCategoriesForParent(categoryParentId int) ([]model.Category, error)
+	DeleteCategory(categoryId int) error
+	GetCategoryRoute(categoryId int) ([]model.Category, error)
 }
 
 type Item interface {
@@ -94,7 +99,14 @@ type Item interface {
 	SaveFilenames(itemId int, filenames []string) error
 	DeleteItem(itemId int) error
 	ChangeItem(itemId int, name, description, price, priceDeposit, categoryId *string) error
+
 	ChangeStockOfItem(itemId, storeId, inStockNumber int) error
+
+	AddInfos(itemId int, info model.ItemInfoCreation) error
+	ChangeInfos(itemId int, info model.ItemInfoChange) error
+	DeleteInfos(itemId int, ids []int) error
+
+	DeleteImages(itemId int, ids []int) ([]string, error)
 }
 
 type Store interface {
@@ -129,5 +141,6 @@ func NewRepository(db *sqlx.DB) *Repository {
 		Cart:        NewCartPostgres(db),
 		Order:       NewOrderPostgres(db),
 		Store:       NewStorePostgres(db),
+		Category:    NewCategoryPostgres(db),
 	}
 }

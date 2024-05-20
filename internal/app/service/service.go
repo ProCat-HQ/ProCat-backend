@@ -74,6 +74,11 @@ type Notification interface {
 }
 
 type Category interface {
+	CreateCategory(categoryParentId int, name string) (int, error)
+	ChangeCategory(categoryId int, name string) error
+	GetCategoriesForParent(categoryParentId int) ([]model.Category, error)
+	DeleteCategory(categoryId int) error
+	GetCategoryRoute(categoryId int) ([]model.Category, error)
 }
 
 type Item interface {
@@ -84,6 +89,12 @@ type Item interface {
 	ChangeItem(itemId int, name, description, price, priceDeposit, categoryId *string) error
 
 	ChangeStockOfItem(itemId, storeId, inStockNumber int) error
+
+	AddInfos(itemId int, info model.ItemInfoCreation) error
+	ChangeInfos(itemId int, info model.ItemInfoChange) error
+	DeleteInfos(itemId int, ids []int) error
+	AddImages(itemId int, files []*multipart.FileHeader) error
+	DeleteImages(itemId int, ids []int) error
 }
 
 type Store interface {
@@ -118,5 +129,6 @@ func NewService(repos *repository.Repository) *Service {
 		Cart:        NewCartService(repos.Cart),
 		Order:       NewOrderService(repos.Order),
 		Store:       NewStoreService(repos.Store),
+		Category:    NewCategoryService(repos.Category),
 	}
 }

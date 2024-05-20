@@ -22,8 +22,7 @@ VALUES ('big', '10:00', '16:00', 'A123BC', 101),
        ('medium', '12:00', '20:00', 'X777XX', 102);
 
 INSERT INTO categories (id, name, parent_id)
-VALUES (0, 'root', NULL), -- THIS CATEGORY ALWAYS MUST BE!!!
-       (1, 'cat1', 0),
+VALUES (1, 'cat1', 2),
        (2, 'cat2', 1);
 
 INSERT INTO items (name, description, price, price_deposit, is_in_stock, category_id)

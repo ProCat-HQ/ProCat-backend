@@ -1,3 +1,5 @@
+DELETE FROM categories WHERE id=0;
+
 DROP INDEX IF EXISTS unique_index_carts_items;
 DROP INDEX IF EXISTS unique_index_subscriptions_items;
 DROP INDEX IF EXISTS unique_index_orders_items;

@@ -2838,7 +2838,7 @@
         }
       ],
       "post": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "category"
         ],
@@ -2891,7 +2891,7 @@
         }
       },
       "get": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "category"
         ],
@@ -2931,7 +2931,7 @@
         }
       },
       "patch": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "category"
         ],
@@ -2965,7 +2965,7 @@
         }
       },
       "delete": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "category"
         ],
@@ -2997,7 +2997,7 @@
         }
       ],
       "get": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "category"
         ],
@@ -3416,7 +3416,7 @@
         }
       ],
       "post": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "infoOfItem"
         ],
@@ -3462,16 +3462,16 @@
         }
       },
       "delete": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "infoOfItem"
         ],
         "summary": "delete infos with ids in array (array provided in query params)",
         "parameters": [
           {
-            "name": "tags",
+            "name": "id",
             "in": "query",
-            "required": false,
+            "required": true,
             "description": "One or more tags",
             "schema": {
               "type": "array",
@@ -3482,12 +3482,12 @@
             "explode": false,
             "style": "form",
             "examples": {
-              "oneTag": {
+              "oneId": {
                 "value": [
                   52
                 ]
               },
-              "multipleTags": {
+              "multipleIds": {
                 "value": [
                   52,
                   85,
@@ -3511,7 +3511,7 @@
         }
       },
       "patch": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "infoOfItem"
         ],
@@ -3573,11 +3573,11 @@
         }
       ],
       "post": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "imageOfItem"
         ],
-        "summary": "to add images to item",
+        "summary": "to add images to item FORMDATA HERE",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3615,36 +3615,36 @@
         }
       },
       "delete": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "imageOfItem"
         ],
         "summary": "deletes images with certain ids",
         "parameters": [
           {
-            "name": "images",
+            "name": "id",
             "in": "query",
-            "required": false,
+            "required": true,
             "description": "One or more tags",
             "schema": {
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "integer"
               }
             },
             "explode": false,
             "style": "form",
             "examples": {
-              "oneTag": {
+              "oneId": {
                 "value": [
-                  "pic1.jpg"
+                  52
                 ]
               },
-              "multipleTags": {
+              "multipleIds": {
                 "value": [
-                  "pic2.jpg",
-                  "pic5.jpg",
-                  "pic8.jpg"
+                  52,
+                  85,
+                  45
                 ]
               }
             }

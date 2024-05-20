@@ -103,3 +103,22 @@ type ChangeStock struct {
 	StoreId       int `json:"storeId" binding:"required"`
 	InStockNumber int `json:"inStockNumber" binding:"min=0"`
 }
+
+type ItemInfoCreation struct {
+	Info []InfoCreation `json:"info" binding:"required"`
+}
+
+type InfoCreation struct {
+	Name        string `json:"name" binding:"required"`
+	Description string `json:"description" binding:"required"`
+}
+
+type ItemInfoChange struct {
+	Info []InfoChange `json:"info" binding:"required"`
+}
+
+type InfoChange struct {
+	Id          int    `json:"id" binding:"required"`
+	Name        string `json:"name" binding:"required"`
+	Description string `json:"description" binding:"required"`
+}
