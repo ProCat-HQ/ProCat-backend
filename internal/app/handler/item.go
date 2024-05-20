@@ -185,23 +185,152 @@ func (h *Handler) DeleteItem(c *gin.Context) {
 }
 
 func (h *Handler) AddInfo(c *gin.Context) {
+	itemIdInt, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
 
+	var input model.ItemInfoCreation
+	if err = c.ShouldBind(&input); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err = h.services.Item.AddInfos(itemIdInt, input); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: nil,
+	})
 }
 
 func (h *Handler) DeleteInfo(c *gin.Context) {
+	itemIdInt, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
 
+	ids := c.QueryArray("id")
+	if ids == nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "no ids were passed")
+		return
+	}
+	idsInt := make([]int, 0, len(ids))
+	for _, id := range ids {
+		idInt, err := strconv.Atoi(id)
+		if err != nil {
+			custom_errors.NewErrorResponse(c, http.StatusBadRequest, "id query param is not a number")
+			return
+		}
+		idsInt = append(idsInt, idInt)
+	}
+
+	if err = h.services.Item.DeleteInfos(itemIdInt, idsInt); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: nil,
+	})
 }
 
 func (h *Handler) ChangeInfo(c *gin.Context) {
+	itemIdInt, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
 
+	var input model.ItemInfoChange
+	if err = c.ShouldBind(&input); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err = h.services.Item.ChangeInfos(itemIdInt, input); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: nil,
+	})
 }
 
 func (h *Handler) AddImages(c *gin.Context) {
+	itemIdInt, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
 
+	form, err := c.MultipartForm()
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "Invalid input form")
+		return
+	}
+
+	files, ok := form.File["images"]
+	if !ok {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "No files included")
+		return
+	}
+
+	if err = h.services.Item.AddImages(itemIdInt, files); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: nil,
+	})
 }
 
 func (h *Handler) DeleteImages(c *gin.Context) {
+	itemIdInt, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
 
+	ids := c.QueryArray("id")
+	if ids == nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "no ids were passed")
+		return
+	}
+	idsInt := make([]int, 0, len(ids))
+	for _, id := range ids {
+		idInt, err := strconv.Atoi(id)
+		if err != nil {
+			custom_errors.NewErrorResponse(c, http.StatusBadRequest, "id query param is not a number")
+			return
+		}
+		idsInt = append(idsInt, idInt)
+	}
+
+	if err = h.services.Item.DeleteImages(itemIdInt, idsInt); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: nil,
+	})
 }
 
 func (h *Handler) ChangeStock(c *gin.Context) {

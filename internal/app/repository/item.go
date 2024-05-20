@@ -284,3 +284,104 @@ func (r *ItemPostgres) ChangeStockOfItem(itemId, storeId, inStockNumber int) err
 
 	return tx.Commit()
 }
+
+func (r *ItemPostgres) AddInfos(itemId int, info model.ItemInfoCreation) error {
+	tx, err := r.db.Beginx()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	query := fmt.Sprintf(`INSERT INTO %s (name, description, item_id) VALUES ($1, $2, $3)`, infosTable)
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	for _, item := range info.Info {
+		if _, err = stmt.Exec(item.Name, item.Description, itemId); err != nil {
+			return err
+		}
+	}
+	return tx.Commit()
+}
+
+func (r *ItemPostgres) ChangeInfos(itemId int, info model.ItemInfoChange) error {
+	query := fmt.Sprintf(`UPDATE %s SET name=$1, description=$2 WHERE item_id=$3 AND id=$4`, infosTable)
+
+	tx, err := r.db.Beginx()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	for _, item := range info.Info {
+		if _, err = stmt.Exec(item.Name, item.Description, itemId, item.Id); err != nil {
+			return err
+		}
+	}
+
+	return tx.Commit()
+}
+
+func (r *ItemPostgres) DeleteInfos(itemId int, ids []int) error {
+	query := fmt.Sprintf(`DELETE FROM %s WHERE id=$1 AND item_id=$2`, infosTable)
+
+	tx, err := r.db.Beginx()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	for _, id := range ids {
+		if _, err = stmt.Exec(id, itemId); err != nil {
+			return err
+		}
+	}
+
+	return tx.Commit()
+}
+
+func (r *ItemPostgres) DeleteImages(itemId int, ids []int) ([]string, error) {
+	query := fmt.Sprintf(`DELETE FROM %s WHERE id=$1 AND item_id=$2 RETURNING image`, itemsImagesTable)
+
+	tx, err := r.db.Beginx()
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+
+	stmt, err := tx.Preparex(query)
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	filenames := make([]string, 0)
+
+	for _, id := range ids {
+		var filename string
+		if err = stmt.Get(&filename, id, itemId); err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				continue
+			}
+			return nil, err
+		}
+		filenames = append(filenames, filename)
+	}
+
+	return filenames, tx.Commit()
+}

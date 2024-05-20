@@ -84,6 +84,12 @@ type Item interface {
 	ChangeItem(itemId int, name, description, price, priceDeposit, categoryId *string) error
 
 	ChangeStockOfItem(itemId, storeId, inStockNumber int) error
+
+	AddInfos(itemId int, info model.ItemInfoCreation) error
+	ChangeInfos(itemId int, info model.ItemInfoChange) error
+	DeleteInfos(itemId int, ids []int) error
+	AddImages(itemId int, files []*multipart.FileHeader) error
+	DeleteImages(itemId int, ids []int) error
 }
 
 type Store interface {

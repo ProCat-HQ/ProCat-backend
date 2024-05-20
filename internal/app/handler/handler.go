@@ -143,14 +143,14 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		infos := items.Group("/infos", h.UserIdentify, h.CheckRole("admin"))
 		{
-			infos.POST("/:id", h.AddInfo)      // TODO
-			infos.PATCH("/:id", h.ChangeInfo)  // TODO
-			infos.DELETE("/:id", h.DeleteInfo) // TODO
+			infos.POST("/:id", h.AddInfo)
+			infos.PATCH("/:id", h.ChangeInfo)
+			infos.DELETE("/:id", h.DeleteInfo)
 		}
 
 		images := items.Group("/images", h.UserIdentify, h.CheckRole("admin"))
 		{
-			images.POST("/:id", h.AddImages)      // TODO
+			images.POST("/:id", h.AddImages)
 			images.DELETE("/:id", h.DeleteImages) // TODO
 		}
 	}
