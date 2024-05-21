@@ -1,6 +1,7 @@
 package routing
 
 import (
+	"fmt"
 	"github.com/muesli/clusters"
 	"github.com/muesli/kmeans"
 	"github.com/procat-hq/procat-backend/internal/app/model"
@@ -112,7 +113,9 @@ func ClusterOrders(deliveries []model.DeliveryAndOrder, deliverymen []model.Deli
 				}
 			}
 		}
-
+		if len(deliverymenForThisHour) == 0 && len(coordinates) > 0 {
+			return nil, fmt.Errorf("no deliveryman between %d:00 and %d:00", i, i+1)
+		}
 		km := kmeans.New()
 		partition, err := km.Partition(coordinates, len(deliverymenForThisHour))
 		if err != nil {
