@@ -78,6 +78,9 @@ type Order interface {
 }
 
 type Subscription interface {
+	GetUserSubscriptions(userId int, limit, offset int) (int, []model.Subscription, error)
+	CreateSubscription(userId, itemId int) error
+	DeleteSubscription(userId, subId int) error
 }
 
 type Notification interface {
@@ -148,5 +151,6 @@ func NewRepository(db *sqlx.DB) *Repository {
 		Store:        NewStorePostgres(db),
 		Category:     NewCategoryPostgres(db),
 		Notification: NewNotificationPostgres(db),
+		Subscription: NewSubscriptionPostgres(db),
 	}
 }

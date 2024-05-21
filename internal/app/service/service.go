@@ -68,6 +68,9 @@ type Order interface {
 }
 
 type Subscription interface {
+	GetUserSubscriptions(userId int, limit, page string) (int, []model.Subscription, error)
+	CreateSubscription(userId, itemId int) error
+	DeleteSubscription(userId, subId int) error
 }
 
 type Notification interface {
@@ -135,5 +138,6 @@ func NewService(repos *repository.Repository) *Service {
 		Store:        NewStoreService(repos.Store),
 		Category:     NewCategoryService(repos.Category),
 		Notification: NewNotificationService(repos.Notification),
+		Subscription: NewSubscriptionService(repos.Subscription),
 	}
 }

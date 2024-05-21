@@ -197,7 +197,7 @@ CREATE TABLE IF NOT EXISTS subscriptions_items
 (
     id              SERIAL PRIMARY KEY,
     subscription_id INTEGER NOT NULL,
-    item_id         INTEGER,
+    item_id         INTEGER NOT NULL,
     FOREIGN KEY (subscription_id) REFERENCES subscriptions (id) ON DELETE CASCADE,
     FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE
 );

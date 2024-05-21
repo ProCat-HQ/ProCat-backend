@@ -2532,7 +2532,7 @@
     },
     "/users/subscriptions": {
       "get": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "subscription"
         ],
@@ -2604,26 +2604,22 @@
         }
       },
       "post": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "subscription"
         ],
         "summary": "add {itemId} to subs",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "itemId": {
-                    "type": "integer",
-                    "example": 459
-                  }
-                }
-              }
+        "parameters": [
+          {
+            "name": "itemId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 15
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -2651,7 +2647,7 @@
         }
       ],
       "delete": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "subscription"
         ],
@@ -2671,7 +2667,7 @@
     },
     "/users/notifications": {
       "get": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "notification"
         ],
@@ -2723,7 +2719,7 @@
         }
       ],
       "post": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "notification"
         ],
@@ -2753,7 +2749,26 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StatusCode200"
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "ok"
+                    },
+                    "payload": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 2
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -2774,7 +2789,7 @@
         }
       ],
       "patch": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "notification"
         ],
@@ -2807,7 +2822,7 @@
         }
       },
       "delete": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "notification"
         ],

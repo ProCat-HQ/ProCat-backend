@@ -110,9 +110,9 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		subscriptions := users.Group("/subscriptions", h.UserIdentify)
 		{
-			subscriptions.GET("", h.GetAllSubscriptions)                // TODO
-			subscriptions.POST("", h.SubscribeToItem)                   // TODO
-			subscriptions.DELETE("/:id", h.DeleteItemFromSubscriptions) // TODO
+			subscriptions.GET("", h.GetAllSubscriptions)
+			subscriptions.POST("", h.SubscribeToItem)
+			subscriptions.DELETE("/:id", h.DeleteItemFromSubscriptions)
 		}
 
 		notifications := users.Group("/notifications", h.UserIdentify)
