@@ -969,7 +969,13 @@ paths:
       deprecated: false
       tags:
         - delivery
-      summary: build a route from deliveryman's deliveries
+      summary: build a route from deliveryman's deliveries from {storeId} <- query param
+      parameters:
+        - name: storeId
+          in: query
+          required: true
+          schema:
+            type: integer
       responses:
         200:
           description: successful operation

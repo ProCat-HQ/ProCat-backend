@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/procat-hq/procat-backend/internal/app/custom_errors"
 	"github.com/procat-hq/procat-backend/internal/app/model"
-	"github.com/procat-hq/procat-backend/internal/routing"
 	"io"
 	"net/http"
 	"os"
@@ -107,7 +106,34 @@ func (h *Handler) CreateRoute(c *gin.Context) {
 		return
 	}
 
-	requestBody, err := h.services.Delivery.GetDeliveriesForDeliveryman(userData.UserId)
+	//storeId, err := strconv.Atoi(c.Query("storeId"))
+	//if err != nil {
+	//	custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+	//	return
+	//}
+
+	// getStoreById
+	//fmt.Println(storeId)
+	//storeLat, storeLon := 54.84271, 83.09084
+
+	route, err := h.services.CheckRoute(userData.UserId)
+
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	if route != nil {
+		c.JSON(http.StatusOK, model.Response{
+			Status:  http.StatusOK,
+			Message: "ok",
+			Payload: gin.H{
+				"points": route,
+			},
+		})
+		return
+	}
+
+	requestBody, mapDeliveryPoint, err := h.services.Delivery.GetDeliveriesForDeliveryman(userData.UserId)
 	if err != nil {
 		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -132,20 +158,16 @@ func (h *Handler) CreateRoute(c *gin.Context) {
 		return
 	}
 
-	response := &routing.Response{}
+	response := model.Api2GisResponse{}
 
 	err = json.Unmarshal(body, &response)
+
 	if err != nil {
 		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	result, _ := routing.GetRoute(*response)
-
-	var realResponse []model.LatLon
-	for _, val := range result.OptimalRoute {
-		realResponse = append(realResponse, requestBody.Points[val])
-	}
+	realResponse, err := h.services.CreateRoute(*requestBody, response, mapDeliveryPoint, userData.UserId)
 
 	c.JSON(http.StatusOK, model.Response{
 		Status:  http.StatusOK,

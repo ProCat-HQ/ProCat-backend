@@ -120,3 +120,143 @@ func (r *DeliveryPostgres) ChangeDeliveryStatus(id int, newStatus string) error 
 	}
 	return nil
 }
+
+func (r *DeliveryPostgres) GetRoute(deliverymanId int) ([]model.Point, error) {
+	queryRoute := fmt.Sprintf(`SELECT COALESCE(
+               (SELECT id FROM %s WHERE deliveryman_id = $1 LIMIT 1), -1) AS result`, routesTable)
+
+	tx, err := r.db.Beginx()
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+
+	var routeId int
+	err = tx.Get(&routeId, queryRoute, deliverymanId)
+	if err != nil {
+		return nil, err
+	}
+	if routeId == -1 {
+		return nil, nil
+	}
+	queryStatuses := fmt.Sprintf(`SELECT status 
+										FROM %s 
+											JOIN %s 
+												ON deliveries.order_id = orders.id 
+													   AND deliveryman_id = $1`, ordersTable, deliveriesTable)
+	var statuses []struct {
+		Status string `db:"status"`
+	}
+	err = r.db.Select(&statuses, queryStatuses, deliverymanId)
+	if err != nil {
+		return nil, err
+	}
+	queryCountCoordinates := fmt.Sprintf(`SELECT count(*) FROM %s where route_id = $1`, coordinatesTable)
+	var count int
+	err = tx.Get(&count, queryCountCoordinates, routeId)
+	if err != nil {
+		return nil, err
+	}
+	queryDeleteRoute := fmt.Sprintf(`DELETE FROM routes where id = $1`)
+	queryChangeStatus := fmt.Sprintf(`UPDATE %s AS o SET status=$1
+											FROM %s AS d WHERE o.id = d.order_id
+											AND d.deliveryman_id = $2`, ordersTable, deliveriesTable)
+	if len(statuses) != count {
+		_, err = tx.Exec(queryDeleteRoute, routeId)
+		if err != nil {
+			return nil, err
+		}
+		_, err = tx.Exec(queryChangeStatus, model.ReadyToDelivery, deliverymanId)
+		if err != nil {
+			return nil, err
+		}
+		err = tx.Commit()
+		if err != nil {
+			return nil, err
+		}
+		return nil, nil
+	}
+	for _, status := range statuses {
+		if status.Status == model.ReadyToDelivery {
+			_, err = tx.Exec(queryDeleteRoute, routeId)
+			if err != nil {
+				return nil, err
+			}
+			_, err = tx.Exec(queryChangeStatus, model.ReadyToDelivery, deliverymanId)
+			if err != nil {
+				return nil, err
+			}
+			err = tx.Commit()
+			if err != nil {
+				return nil, err
+			}
+			return nil, nil
+		}
+	}
+	query := fmt.Sprintf(`SELECT o.latitude, o.longitude, address, d.id
+								FROM %s o
+									JOIN %s d
+										ON o.id = d.order_id
+									JOIN %s c
+										ON d.id = c.delivery_id
+								WHERE route_id = $1
+								ORDER BY sequence_number`, ordersTable, deliveriesTable, coordinatesTable)
+	var route []model.Point
+	err = tx.Select(&route, query, routeId)
+	if err != nil {
+		return nil, err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, err
+	}
+
+	return route, nil
+}
+
+func (r *DeliveryPostgres) InsertRoute(route []model.Point, deliverymanId int) error {
+	queryRouteId := fmt.Sprintf(`INSERT INTO %s (deliveryman_id) VALUES ($1) RETURNING id`, routesTable)
+	var routeId int
+
+	tx, err := r.db.Beginx()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	err = tx.Get(&routeId, queryRouteId, deliverymanId)
+	if err != nil {
+		return err
+	}
+	queryChangeStatus := fmt.Sprintf(`UPDATE %s AS o SET status=$1
+											FROM %s AS d WHERE o.id = d.order_id
+											AND d.id=$2`, ordersTable, deliveriesTable)
+
+	queryPoints := fmt.Sprintf(`INSERT INTO %s (sequence_number, delivery_id, route_id) 
+								VALUES ($1, $2, $3)`, coordinatesTable)
+
+	stmtStatus, err := tx.Preparex(queryChangeStatus)
+	if err != nil {
+		return err
+	}
+	defer stmtStatus.Close()
+	stmtPoints, err := tx.Preparex(queryPoints)
+	if err != nil {
+		return err
+	}
+	defer stmtPoints.Close()
+
+	for i, point := range route {
+		_, err = stmtStatus.Exec(model.Delivering, point.DeliveryId)
+		if err != nil {
+			return err
+		}
+
+		_, err = stmtPoints.Exec(i, point.DeliveryId, routeId)
+		if err != nil {
+			return err
+		}
+	}
+	return tx.Commit()
+}

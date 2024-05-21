@@ -42,6 +42,8 @@ type Delivery interface {
 	GetAllDeliveries(statuses []string, limit int, offset int, id int) ([]model.DeliveryWithOrder, int, error)
 	GetDelivery(id int) (model.DeliveryWithOrder, error)
 	ChangeDeliveryStatus(id int, newStatus string) error
+	GetRoute(deliverymanId int) ([]model.Point, error)
+	InsertRoute(route []model.Point, deliverymanId int) error
 }
 
 type Admin interface {
