@@ -143,7 +143,9 @@ func (r *DeliveryPostgres) GetRoute(deliverymanId int) ([]model.Point, error) {
 										FROM %s 
 											JOIN %s 
 												ON deliveries.order_id = orders.id 
-													   AND deliveryman_id = $1`, ordersTable, deliveriesTable)
+													   AND deliveryman_id = $1
+										WHERE status IN ('%s', '%s')`,
+		ordersTable, deliveriesTable, model.ReadyToDelivery, model.Delivering)
 	var statuses []struct {
 		Status string `db:"status"`
 	}
