@@ -707,7 +707,7 @@
     },
     "/users/change/password": {
       "post": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "userInfoChange"
         ],
@@ -747,7 +747,7 @@
     },
     "/users/change/phone": {
       "post": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "userInfoChange"
         ],
@@ -762,7 +762,7 @@
                     "type": "string",
                     "example": 12345678
                   },
-                  "phone": {
+                  "phoneNumber": {
                     "type": "string",
                     "example": 79000000000
                   }
@@ -787,7 +787,7 @@
     },
     "/users/change/email": {
       "post": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "userInfoChange"
         ],
@@ -838,11 +838,11 @@
         }
       ],
       "patch": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "userInfoChange"
         ],
-        "summary": "change role",
+        "summary": "change role (TODO issues with deliveryMan (need to create/delete him if   this role was used))",
         "requestBody": {
           "content": {
             "application/json": {
@@ -974,22 +974,23 @@
         }
       }
     },
-    "/users/deliverymen/{deliveryId}": {
+    "/users/deliverymen/{userId}": {
+      "parameters": [
+        {
+          "name": "userId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "example": 856
+          }
+        }
+      ],
       "get": {
         "tags": [
           "deliveryman"
         ],
         "summary": "for simple user to get his deliveryman page",
-        "parameters": [
-          {
-            "name": "deliveryId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -1033,20 +1034,7 @@
             }
           }
         }
-      }
-    },
-    "/users/deliverymen/{userId}": {
-      "parameters": [
-        {
-          "name": "userId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "integer",
-            "example": 856
-          }
-        }
-      ],
+      },
       "post": {
         "tags": [
           "deliveryman"
@@ -2850,7 +2838,7 @@
         }
       ],
       "post": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "category"
         ],
@@ -2903,7 +2891,7 @@
         }
       },
       "get": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "category"
         ],
@@ -2943,7 +2931,7 @@
         }
       },
       "patch": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "category"
         ],
@@ -2977,7 +2965,7 @@
         }
       },
       "delete": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "category"
         ],
@@ -3009,7 +2997,7 @@
         }
       ],
       "get": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "category"
         ],
@@ -3377,7 +3365,7 @@
         }
       ],
       "put": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "stockOfItem"
         ],
@@ -3428,7 +3416,7 @@
         }
       ],
       "post": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "infoOfItem"
         ],
@@ -3474,16 +3462,16 @@
         }
       },
       "delete": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "infoOfItem"
         ],
         "summary": "delete infos with ids in array (array provided in query params)",
         "parameters": [
           {
-            "name": "tags",
+            "name": "id",
             "in": "query",
-            "required": false,
+            "required": true,
             "description": "One or more tags",
             "schema": {
               "type": "array",
@@ -3494,12 +3482,12 @@
             "explode": false,
             "style": "form",
             "examples": {
-              "oneTag": {
+              "oneId": {
                 "value": [
                   52
                 ]
               },
-              "multipleTags": {
+              "multipleIds": {
                 "value": [
                   52,
                   85,
@@ -3523,7 +3511,7 @@
         }
       },
       "patch": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "infoOfItem"
         ],
@@ -3585,11 +3573,11 @@
         }
       ],
       "post": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "imageOfItem"
         ],
-        "summary": "to add images to item",
+        "summary": "to add images to item FORMDATA HERE",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3627,36 +3615,36 @@
         }
       },
       "delete": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "imageOfItem"
         ],
         "summary": "deletes images with certain ids",
         "parameters": [
           {
-            "name": "images",
+            "name": "id",
             "in": "query",
-            "required": false,
+            "required": true,
             "description": "One or more tags",
             "schema": {
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "integer"
               }
             },
             "explode": false,
             "style": "form",
             "examples": {
-              "oneTag": {
+              "oneId": {
                 "value": [
-                  "pic1.jpg"
+                  52
                 ]
               },
-              "multipleTags": {
+              "multipleIds": {
                 "value": [
-                  "pic2.jpg",
-                  "pic5.jpg",
-                  "pic8.jpg"
+                  52,
+                  85,
+                  45
                 ]
               }
             }
@@ -3678,7 +3666,7 @@
     },
     "/stores": {
       "get": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "store"
         ],
@@ -3725,11 +3713,11 @@
                           },
                           "workingHoursStart": {
                             "type": "string",
-                            "example": "8:00"
+                            "example": "2004-10-19T09:00:00.000Z"
                           },
                           "workingHoursEnd": {
                             "type": "string",
-                            "example": "20:00"
+                            "example": "2004-10-19T20:00:00.000Z"
                           }
                         }
                       }
@@ -3742,7 +3730,7 @@
         }
       },
       "post": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "store"
         ],
@@ -3763,11 +3751,11 @@
                   },
                   "workingHoursStart": {
                     "type": "string",
-                    "example": "8:00"
+                    "example": "08:00:00"
                   },
                   "workingHoursEnd": {
                     "type": "string",
-                    "example": "20:00"
+                    "example": "20:00:00"
                   }
                 }
               }
@@ -3820,7 +3808,7 @@
         }
       ],
       "patch": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "store"
         ],
@@ -3841,11 +3829,11 @@
                   },
                   "workingHoursStart": {
                     "type": "string",
-                    "example": "8:00"
+                    "example": "08:00:00"
                   },
                   "workingHoursEnd": {
                     "type": "string",
-                    "example": "20:00"
+                    "example": "20:00:00"
                   }
                 }
               }
@@ -3866,7 +3854,7 @@
         }
       },
       "delete": {
-        "deprecated": true,
+        "deprecated": false,
         "tags": [
           "store"
         ],

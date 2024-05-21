@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/penglongli/gin-metrics/ginmetrics"
 	"github.com/procat-hq/procat-backend/internal/app/service"
 	v3 "github.com/swaggest/swgui/v3"
 )
@@ -23,6 +24,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	swaggerHandler := v3.NewHandler("ProCat API", "/docs/api.json", "/swagger")
 
 	router.GET("/swagger/*any", gin.WrapH(swaggerHandler))
+
+	m := ginmetrics.GetMonitor()
+	m.SetMetricPath("/metrics")
+	m.SetSlowTime(10)
+	m.Use(router)
 
 	users := router.Group("/users")
 	{
@@ -47,12 +53,12 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		change := users.Group("/change", h.UserIdentify)
 		{
-			change.POST("/iin-bin", h.ChangeIIN) // TODO
+			change.POST("/iin-bin", h.ChangeIIN)
 			change.POST("/fullname", h.ChangeFullName)
-			change.POST("/password", h.ChangePassword)                    // TODO
-			change.POST("/email", h.ChangeEmail)                          // TODO
-			change.POST("/phone", h.ChangePhone)                          // TODO
-			change.PATCH("/role/:id", h.CheckRole("admin"), h.ChangeRole) // TODO
+			change.POST("/password", h.ChangePassword)
+			change.POST("/phone", h.ChangePhone)
+			change.POST("/email", h.ChangeEmail)
+			change.PATCH("/role/:id", h.CheckRole("admin"), h.ChangeRole)
 		}
 
 		deliverymen := users.Group("/deliverymen", h.UserIdentify, h.CheckRole("deliveryman"))
@@ -121,11 +127,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	categories := router.Group("/categories")
 	{
-		categories.GET("/:id", h.GetCategory)                                             // TODO
-		categories.GET("/route/:id", h.GetCategoryRoute)                                  // TODO
-		categories.POST("/:id", h.UserIdentify, h.CheckRole("admin"), h.CreateCategory)   // TODO
-		categories.PATCH("/:id", h.UserIdentify, h.CheckRole("admin"), h.ChangeCategory)  // TODO
-		categories.DELETE("/:id", h.UserIdentify, h.CheckRole("admin"), h.DeleteCategory) // TODO
+		categories.GET("/:id", h.GetCategoriesForParent)
+		categories.GET("/route/:id", h.GetCategoryRoute)
+		categories.POST("/:id", h.UserIdentify, h.CheckRole("admin"), h.CreateCategory)
+		categories.PATCH("/:id", h.UserIdentify, h.CheckRole("admin"), h.ChangeCategory)
+		categories.DELETE("/:id", h.UserIdentify, h.CheckRole("admin"), h.DeleteCategory)
 	}
 
 	items := router.Group("/items")
@@ -138,29 +144,29 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		stock := items.Group("/stock", h.UserIdentify, h.CheckRole("admin"))
 		{
-			stock.PUT("/:id", h.ChangeStock) // TODO
+			stock.PUT("/:id", h.ChangeStock)
 		}
 
 		infos := items.Group("/infos", h.UserIdentify, h.CheckRole("admin"))
 		{
-			infos.POST("/:id", h.AddInfo)      // TODO
-			infos.PATCH("/:id", h.ChangeInfo)  // TODO
-			infos.DELETE("/:id", h.DeleteInfo) // TODO
+			infos.POST("/:id", h.AddInfo)
+			infos.PATCH("/:id", h.ChangeInfo)
+			infos.DELETE("/:id", h.DeleteInfo)
 		}
 
 		images := items.Group("/images", h.UserIdentify, h.CheckRole("admin"))
 		{
-			images.POST("/:id", h.AddImages)      // TODO
-			images.DELETE("/:id", h.DeleteImages) // TODO
+			images.POST("/:id", h.AddImages)
+			images.DELETE("/:id", h.DeleteImages)
 		}
 	}
 
 	stores := router.Group("/stores")
 	{
-		stores.GET("", h.GetAllStores)                                             // TODO
-		stores.POST("", h.UserIdentify, h.CheckRole("admin"), h.CreateStore)       // TODO
-		stores.PATCH("/:id", h.UserIdentify, h.CheckRole("admin"), h.ChangeStore)  // TODO
-		stores.DELETE("/:id", h.UserIdentify, h.CheckRole("admin"), h.DeleteStore) // TODO
+		stores.GET("", h.GetAllStores)
+		stores.POST("", h.UserIdentify, h.CheckRole("admin"), h.CreateStore)
+		stores.PATCH("/:id", h.UserIdentify, h.CheckRole("admin"), h.ChangeStore)
+		stores.DELETE("/:id", h.UserIdentify, h.CheckRole("admin"), h.DeleteStore)
 	}
 
 	return router

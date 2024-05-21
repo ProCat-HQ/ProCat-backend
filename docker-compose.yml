@@ -39,9 +39,40 @@ services:
     networks:
       - appnet
 
+  prometheus:
+    build:
+      context: .
+      dockerfile: Dockerfile_prometheus
+    container_name: prometheus-service
+    restart: unless-stopped
+    user: root
+    depends_on:
+      - procat-server
+    ports:
+      - "${PROMETHEUS_BIND_ADDR}:9090"
+    networks:
+      - appnet
+
+  grafana:
+    build:
+      context: .
+      dockerfile: Dockerfile_grafana
+    container_name: grafana-service
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+    volumes:
+      - grafana_storage:/var/lib/grafana
+    ports:
+      - "${GRAFANA_BIND_ADDR}:3000"
+    networks:
+      - appnet
+      - internet
+
 volumes:
   procat_db_tmp:
   procat_assets:
+  grafana_storage:
 
 networks:
   internet:

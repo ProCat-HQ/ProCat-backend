@@ -461,7 +461,7 @@ paths:
                 $ref: '#/components/schemas/StatusCode200'
   /users/change/password:
     post:
-      deprecated: true
+      deprecated: false
       tags:
         - userInfoChange
       summary: check if old passwords match, then send confirmation code on current number
@@ -487,7 +487,7 @@ paths:
 
   /users/change/phone:
     post:
-      deprecated: true
+      deprecated: false
       tags:
         - userInfoChange
       summary: check password and send confirmation code on new number
@@ -500,7 +500,7 @@ paths:
                 password:
                   type: string
                   example: 12345678
-                phone:
+                phoneNumber:
                   type: string
                   example: +79000000000
       responses:
@@ -512,7 +512,7 @@ paths:
                 $ref: '#/components/schemas/StatusCode200'
   /users/change/email:
     post:
-      deprecated: true
+      deprecated: false
       tags:
         - userInfoChange
       summary: check password and send confirmation code on new email
@@ -544,10 +544,10 @@ paths:
           type: integer
           example: 56
     patch:
-      deprecated: true
+      deprecated: false
       tags:
         - userInfoChange
-      summary: change role
+      summary: change role (TODO issues with deliveryMan (need to create/delete him if   this role was used))
       requestBody:
         content:
           application/json:
@@ -635,17 +635,19 @@ paths:
                             phoneNumber:
                               type: string
                               example: +79163125366
-  /users/deliverymen/{deliveryId}:
+
+  /users/deliverymen/{userId}:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 856
     get:
       tags:
         - deliveryman
       summary: for simple user to get his deliveryman page
-      parameters:
-        - name: deliveryId
-          in: path
-          required: true
-          schema:
-            type: integer
       responses:
         200:
           description: successful operation
@@ -675,14 +677,7 @@ paths:
                       carId:
                         type: string
                         example: P425YB154
-  /users/deliverymen/{userId}:
-    parameters:
-      - name: userId
-        in: path
-        required: true
-        schema:
-          type: integer
-          example: 856
+
     post:
       tags:
         - deliveryman
@@ -1888,7 +1883,7 @@ paths:
           type: integer
           example: 0
     post:
-      deprecated: true
+      deprecated: false
       tags:
         - category
       summary: create category with parent id equals to{categoryId}, 0 - root category
@@ -1922,7 +1917,7 @@ paths:
                         type: integer
                         example: 20
     get:
-      deprecated: true
+      deprecated: false
       tags:
         - category
       summary: get all categories with {categoryId} parent id
@@ -1948,7 +1943,7 @@ paths:
                         items:
                           $ref: '#/components/schemas/Category'
     patch:
-      deprecated: true
+      deprecated: false
       tags:
         - category
       summary: edit name
@@ -1970,7 +1965,7 @@ paths:
                 $ref: '#/components/schemas/StatusCode200'
 
     delete:
-      deprecated: true
+      deprecated: false
       tags:
         - category
       summary: delete all route if it's not a leaf in the category tree
@@ -1992,7 +1987,7 @@ paths:
           type: integer
           example: 547
     get:
-      deprecated: true
+      deprecated: false
       tags:
         - category
       summary: get category route
@@ -2236,7 +2231,7 @@ paths:
           type: integer
           example: 56
     put:
-      deprecated: true
+      deprecated: false
       tags:
         - stockOfItem
       summary: creates stock in some {storeId} or changes stock if relation exists
@@ -2268,7 +2263,7 @@ paths:
           type: integer
           example: 65
     post:
-      deprecated: true
+      deprecated: false
       tags:
         - infoOfItem
       summary: add array of characteristics
@@ -2297,14 +2292,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/StatusCode200'
     delete:
-      deprecated: true
+      deprecated: false
       tags:
         - infoOfItem
       summary: delete infos with ids in array (array provided in query params)
       parameters:
-        - name: tags
+        - name: id
           in: query
-          required: false
+          required: true
           description: One or more tags
           schema:
             type: array
@@ -2313,9 +2308,9 @@ paths:
           explode: false
           style: form
           examples:
-            oneTag:
+            oneId:
               value: [ 52 ]
-            multipleTags:
+            multipleIds:
               value: [ 52, 85, 45 ]
       responses:
         200:
@@ -2325,7 +2320,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/StatusCode200'
     patch:
-      deprecated: true
+      deprecated: false
       tags:
         - infoOfItem
       summary: array with new data and ids which will be changed
@@ -2364,10 +2359,10 @@ paths:
           type: integer
           example: 78
     post:
-      deprecated: true
+      deprecated: false
       tags:
         - imageOfItem
-      summary: to add images to item
+      summary: to add images to item FORMDATA HERE
       requestBody:
         content:
           application/json:
@@ -2390,26 +2385,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/StatusCode200'
     delete:
-      deprecated: true
+      deprecated: false
       tags:
         - imageOfItem
       summary: deletes images with certain ids
       parameters:
-        - name: images
+        - name: id
           in: query
-          required: false
+          required: true
           description: One or more tags
           schema:
             type: array
             items:
-              type: string
+              type: integer
           explode: false
           style: form
           examples:
-            oneTag:
-              value: [ 'pic1.jpg' ]
-            multipleTags:
-              value: [ 'pic2.jpg', 'pic5.jpg', 'pic8.jpg' ]
+            oneId:
+              value: [ 52 ]
+            multipleIds:
+              value: [ 52, 85, 45 ]
       responses:
         200:
           description: successful operation
@@ -2419,7 +2414,7 @@ paths:
                 $ref: '#/components/schemas/StatusCode200'
   /stores:
     get:
-      deprecated: true
+      deprecated: false
       tags:
         - store
       summary: to get all stores
@@ -2458,12 +2453,12 @@ paths:
                           example: 123.32131
                         workingHoursStart:
                           type: string
-                          example: 8:00
+                          example: 2004-10-19T09:00:00Z
                         workingHoursEnd:
                           type: string
-                          example: 20:00
+                          example: 2004-10-19T20:00:00Z
     post:
-      deprecated: true
+      deprecated: false
       tags:
         - store
       summary: creates new store and finds it's coordinates according to the address
@@ -2481,10 +2476,10 @@ paths:
                   example: name
                 workingHoursStart:
                   type: string
-                  example: 8:00
+                  example: 08:00:00
                 workingHoursEnd:
                   type: string
-                  example: 20:00
+                  example: 20:00:00
       responses:
         200:
           description: successful operation
@@ -2514,7 +2509,7 @@ paths:
           type: integer
           example: 56
     patch:
-      deprecated: true
+      deprecated: false
       tags:
         - store
       summary: updates latLon if address changes
@@ -2532,10 +2527,10 @@ paths:
                   example: name
                 workingHoursStart:
                   type: string
-                  example: 8:00
+                  example: 08:00:00
                 workingHoursEnd:
                   type: string
-                  example: 20:00
+                  example: 20:00:00
       responses:
         200:
           description: successful operation
@@ -2544,7 +2539,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/StatusCode200'
     delete:
-      deprecated: true
+      deprecated: false
       tags:
         - store
       responses:

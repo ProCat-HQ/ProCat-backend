@@ -275,3 +275,45 @@ func (s *UserService) ChangeIdentificationNumber(userId int, identificationNumbe
 
 	return s.repo.ChangeIdentificationNumber(userId, identificationNumber)
 }
+
+func (s *UserService) ChangePassword(userId int, password string) error {
+	user, err := s.repo.GetUserById(userId)
+	if err != nil {
+		return err
+	}
+
+	passwordHash := generatePasswordHash(user.PhoneNumber, password)
+	return s.repo.ChangePassword(userId, passwordHash)
+}
+
+func (s *UserService) ChangePhoneNumber(userId int, phoneNumber, password string) error {
+	passwordHash := generatePasswordHash(phoneNumber, password)
+	return s.repo.ChangePhoneNumber(userId, phoneNumber, passwordHash)
+}
+
+func (s *UserService) ChangeEmail(userId int, email string) error {
+	return s.repo.ChangeEmail(userId, email)
+}
+
+func getRolePriority(role string) (int, error) {
+	switch role {
+	case model.UserRole:
+		return 1, nil
+	case model.DeliverymanRole:
+		return 2, nil
+	case model.ModeratorRole:
+		return 3, nil
+	case model.AdminRole:
+		return 4, nil
+	default:
+		return 0, errors.New("unknown role")
+	}
+}
+
+func (s *UserService) ChangeUserRole(userId int, role string) error {
+	if _, err := getRolePriority(role); err != nil {
+		return err
+	}
+
+	return s.repo.ChangeUserRole(userId, role)
+}

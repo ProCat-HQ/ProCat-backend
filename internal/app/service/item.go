@@ -140,3 +140,59 @@ func (s *ItemService) ChangeItem(itemId int, name, description, price, priceDepo
 func (s *ItemService) DeleteItem(itemId int) error {
 	return s.repo.DeleteItem(itemId)
 }
+
+func (s *ItemService) ChangeStockOfItem(itemId, storeId, inStockNumber int) error {
+	if inStockNumber < 0 {
+		return errors.New("inStockNumber must be positive")
+	}
+	return s.repo.ChangeStockOfItem(itemId, storeId, inStockNumber)
+}
+
+func (s *ItemService) AddInfos(itemId int, info model.ItemInfoCreation) error {
+	return s.repo.AddInfos(itemId, info)
+}
+
+func (s *ItemService) ChangeInfos(itemId int, info model.ItemInfoChange) error {
+	return s.repo.ChangeInfos(itemId, info)
+}
+
+func (s *ItemService) DeleteInfos(itemId int, ids []int) error {
+	return s.repo.DeleteInfos(itemId, ids)
+}
+
+func (s *ItemService) AddImages(itemId int, files []*multipart.FileHeader) error {
+	filenames := make([]string, 0)
+	for _, file := range files {
+		filenameParts := strings.Split(strings.TrimSpace(file.Filename), ".")
+		newFilename := uuid.New().String() + "." + filenameParts[len(filenameParts)-1]
+
+		err := utils.SaveUploadedFileAndCheckExtension(file, "./assets/"+newFilename)
+		if err != nil {
+			fileError := errors.New("Error while uploading " + file.Filename + ": " + err.Error())
+			err1 := utils.RemoveFiles(filenames, "./assets/")
+			if err1 != nil {
+				return errors.New(fileError.Error() + " and " + err1.Error())
+			}
+			return fileError
+		}
+		filenames = append(filenames, newFilename)
+	}
+
+	err := s.repo.SaveFilenames(itemId, filenames)
+	if err != nil {
+		err1 := utils.RemoveFiles(filenames, "./assets/")
+		if err1 != nil {
+			return errors.New(err.Error() + " and " + err1.Error())
+		}
+		return err
+	}
+	return nil
+}
+
+func (s *ItemService) DeleteImages(itemId int, ids []int) error {
+	filenames, err := s.repo.DeleteImages(itemId, ids)
+	if err != nil {
+		return err
+	}
+	return utils.RemoveFiles(filenames, "./assets/")
+}
