@@ -1,29 +1,11 @@
 package routing
 
 import (
+	"github.com/procat-hq/procat-backend/internal/app/model"
 	"math"
 )
 
-type Result struct {
-	OptimalRoute []int `json:"optimal_route"`
-	Distance     int   `json:"distance"`
-	Duration     int   `json:"duration"`
-}
-
-type Route struct {
-	Distance int    `json:"distance"`
-	Duration int    `json:"duration"`
-	SourceID int    `json:"source_id"`
-	Status   string `json:"status"`
-	TargetID int    `json:"target_id"`
-}
-
-type Response struct {
-	GenerationTime int     `json:"generation_time"`
-	Routes         []Route `json:"routes"`
-}
-
-func GetRoute(response Response) (Result, error) {
+func GetRoute(response model.Api2GisResponse) (model.RoutingResult, error) {
 
 	pointMap := make(map[int]bool)
 	for _, route := range response.Routes {
@@ -49,8 +31,8 @@ func GetRoute(response Response) (Result, error) {
 	return result, nil
 }
 
-func solveTSP(distanceMatrix [][]int, durationMatrix [][]int) Result {
-	var result Result
+func solveTSP(distanceMatrix [][]int, durationMatrix [][]int) model.RoutingResult {
+	var result model.RoutingResult
 	minCost := math.MaxInt
 	optimalRoute := make([]int, 0)
 
