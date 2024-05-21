@@ -4,6 +4,7 @@ import (
 	"github.com/procat-hq/procat-backend/internal/app/model"
 	"github.com/procat-hq/procat-backend/internal/app/repository"
 	"mime/multipart"
+	"time"
 )
 
 type User interface {
@@ -65,6 +66,8 @@ type Order interface {
 	ChangeOrderStatus(orderId int, status string) error
 	GetPaymentsForOrder(orderId int) ([]model.Payment, error)
 	ChangePaymentStatus(paymentId, paid int, method string) error
+	ExtendOrder(orderId int, rentalPeriodEnd time.Time) error
+	ConfirmOrderExtension(order model.Order) error
 }
 
 type Subscription interface {

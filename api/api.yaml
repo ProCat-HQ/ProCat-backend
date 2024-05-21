@@ -1547,6 +1547,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StatusCode200'
+
+  /users/orders/extend/{orderId}:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 54
+    patch:
+      deprecated: false
+      tags:
+        - order
+      summary: set status to "extensionRequest", waits till admin do some stuff and then set status of order to "awaitingPayment", that will check another bunch of stuff to "recreate" order and create new payment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rentalPeriodEnd:
+                  type: string
+                  example: 2023-10-27 20:30:00
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusCode200'
+
   /users/orders/status/{orderId}:
     parameters:
       - name: orderId
@@ -1741,6 +1772,15 @@ paths:
           schema:
             type: integer
             example: 15
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                itemId:
+                  type: integer
+                  example: 459
       responses:
         200:
           description: successful operation

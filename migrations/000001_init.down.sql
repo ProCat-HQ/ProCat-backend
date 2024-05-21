@@ -32,6 +32,7 @@ DROP TABLE IF EXISTS coordinates;
 DROP TABLE IF EXISTS routes;
 DROP TABLE IF EXISTS deliveries;
 
+DROP TABLE IF EXISTS orders_extension;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS verifications;
 DROP TABLE IF EXISTS deliverymen;

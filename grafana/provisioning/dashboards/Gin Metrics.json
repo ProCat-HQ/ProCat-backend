@@ -419,12 +419,12 @@
       "pluginVersion": "7.2.0",
       "targets": [
         {
-          "expr": "sum by(uri, instance) (gin_uri_request_total)",
+          "expr": "sum by(uri, instance, method) (gin_uri_request_total)",
           "format": "time_series",
           "instant": false,
           "interval": "",
           "intervalFactor": 1,
-          "legendFormat": "{{instance}}-{{uri}}",
+          "legendFormat": "{{instance}}-{{uri}}-{{method}}",
           "refId": "A"
         }
       ],

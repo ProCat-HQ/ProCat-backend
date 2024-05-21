@@ -99,6 +99,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			orders.GET("/:id", h.GetOrder)
 			orders.POST("", h.CreateOrder)
 			orders.PATCH("/cancel/:id", h.CancelOrder)
+			orders.PATCH("/extend/:id", h.ExtendOrder)
+			orders.PATCH("/confirm-extension/:id", h.CheckRole("admin"), h.ConfirmOrderExtension)
 			orders.PATCH("/status/:id", h.CheckRole("admin"), h.ChangeOrderStatus)
 
 			payment := orders.Group("/payment")
