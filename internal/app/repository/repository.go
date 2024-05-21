@@ -81,6 +81,11 @@ type Subscription interface {
 }
 
 type Notification interface {
+	GetUsersNotification(userId int) ([]model.Notification, error)
+	CreateNotification(userId int, title, description string) (int, error)
+	ReadAndGetNotification(notificationId int) (model.Notification, error)
+	GetNotificationUserId(notificationId int) (int, error)
+	DeleteNotification(notificationId int) error
 }
 
 type Category interface {
@@ -133,14 +138,15 @@ type Repository struct {
 
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
-		User:        NewUserPostgres(db),
-		Item:        NewItemPostgres(db),
-		Admin:       NewAdminPostgres(db),
-		Deliveryman: NewDeliverymanPostgres(db),
-		Delivery:    NewDeliveryPostgres(db),
-		Cart:        NewCartPostgres(db),
-		Order:       NewOrderPostgres(db),
-		Store:       NewStorePostgres(db),
-		Category:    NewCategoryPostgres(db),
+		User:         NewUserPostgres(db),
+		Item:         NewItemPostgres(db),
+		Admin:        NewAdminPostgres(db),
+		Deliveryman:  NewDeliverymanPostgres(db),
+		Delivery:     NewDeliveryPostgres(db),
+		Cart:         NewCartPostgres(db),
+		Order:        NewOrderPostgres(db),
+		Store:        NewStorePostgres(db),
+		Category:     NewCategoryPostgres(db),
+		Notification: NewNotificationPostgres(db),
 	}
 }

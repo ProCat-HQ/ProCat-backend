@@ -71,6 +71,10 @@ type Subscription interface {
 }
 
 type Notification interface {
+	GetUsersNotification(userId int) ([]model.Notification, error)
+	CreateNotification(userId int, title, description string) (int, error)
+	ReadAndGetNotification(userId int, notificationId int) (model.Notification, error)
+	DeleteNotification(notificationId int) error
 }
 
 type Category interface {
@@ -121,14 +125,15 @@ type Service struct {
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
-		User:        NewUserService(repos.User),
-		Item:        NewItemService(repos.Item),
-		Admin:       NewAdminService(repos.Admin),
-		Delivery:    NewDeliveryService(repos.Delivery),
-		Deliveryman: NewDeliverymanService(repos.Deliveryman),
-		Cart:        NewCartService(repos.Cart),
-		Order:       NewOrderService(repos.Order),
-		Store:       NewStoreService(repos.Store),
-		Category:    NewCategoryService(repos.Category),
+		User:         NewUserService(repos.User),
+		Item:         NewItemService(repos.Item),
+		Admin:        NewAdminService(repos.Admin),
+		Delivery:     NewDeliveryService(repos.Delivery),
+		Deliveryman:  NewDeliverymanService(repos.Deliveryman),
+		Cart:         NewCartService(repos.Cart),
+		Order:        NewOrderService(repos.Order),
+		Store:        NewStoreService(repos.Store),
+		Category:     NewCategoryService(repos.Category),
+		Notification: NewNotificationService(repos.Notification),
 	}
 }

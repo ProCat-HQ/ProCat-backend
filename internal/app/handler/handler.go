@@ -27,7 +27,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	m := ginmetrics.GetMonitor()
 	m.SetMetricPath("/metrics")
-	m.SetSlowTime(10)
+	m.SetSlowTime(5)
 	m.Use(router)
 
 	users := router.Group("/users")
@@ -117,10 +117,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		notifications := users.Group("/notifications", h.UserIdentify)
 		{
-			notifications.GET("", h.GetAllNotifications)                             // TODO
-			notifications.POST("/:id", h.CheckRole("admin"), h.SendNotification)     // TODO
-			notifications.PATCH("/:id", h.ViewNotification)                          // TODO
-			notifications.DELETE("/:id", h.CheckRole("admin"), h.DeleteNotification) // TODO
+			notifications.GET("", h.GetAllNotifications)
+			notifications.POST("/:id", h.CheckRole("admin"), h.SendNotification)
+			notifications.PATCH("/:id", h.ViewNotification)
+			notifications.DELETE("/:id", h.CheckRole("admin"), h.DeleteNotification)
 		}
 
 	}
