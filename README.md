@@ -4,6 +4,8 @@ Server for **"ProCat"**.
 Create ```.env``` file in root directory and fill following values:
 ```
 BIND_ADDR=
+PROMETHEUS_BIND_ADDR=
+GRAFANA_BIND_ADDR=
 DB_USERNAME=
 DB_HOST=
 DB_PORT=

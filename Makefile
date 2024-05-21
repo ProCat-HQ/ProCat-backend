@@ -24,6 +24,7 @@ dockerExec:
 .PHONY: dockerCompose
 dockerCompose:
 	docker compose up --build -d
+	docker restart grafana-service
 
 ifeq (migration,$(firstword $(MAKECMDGOALS)))
   RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
