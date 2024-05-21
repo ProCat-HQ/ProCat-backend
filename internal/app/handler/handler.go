@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/penglongli/gin-metrics/ginmetrics"
 	"github.com/procat-hq/procat-backend/internal/app/service"
 	v3 "github.com/swaggest/swgui/v3"
 )
@@ -23,6 +24,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	swaggerHandler := v3.NewHandler("ProCat API", "/docs/api.json", "/swagger")
 
 	router.GET("/swagger/*any", gin.WrapH(swaggerHandler))
+
+	m := ginmetrics.GetMonitor()
+	m.SetMetricPath("/metrics")
+	m.SetSlowTime(10)
+	m.Use(router)
 
 	users := router.Group("/users")
 	{

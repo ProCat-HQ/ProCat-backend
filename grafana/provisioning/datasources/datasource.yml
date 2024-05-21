@@ -1,0 +1,16 @@
+apiVersion: 1
+
+deleteDatasources:
+  - name: Prometheus
+    orgId: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    # <string, required> access mode. direct or proxy. Required
+    access: proxy
+    orgId: 1
+    url: http://prometheus-service:9090
+    version: 1
+    # <bool> allow users to edit datasources from the UI.
+    editable: true
