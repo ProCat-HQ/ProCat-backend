@@ -13,6 +13,7 @@ const (
 	coordinatesTable        = "coordinates"
 	verificationsTable      = "verifications"
 	ordersTable             = "orders"
+	ordersExtensionTable    = "orders_extension"
 	deliveriesTable         = "deliveries"
 	paymentsTable           = "payments"
 	categoriesTable         = "categories"

@@ -54,6 +54,8 @@ func (r *UserPostgres) GetUserWithPasswordById(userId int) (model.UserPassword, 
 func (r *UserPostgres) CreateUser(user model.SignUpInput) (int, error) {
 	query := fmt.Sprintf("INSERT INTO %s (fullname, phone_number, password_hash) VALUES ($1, $2, $3) RETURNING id", usersTable)
 	queryCart := fmt.Sprintf(`INSERT INTO %s (user_id) VALUES ($1)`, cartsTable)
+	querySubs := fmt.Sprintf(`INSERT INTO %s (user_id) VALUES ($1)`, subscriptionsTable)
+
 	tx, err := r.db.Beginx()
 	if err != nil {
 		return 0, err
@@ -66,6 +68,10 @@ func (r *UserPostgres) CreateUser(user model.SignUpInput) (int, error) {
 		return 0, err
 	}
 	_, err = tx.Exec(queryCart, id)
+	if err != nil {
+		return 0, err
+	}
+	_, err = tx.Exec(querySubs, id)
 	if err != nil {
 		return 0, err
 	}

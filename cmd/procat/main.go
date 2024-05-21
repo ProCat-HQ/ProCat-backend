@@ -7,6 +7,7 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/procat-hq/procat-backend/internal/app/handler"
 	"github.com/procat-hq/procat-backend/internal/app/repository"
+	"github.com/procat-hq/procat-backend/internal/app/scheduler"
 	"github.com/procat-hq/procat-backend/internal/app/server"
 	"github.com/procat-hq/procat-backend/internal/app/service"
 	"github.com/sirupsen/logrus"
@@ -42,6 +43,9 @@ func main() {
 
 	srv := new(server.Server)
 	bindAddr := os.Getenv("BIND_ADDR")
+
+	sch := scheduler.NewScheduler(db)
+	go sch.CheckOrdersAndSetStatuses()
 
 	go func() {
 		if err := srv.Run(bindAddr, handlers.InitRoutes()); !errors.Is(err, http.ErrServerClosed) {

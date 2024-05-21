@@ -6,6 +6,7 @@ import (
 	"github.com/procat-hq/procat-backend/internal/app/repository"
 	"github.com/procat-hq/procat-backend/internal/kzgov"
 	"github.com/procat-hq/procat-backend/internal/twogis"
+	"time"
 )
 
 type OrderService struct {
@@ -88,4 +89,45 @@ func (s *OrderService) GetPaymentsForOrder(orderId int) ([]model.Payment, error)
 
 func (s *OrderService) ChangePaymentStatus(paymentId, paid int, method string) error {
 	return s.repo.ChangePaymentStatus(paymentId, paid, method)
+}
+
+func (s *OrderService) ExtendOrder(orderId int, rentalPeriodEnd time.Time) error {
+	return s.repo.ExtendOrder(orderId, rentalPeriodEnd)
+}
+
+func (s *OrderService) ConfirmOrderExtension(order model.Order) error {
+	rentalPeriodEnd, err := s.repo.GetRentalPeriodEndFromExtension(order.Id)
+	if err != nil {
+		return err
+	}
+
+	duration := rentalPeriodEnd.Sub(order.RentalPeriodEnd).Hours()
+	if duration <= 0 {
+		return errors.New("rental period of order less or equals to zero")
+	}
+
+	rentPeriodDays := int(duration/24) + 1
+
+	user, err := s.repo.GetUserById(order.UserId)
+	if err != nil {
+		return err
+	}
+
+	if user.IdentificationNumber == "" {
+		return errors.New("user identification number is empty")
+	}
+	arrearResponse, err := kzgov.GetArrear(user.IdentificationNumber)
+	if err != nil {
+		return err
+	}
+
+	if !kzgov.CompareNames(arrearResponse.NameKk, arrearResponse.NameRu, user.FullName) {
+		return errors.New("fullname from kz.gov service doesn't match with user's fullname")
+	}
+
+	defaultStatus := model.AwaitingPayment
+
+	deposit := arrearResponse.TotalArrear > 0
+
+	return s.repo.ConfirmOrderExtension(order.Id, rentalPeriodEnd, rentPeriodDays, defaultStatus, deposit)
 }

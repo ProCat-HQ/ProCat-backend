@@ -1553,6 +1553,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StatusCode200'
+
+  /users/orders/extend/{orderId}:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 54
+    patch:
+      deprecated: false
+      tags:
+        - order
+      summary: set status to "extensionRequest", waits till admin do some stuff and then set status of order to "awaitingPayment", that will check another bunch of stuff to "recreate" order and create new payment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rentalPeriodEnd:
+                  type: string
+                  example: 2023-10-27 20:30:00
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusCode200'
+
   /users/orders/status/{orderId}:
     parameters:
       - name: orderId
@@ -1689,7 +1720,7 @@ paths:
                 $ref: '#/components/schemas/StatusCode200'
   /users/subscriptions:
     get:
-      deprecated: true
+      deprecated: false
       tags:
         - subscription
       summary: get all subs for self user
@@ -1736,10 +1767,17 @@ paths:
                             item:
                               $ref: '#/components/schemas/ItemMiniSub'
     post:
-      deprecated: true
+      deprecated: false
       tags:
         - subscription
       summary: add {itemId} to subs
+      parameters:
+        - name: itemId
+          in: query
+          required: true
+          schema:
+            type: integer
+            example: 15
       requestBody:
         content:
           application/json:
@@ -1765,7 +1803,7 @@ paths:
           type: integer
           example: 89
     delete:
-      deprecated: true
+      deprecated: false
       tags:
         - subscription
       responses:
@@ -1777,7 +1815,7 @@ paths:
                 $ref: '#/components/schemas/StatusCode200'
   /users/notifications:
     get:
-      deprecated: true
+      deprecated: false
       tags:
         - notification
       responses:
@@ -1810,7 +1848,7 @@ paths:
           type: integer
           example: 848
     post:
-      deprecated: true
+      deprecated: false
       tags:
         - notification
       summary: send notification to user
@@ -1832,7 +1870,20 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StatusCode200'
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: ok
+                  payload:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 2
   /users/notifications/{notificationId}:
     parameters:
       - name: notificationId
@@ -1842,7 +1893,7 @@ paths:
           type: integer
           example: 56
     patch:
-      deprecated: true
+      deprecated: false
       tags:
         - notification
       summary: to open and read notification
@@ -1864,7 +1915,7 @@ paths:
                   payload:
                     $ref: '#/components/schemas/Notification'
     delete:
-      deprecated: true
+      deprecated: false
       tags:
         - notification
       responses:

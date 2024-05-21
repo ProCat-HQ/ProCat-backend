@@ -77,12 +77,23 @@ type Order interface {
 	ChangeOrderStatus(orderId int, status string) error
 	GetPaymentsForOrder(orderId int) ([]model.Payment, error)
 	ChangePaymentStatus(paymentId, paid int, method string) error
+	ExtendOrder(orderId int, rentalPeriodEnd time.Time) error
+	GetRentalPeriodEndFromExtension(orderId int) (time.Time, error)
+	ConfirmOrderExtension(orderId int, rentalPeriodEnd time.Time, rentalPeriodDays int, status string, deposit bool) error
 }
 
 type Subscription interface {
+	GetUserSubscriptions(userId int, limit, offset int) (int, []model.Subscription, error)
+	CreateSubscription(userId, itemId int) error
+	DeleteSubscription(userId, subId int) error
 }
 
 type Notification interface {
+	GetUsersNotification(userId int) ([]model.Notification, error)
+	CreateNotification(userId int, title, description string) (int, error)
+	ReadAndGetNotification(notificationId int) (model.Notification, error)
+	GetNotificationUserId(notificationId int) (int, error)
+	DeleteNotification(notificationId int) error
 }
 
 type Category interface {
@@ -135,14 +146,16 @@ type Repository struct {
 
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
-		User:        NewUserPostgres(db),
-		Item:        NewItemPostgres(db),
-		Admin:       NewAdminPostgres(db),
-		Deliveryman: NewDeliverymanPostgres(db),
-		Delivery:    NewDeliveryPostgres(db),
-		Cart:        NewCartPostgres(db),
-		Order:       NewOrderPostgres(db),
-		Store:       NewStorePostgres(db),
-		Category:    NewCategoryPostgres(db),
+		User:         NewUserPostgres(db),
+		Item:         NewItemPostgres(db),
+		Admin:        NewAdminPostgres(db),
+		Deliveryman:  NewDeliverymanPostgres(db),
+		Delivery:     NewDeliveryPostgres(db),
+		Cart:         NewCartPostgres(db),
+		Order:        NewOrderPostgres(db),
+		Store:        NewStorePostgres(db),
+		Category:     NewCategoryPostgres(db),
+		Notification: NewNotificationPostgres(db),
+		Subscription: NewSubscriptionPostgres(db),
 	}
 }
