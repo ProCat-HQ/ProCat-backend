@@ -36,20 +36,20 @@ func (r *DeliverymanPostgres) GetAllDeliverymen(limit int, offset int) ([]model.
 	return deliverymen, count, nil
 }
 
-func (r *DeliverymanPostgres) GetDeliveryman(userId int) (model.DeliveryManInfoCreate, error) {
-	query := fmt.Sprintf(`SELECT COALESCE(car_capacity, '') AS car_capacity,
+func (r *DeliverymanPostgres) GetDeliveryman(userId int) (model.DeliveryManInfoWithId, error) {
+	query := fmt.Sprintf(`SELECT id, COALESCE(car_capacity, '') AS car_capacity,
 							    COALESCE(CAST(working_hours_start AS VARCHAR), '') AS working_hours_start,
 								COALESCE(CAST(working_hours_end AS VARCHAR), '') AS working_hours_end,
 								COALESCE(car_id, '') AS car_id
 								FROM %s d
 								WHERE user_id = $1`, deliverymenTable)
-	var deliveryman model.DeliveryManInfoCreate
+	var deliveryman model.DeliveryManInfoWithId
 	err := r.db.Get(&deliveryman, query, userId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return model.DeliveryManInfoCreate{}, nil
+			return model.DeliveryManInfoWithId{}, nil
 		}
-		return model.DeliveryManInfoCreate{}, err
+		return model.DeliveryManInfoWithId{}, err
 	}
 	return deliveryman, nil
 }
