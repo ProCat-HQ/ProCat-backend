@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -106,12 +107,6 @@ func (h *Handler) CreateRoute(c *gin.Context) {
 		return
 	}
 
-	//storeId, err := strconv.Atoi(c.Query("storeId"))
-	//if err != nil {
-	//	custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
-	//	return
-	//}
-
 	// getStoreById
 	//fmt.Println(storeId)
 	//storeLat, storeLon := 54.84271, 83.09084
@@ -133,7 +128,13 @@ func (h *Handler) CreateRoute(c *gin.Context) {
 		return
 	}
 
-	requestBody, mapDeliveryPoint, err := h.services.Delivery.GetDeliveriesForDeliveryman(userData.UserId)
+	storeId, err := strconv.Atoi(c.Query("storeId"))
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	requestBody, mapDeliveryPoint, waitingHours, err := h.services.Delivery.GetDeliveriesForDeliveryman(userData.UserId, storeId)
 	if err != nil {
 		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -161,13 +162,12 @@ func (h *Handler) CreateRoute(c *gin.Context) {
 	response := model.Api2GisResponse{}
 
 	err = json.Unmarshal(body, &response)
-
 	if err != nil {
 		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	realResponse, err := h.services.CreateRoute(*requestBody, response, mapDeliveryPoint, userData.UserId)
+	realResponse, err := h.services.CreateRoute(*requestBody, response, mapDeliveryPoint, userData.UserId, waitingHours)
 
 	c.JSON(http.StatusOK, model.Response{
 		Status:  http.StatusOK,

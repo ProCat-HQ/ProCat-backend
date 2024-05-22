@@ -55,7 +55,8 @@ func (r *AdminPostgres) GetDeliveriesToSort() (int, []model.DeliveriesForDeliver
 										   FROM %s d
 										   JOIN %s o ON d.order_id = o.id
 										   WHERE d.deliveryman_id=$1
-										   AND o.status = $2`, deliveriesTable, ordersTable)
+										   AND o.status = $2 
+												AND d.method = $3`, deliveriesTable, ordersTable)
 
 	var deliverymenId []int
 	err := r.db.Select(&deliverymenId, queryDeliverymen, model.Accepted)
@@ -66,7 +67,7 @@ func (r *AdminPostgres) GetDeliveriesToSort() (int, []model.DeliveriesForDeliver
 
 	for _, deliverymanId := range deliverymenId {
 		var deliveries []model.Point
-		err = r.db.Select(&deliveries, queryDeliveries, deliverymanId, model.Accepted)
+		err = r.db.Select(&deliveries, queryDeliveries, deliverymanId, model.Accepted, model.DeliveryMethodCar)
 		if err != nil {
 			return 0, nil, err
 		}

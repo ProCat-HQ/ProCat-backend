@@ -262,3 +262,10 @@ func (r *DeliveryPostgres) InsertRoute(route []model.Point, deliverymanId int) e
 	}
 	return tx.Commit()
 }
+
+func (r *DeliveryPostgres) GetStore(storeId int) (model.Point, error) {
+	query := fmt.Sprintf(`SELECT address, latitude, longitude FROM %s WHERE id = $1`, storesTable)
+	var store model.Point
+	err := r.db.Get(&store, query, storeId)
+	return store, err
+}

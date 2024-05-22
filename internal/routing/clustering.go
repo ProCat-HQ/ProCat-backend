@@ -1,7 +1,6 @@
 package routing
 
 import (
-	"fmt"
 	"github.com/muesli/clusters"
 	"github.com/muesli/kmeans"
 	"github.com/procat-hq/procat-backend/internal/app/model"
@@ -22,8 +21,8 @@ func ClusterOrders(deliveries []model.DeliveryAndOrder, deliverymen []model.Deli
 	mapIdCount := make(map[int]int)
 	mapDeprecation := make(map[int]int)
 
-	workStart := deliveries[0].TimeStart.Hour()
-	workEnd := deliveries[0].TimeEnd.Hour()
+	workStart := deliverymen[0].WorkingHoursStart.Hour()
+	workEnd := deliverymen[0].WorkingHoursEnd.Hour()
 	for _, man := range deliverymen {
 		currentHourStart := man.WorkingHoursStart.Hour()
 		currentHourEnd := man.WorkingHoursEnd.Hour()
@@ -43,12 +42,12 @@ func ClusterOrders(deliveries []model.DeliveryAndOrder, deliverymen []model.Deli
 	for i := workStart; i < workEnd; i++ {
 		var coordinates clusters.Observations
 		for _, delivery := range deliveries {
-			if delivery.TimeStart.Hour() < i {
+			if mapDeprecation[delivery.Id] == 1 || delivery.TimeEnd.Hour() <= i {
 				continue
-			} else if delivery.TimeStart.Hour() > i || mapDeprecation[delivery.Id] == 1 {
+			} else if delivery.TimeStart.Hour() > i {
 				break
 			}
-			mapDeprecation[delivery.Id] = 1
+
 			x, err := strconv.ParseFloat(delivery.Latitude, 64)
 			if err != nil {
 				return nil, err
@@ -95,6 +94,7 @@ func ClusterOrders(deliveries []model.DeliveryAndOrder, deliverymen []model.Deli
 						}
 					}
 				}
+				mapDeprecation[mapId[model.Point{Latitude: coordinate.Coordinates()[0], Longitude: coordinate.Coordinates()[1]}]] = 1
 			}
 			continue
 		}
@@ -114,7 +114,7 @@ func ClusterOrders(deliveries []model.DeliveryAndOrder, deliverymen []model.Deli
 			}
 		}
 		if len(deliverymenForThisHour) == 0 && len(coordinates) > 0 {
-			return nil, fmt.Errorf("no deliveryman between %d:00 and %d:00", i, i+1)
+			continue
 		}
 		km := kmeans.New()
 		partition, err := km.Partition(coordinates, len(deliverymenForThisHour))
@@ -169,7 +169,7 @@ func ClusterOrders(deliveries []model.DeliveryAndOrder, deliverymen []model.Deli
 						}
 					}
 				}
-
+				mapDeprecation[mapId[model.Point{Latitude: k.Coordinates()[0], Longitude: k.Coordinates()[1]}]] = 1
 			}
 		}
 	}
