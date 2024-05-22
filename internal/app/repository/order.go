@@ -302,7 +302,19 @@ func (r *OrderPostgres) GetItemCheque(cartId int) ([]model.ItemCheque, error) {
 func (r *OrderPostgres) ChangeOrderStatus(orderId int, status string) error {
 	query := fmt.Sprintf(`UPDATE %s SET status=$1 WHERE id=$2`, ordersTable)
 	_, err := r.db.Exec(query, status, orderId)
-	return err
+	if err != nil {
+		return err
+	}
+	if status == model.Rejected {
+		// delete delivery corresponding to the order
+		queryDelete := fmt.Sprintf(`DELETE FROM %s WHERE order_id=$1`, deliveriesTable)
+		_, err = r.db.Exec(queryDelete, orderId)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (r *OrderPostgres) GetPaymentsForOrder(orderId int) ([]model.Payment, error) {

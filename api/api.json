@@ -1515,17 +1515,21 @@
                           "type": "array",
                           "items": {
                             "properties": {
-                              "orderId": {
+                              "address": {
+                                "type": "string",
+                                "example": "адрес"
+                              },
+                              "latitude": {
+                                "type": "string",
+                                "example": 55.072470687600536
+                              },
+                              "longitude": {
+                                "type": "string",
+                                "example": 83.04634094238281
+                              },
+                              "deliveryId": {
                                 "type": "integer",
                                 "example": 45
-                              },
-                              "lat": {
-                                "type": "string",
-                                "example": 54.99770587584445
-                              },
-                              "lon": {
-                                "type": "string",
-                                "example": 82.79502868652345
                               }
                             }
                           }
@@ -2327,7 +2331,7 @@
         "tags": [
           "order"
         ],
-        "summary": "set status to \"awaitingRejection\", waits till admin do some stuff and then set status of order to \"rejected\"",
+        "summary": "set status to \"awaitingRejection\" or \"awaitingMoneyBack\", waits till admin do some stuff and then set status of order to \"rejected\"",
         "responses": {
           "200": {
             "description": "successful operation",
