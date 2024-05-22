@@ -412,6 +412,11 @@ func (h *Handler) ConfirmOrderExtension(c *gin.Context) {
 		return
 	}
 
+	if order.Status != model.ExtensionRequest {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "can't extend order without user request")
+		return
+	}
+
 	if err = h.services.Order.ConfirmOrderExtension(order); err != nil {
 		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

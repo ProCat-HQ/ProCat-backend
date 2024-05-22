@@ -81,7 +81,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		admin := users.Group("/admin", h.UserIdentify, h.CheckRole("admin"))
 		{
-			admin.POST("/cluster", h.Cluster) // TODO
+			admin.POST("/cluster", h.Cluster)
 			admin.GET("/deliveries-to-sort", h.GetAllDeliveriesToSort)
 			admin.PATCH("/change-delivery", h.ChangeDeliveryData)
 		}

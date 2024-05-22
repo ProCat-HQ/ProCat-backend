@@ -183,7 +183,8 @@ func (r *OrderPostgres) CreateOrder(status string, deposit bool, rpStart, rpEnd 
 	defer tx.Rollback()
 
 	var isOkCartItems int
-	queryCheckCartStock := fmt.Sprintf(`SELECT MIN(CAST(in_stock_number - items_number >= 0 AS INTEGER)) FROM %s i
+	queryCheckCartStock := fmt.Sprintf(`SELECT COALESCE(MIN(CAST(in_stock_number - items_number >= 0 AS INTEGER)), 0)
+										       FROM %s i
 												JOIN %s c ON i.item_id = c.item_id WHERE c.cart_id=$1`, itemsStoresTable, cartsItemsTable)
 
 	err = tx.Get(&isOkCartItems, queryCheckCartStock, cartId)
@@ -262,14 +263,21 @@ func (r *OrderPostgres) CreateOrder(status string, deposit bool, rpStart, rpEnd 
 }
 
 func (r *OrderPostgres) GetTotalCartPrices(cartId int) (int, int, error) {
-	query := fmt.Sprintf(`SELECT SUM(i.price * c.items_number) as price, SUM(i.price_deposit * c.items_number) as price_deposit FROM %s c
+	query := fmt.Sprintf(`SELECT COALESCE(SUM(i.price * c.items_number), 0) as price,
+       							COALESCE(SUM(i.price_deposit * c.items_number), 0) as price_deposit FROM %s c
 								LEFT JOIN %s i ON c.item_id = i.id WHERE c.cart_id=$1`, cartsItemsTable, itemsTable)
 	var res struct {
 		Price        int `db:"price"`
 		PriceDeposit int `db:"price_deposit"`
 	}
 	err := r.db.Get(&res, query, cartId)
-	return res.Price, res.PriceDeposit, err
+	if err != nil {
+		return 0, 0, err
+	}
+	if res.Price == 0 && res.PriceDeposit == 0 {
+		return 0, 0, errors.New("empty cart")
+	}
+	return res.Price, res.PriceDeposit, nil
 }
 
 func (r *OrderPostgres) GetUsersCartId(userId int) (int, error) {
