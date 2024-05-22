@@ -159,10 +159,11 @@ func (r *DeliveryPostgres) GetRoute(deliverymanId int) ([]model.Point, error) {
 	if err != nil {
 		return nil, err
 	}
-	queryDeleteRoute := fmt.Sprintf(`DELETE FROM routes where id = $1`)
 	queryChangeStatus := fmt.Sprintf(`UPDATE %s AS o SET status=$1
-											FROM %s AS d WHERE o.id = d.order_id
-											AND d.deliveryman_id = $2`, ordersTable, deliveriesTable)
+											FROM %s AS d JOIN %s c on d.id = c.delivery_id
+											WHERE o.id = d.order_id AND d.deliveryman_id = $2`,
+		ordersTable, deliveriesTable, coordinatesTable)
+	queryDeleteRoute := fmt.Sprintf(`DELETE FROM routes where id = $1`)
 	if len(statuses) != count {
 		_, err = tx.Exec(queryDeleteRoute, routeId)
 		if err != nil {
