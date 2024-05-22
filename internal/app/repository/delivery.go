@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/procat-hq/procat-backend/internal/app/model"
+	"time"
 )
 
 type DeliveryPostgres struct {
@@ -23,6 +24,18 @@ func (r *DeliveryPostgres) GetDeliverymanId(userId int) (int, error) {
 		return 0, err
 	}
 	return id, nil
+}
+
+func (r *DeliveryPostgres) GetWorkingHours(deliverymanId int) (int, error) {
+	var start time.Time
+	query := fmt.Sprintf(`SELECT working_hours_start
+								FROM %s 
+								WHERE id = $1`, deliverymenTable)
+	err := r.db.Get(&start, query, deliverymanId)
+	if err != nil {
+		return 0, err
+	}
+	return start.Hour(), nil
 }
 
 func (r *DeliveryPostgres) GetDeliveriesOrdersForDeliveryman(deliverymanId int) ([]model.DeliveryAndOrder, error) {

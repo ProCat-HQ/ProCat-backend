@@ -22,6 +22,7 @@ func (s *DeliveryService) GetDeliveriesForDeliveryman(userId int, storeId int) (
 	if err != nil {
 		return nil, nil, nil, err
 	}
+	workStart, err := s.repo.GetWorkingHours(deliverymanId)
 	deliveries, err := s.repo.GetDeliveriesOrdersForDeliveryman(deliverymanId)
 	if err != nil {
 		return nil, nil, nil, err
@@ -66,8 +67,8 @@ func (s *DeliveryService) GetDeliveriesForDeliveryman(userId int, storeId int) (
 		}
 		waitingHours = append(waitingHours, model.WaitingHoursForRouting{
 			Id:    i + 1,
-			Start: delivery.TimeStart.Hour() * 3600,
-			End:   delivery.TimeEnd.Hour() * 3600})
+			Start: (delivery.TimeStart.Hour() - workStart) * 3600,
+			End:   (delivery.TimeEnd.Hour() - workStart - 1) * 3600})
 	}
 	req := &model.MapRequest{
 		Points:  points,
