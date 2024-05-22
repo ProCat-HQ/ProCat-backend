@@ -131,3 +131,29 @@ func (s *OrderService) ConfirmOrderExtension(order model.Order) error {
 
 	return s.repo.ConfirmOrderExtension(order.Id, rentalPeriodEnd, rentPeriodDays, defaultStatus, deposit)
 }
+
+func (s *OrderService) ReturnOrder(orderId int, problem bool, deliveryMethod, deliveryTimeStart, deliveryTimeEnd string) error {
+	timeStart, err := time.Parse(time.DateTime, deliveryTimeStart)
+	if err != nil {
+		return err
+	}
+	timeEnd, err := time.Parse(time.DateTime, deliveryTimeEnd)
+	if err != nil {
+		return err
+	}
+	var newStatus string
+	if problem {
+		newStatus = model.Problem
+	} else {
+		newStatus = model.ReadyToDeliveryBack
+	}
+
+	return s.repo.ReturnOrder(orderId, timeStart, timeEnd, newStatus, deliveryMethod)
+}
+
+func (s *OrderService) NeedRepairForOrder(orderId, price int) error {
+	if price <= 0 {
+		return errors.New("price must be greater than zero")
+	}
+	return s.repo.NeedRepairForOrder(orderId, price)
+}

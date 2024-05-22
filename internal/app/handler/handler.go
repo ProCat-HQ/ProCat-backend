@@ -16,6 +16,7 @@ func NewHandler(services *service.Service) *Handler {
 }
 
 func (h *Handler) InitRoutes() *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
 
 	router.StaticFS("/assets", gin.Dir("./assets", false))
@@ -75,7 +76,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				deliveries.GET("/:id", h.GetAllDeliveriesForOneDeliveryman)
 				deliveries.GET("/delivery/:id", h.GetDelivery)
 				deliveries.PATCH("/:id", h.ChangeDeliveryStatus)
-				deliveries.POST("/create-route", h.CreateRoute) // TODO
+				deliveries.POST("/create-route", h.CreateRoute)
 			}
 		}
 
@@ -100,8 +101,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			orders.POST("", h.CreateOrder)
 			orders.PATCH("/cancel/:id", h.CancelOrder)
 			orders.PATCH("/extend/:id", h.ExtendOrder)
+			orders.PATCH("/return/:id", h.ReturnOrder)
 			orders.PATCH("/confirm-extension/:id", h.CheckRole("admin"), h.ConfirmOrderExtension)
 			orders.PATCH("/status/:id", h.CheckRole("admin"), h.ChangeOrderStatus)
+			orders.PATCH("/need-repair/:id", h.CheckRole("admin"), h.NeedRepairForOrder)
 
 			payment := orders.Group("/payment")
 			{

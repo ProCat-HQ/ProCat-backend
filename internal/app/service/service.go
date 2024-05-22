@@ -73,6 +73,8 @@ type Order interface {
 	ChangePaymentStatus(paymentId, paid int, method string) error
 	ExtendOrder(orderId int, rentalPeriodEnd time.Time) error
 	ConfirmOrderExtension(order model.Order) error
+	ReturnOrder(orderId int, problem bool, deliveryMethod, deliveryTimeStart, deliveryTimeEnd string) error
+	NeedRepairForOrder(orderId, price int) error
 }
 
 type Subscription interface {
