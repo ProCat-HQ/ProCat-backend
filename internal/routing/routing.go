@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/procat-hq/procat-backend/internal/app/model"
 	"math"
+	"sort"
 )
 
 func GetRoute(response model.Api2GisResponse, waitingHours []model.WaitingHoursForRouting) (model.RoutingResult, error) {
@@ -17,6 +18,23 @@ func GetRoute(response model.Api2GisResponse, waitingHours []model.WaitingHoursF
 	}
 	n := len(pointMap)
 
+	hours := make(map[int][]int)
+	for _, hour := range waitingHours {
+		if hour.Id == 0 {
+			continue
+		}
+		if _, e := hours[hour.End]; e {
+			hours[hour.End] = append(hours[hour.End], hour.Id)
+		} else {
+			hours[hour.End] = make([]int, 1)
+			hours[hour.End][0] = hour.Id
+		}
+	}
+	keys := make([]int, 0, len(hours))
+	for key := range hours {
+		keys = append(keys, key)
+	}
+	sort.Ints(keys)
 	distanceMatrix := make([][]int, n)
 	durationMatrix := make([][]int, n)
 	for i := 0; i < n; i++ {
@@ -26,26 +44,60 @@ func GetRoute(response model.Api2GisResponse, waitingHours []model.WaitingHoursF
 		distanceMatrix[i][i] = math.MaxInt
 	}
 	for _, route := range response.Routes {
-		distanceMatrix[route.SourceID][route.TargetID] = route.Distance
-		durationMatrix[route.SourceID][route.TargetID] = route.Duration + 12*3600
+		if route.SourceID != route.TargetID {
+			distanceMatrix[route.SourceID][route.TargetID] = route.Distance
+			durationMatrix[route.SourceID][route.TargetID] = route.Duration
+		}
 	}
-	result := solveTSP(distanceMatrix, durationMatrix)
-	//fmt.Println(waitingHours)
-	//fmt.Println(durationMatrix)
+
+	var start = 0
+	result := model.RoutingResult{
+		OptimalRoute: []int{0},
+		Distance:     0,
+		Duration:     0,
+	}
+	for _, key := range keys {
+		if len(hours[key]) == 1 {
+			result.OptimalRoute = append(result.OptimalRoute, hours[key]...)
+		} else {
+			r := solveTSP(distanceMatrix, durationMatrix, start, hours[key])
+			result.OptimalRoute = append(result.OptimalRoute, r.OptimalRoute[n-len(hours[key]):]...)
+			result.Distance += r.Distance
+			result.Duration += r.Duration
+
+		}
+		start = result.OptimalRoute[len(result.OptimalRoute)-1]
+	}
 
 	return result, nil
 }
 
-func solveTSP(distanceMatrix [][]int, durationMatrix [][]int) model.RoutingResult {
+func solveTSP(distanceMatrix [][]int, durationMatrix [][]int, start int, points []int) model.RoutingResult {
 	var result model.RoutingResult
 	minCost := math.MaxInt
 	optimalRoute := make([]int, 0)
 
 	visited := make([]bool, len(distanceMatrix))
-	visited[0] = true // Начинаем с города 0
+	visited[start] = true
 	currentPath := make([]int, 0, len(distanceMatrix))
-	currentPath = append(currentPath, 0)
+	currentPath = append(currentPath, start)
 
+	f := true
+	for i := 0; i < len(durationMatrix); i++ {
+		for _, point := range points {
+			if point == i {
+				f = false
+				break
+			}
+		}
+		if f {
+			for j := 0; j < len(durationMatrix); j++ {
+				durationMatrix[i][j] = 0
+				durationMatrix[j][i] = 0
+			}
+		}
+		f = true
+	}
 	var dfs func(int, int)
 	dfs = func(currentCity, costSoFar int) {
 		if len(currentPath) == len(distanceMatrix) {
@@ -80,19 +132,5 @@ func solveTSP(distanceMatrix [][]int, durationMatrix [][]int) model.RoutingResul
 		index = optimalRoute[i]
 	}
 	result.Duration = duration
-	//fmt.Println(optimalRoute)
-	//fmt.Println(countDuration(optimalRoute, durationMatrix))
 	return result
-}
-
-func countDuration(optimalRoute []int, durationMatrix [][]int) []int {
-	durationRoute := make([]int, 0)
-	durationRoute = append(durationRoute, 0)
-	for i, point := range optimalRoute {
-		if i != 0 {
-			durationRoute = append(durationRoute,
-				durationRoute[i-1]+durationMatrix[optimalRoute[i-1]][point]+15*60)
-		}
-	}
-	return durationRoute
 }

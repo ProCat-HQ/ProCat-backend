@@ -49,6 +49,7 @@ type Delivery interface {
 	GetRoute(deliverymanId int) ([]model.Point, error)
 	InsertRoute(route []model.Point, deliverymanId int) error
 	GetStore(storeId int) (model.Point, error)
+	GetWorkingHours(deliverymanId int) (int, error)
 }
 
 type Admin interface {
