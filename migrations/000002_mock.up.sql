@@ -9,13 +9,17 @@ VALUES (100, 'Админ Админович', 'admin@gmail.com', '+79998887766',
         '6e77446d383649393b4c653428734456d46fbd98aa243d1d58c7132ac8e7a29ca90f7e31', 'deliveryman'),
 
        (103, 'User Usernamovich', 'user@gmail.com', '+72998887766', '345',
-        '6e77446d383649393b4c6534287344564f61d67813c5a1818322c1cf96890b8b7934f97f', 'user');
+        '6e77446d383649393b4c6534287344564f61d67813c5a1818322c1cf96890b8b7934f97f', 'user'),
+
+        (104, 'Рамазанова Амина Рустамовна', '', ' +89642130784', '030111050412',
+         '6e77446d383649393b4c6534287344566c1e40094f55f8c475d3ad1d7b12be4313c62fb7', 'user');
 
 INSERT INTO carts (user_id)
 VALUES (100),
        (101),
        (102),
-       (103);
+       (103),
+       (104);
 
 INSERT INTO deliverymen (car_capacity, working_hours_start, working_hours_end, car_id, user_id)
 VALUES ('big', '10:00', '16:00', 'A123BC', 101),
@@ -41,8 +45,8 @@ VALUES ('hammer.jpg', 1),
        ('hammer.jpg', 1),
        ('set.jpg', 3);
 
-INSERT INTO stores (name, address, working_hours_start, working_hours_end)
-VALUES ('1', '1', '8:00', '20:00');
+INSERT INTO stores (name, address, latitude, longitude, working_hours_start, working_hours_end)
+VALUES ('1', 'Россия Новосибирск Пирогова 1', '54.843072', '83.090792', '8:00', '20:00');
 
 INSERT INTO item_stores (in_stock_number, store_id, item_id)
 VALUES (20, 1, 1),

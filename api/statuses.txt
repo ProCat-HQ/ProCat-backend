@@ -14,11 +14,14 @@ b.  Админ сделал всё необходимое чтобы его от
 6.  Пользователь сделал запрос на продление аренды  - extensionRequest
 6.  Продлено                                        - extended
 7.  Проблема с инструментом                         - problem
-8.  Доставка обратно на склад                       - deliveryBack
+7.  Готово для доставки на склад                    - readyToDeliveryBack
+8.  Доставка обратно на склад                       - deliveringBack
 9.  Заказ доставлен на склад                        - returned
 10. Проверка состояния инструмента                  - itemsCheck
 11. Ожидание оплаты за ремонт                       - awaitingRepairPayment
 12. Заказ закрыт                                    - closed
+
+Возможные статусы для смены для Админа: rejected, readyToPickup, rent (в случае самовывоза)
 
 Способы доставки:
 DeliveryMethodCar     = "car" - доставка
@@ -30,11 +33,12 @@ DeliveryMethodPickup  = "pickup" - самовывоз
 "moderator" - не используется, просто вдруг потом нужен будет
 "admin"
 
+Поведение статусов при доставке:
 accepted - до Cluster
 accepted и у delivery появилася deliveryman_id - после Cluster, то, что возвращает deliveries-to-sort
 readyToDelivery - после согласия админа с кластером системы
 
-
+Время:
 Принимаем
 TimeOnly   = "15:04:05"
 DateTime   = "2006-01-02 15:04:05"
