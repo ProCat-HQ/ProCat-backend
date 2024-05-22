@@ -224,9 +224,9 @@ func (r *OrderPostgres) CreateOrder(status string, deposit bool, rpStart, rpEnd 
 	}
 
 	queryUpdateItemBoolStock := fmt.Sprintf(`UPDATE %s it SET is_in_stock = i.in_stock_number > 0
-													FROM %s i WHERE it.id = i.item_id`, itemsTable, itemsStoresTable)
+													FROM %s i WHERE it.id = i.item_id AND store_id=$1`, itemsTable, itemsStoresTable)
 
-	_, err = tx.Exec(queryUpdateItemBoolStock)
+	_, err = tx.Exec(queryUpdateItemBoolStock, defaultStoreId)
 	if err != nil {
 		return model.OrderCheque{}, err
 	}
@@ -312,6 +312,32 @@ func (r *OrderPostgres) ChangeOrderStatus(orderId int, status string) error {
 		if err != nil {
 			return err
 		}
+	}
+	if status == model.Returned {
+		defaultStoreId := 1
+		queryUpdateStock := fmt.Sprintf(`UPDATE %s i SET in_stock_number = i.in_stock_number + o.items_number
+												FROM %s o WHERE o.order_id=$1 AND i.store_id=$2 AND o.item_id=i.item_id`,
+			itemsStoresTable, ordersItemsTable)
+
+		queryUpdateInStockBoolItem := fmt.Sprintf(`UPDATE %s it SET is_in_stock = i.in_stock_number > 0
+														  FROM %s i WHERE it.id = i.item_id AND store_id=$1`,
+			itemsTable, itemsStoresTable)
+
+		tx, err := r.db.Beginx()
+		if err != nil {
+			return err
+		}
+		defer tx.Rollback()
+
+		_, err = tx.Exec(queryUpdateStock, orderId, defaultStoreId)
+		if err != nil {
+			return err
+		}
+		_, err = tx.Exec(queryUpdateInStockBoolItem, defaultStoreId)
+		if err != nil {
+			return err
+		}
+		return tx.Commit()
 	}
 
 	return nil
@@ -452,4 +478,49 @@ func (r *OrderPostgres) ConfirmOrderExtension(orderId int, rentalPeriodEnd time.
 	}
 
 	return nil
+}
+
+func (r *OrderPostgres) ReturnOrder(orderId int, timeStart, timeEnd time.Time, newStatus, deliveryMethod string) error {
+	queryUpdateStatus := fmt.Sprintf(`UPDATE %s SET status=$1 WHERE id=$2`, ordersTable)
+	queryCreateDelivery := fmt.Sprintf(`INSERT INTO %s (time_start, time_end, method, order_id)
+												VALUES ($1, $2, $3, $4)`, deliveriesTable)
+
+	tx, err := r.db.Beginx()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	_, err = tx.Exec(queryUpdateStatus, newStatus, orderId)
+	if err != nil {
+		return err
+	}
+	_, err = tx.Exec(queryCreateDelivery, timeStart, timeEnd, deliveryMethod, orderId)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
+}
+
+func (r *OrderPostgres) NeedRepairForOrder(orderId, price int) error {
+	queryUpdateStatus := fmt.Sprintf(`UPDATE %s SET status=$1 WHERE id=$2`, ordersTable)
+	queryCreatePayment := fmt.Sprintf(`INSERT INTO %s (price, order_id) VALUES ($1, $2)`, paymentsTable)
+
+	tx, err := r.db.Beginx()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	_, err = tx.Exec(queryUpdateStatus, model.AwaitingRepairPayment, orderId)
+	if err != nil {
+		return err
+	}
+	_, err = tx.Exec(queryCreatePayment, price, orderId)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
 }

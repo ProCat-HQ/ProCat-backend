@@ -428,3 +428,90 @@ func (h *Handler) ConfirmOrderExtension(c *gin.Context) {
 		Payload: nil,
 	})
 }
+
+func (h *Handler) ReturnOrder(c *gin.Context) {
+	orderId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	var input struct {
+		Problem           bool   `json:"problem" binding:"required"`
+		DeliveryMethod    string `json:"deliveryMethod" binding:"required"`
+		DeliveryTimeStart string `json:"deliveryTimeStart" binding:"required"`
+		DeliveryTimeEnd   string `json:"deliveryTimeEnd" binding:"required"`
+	}
+
+	if err = c.ShouldBindJSON(&input); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	userData, err := h.GetUserContext(c)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	order, err := h.services.Order.GetOrder(orderId)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if userData.UserId != order.UserId {
+		custom_errors.NewErrorResponse(c, http.StatusForbidden, "Forbidden")
+		return
+	}
+
+	if err = h.services.Order.ReturnOrder(orderId, input.Problem, input.DeliveryMethod,
+		input.DeliveryTimeStart, input.DeliveryTimeEnd); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: nil,
+	})
+}
+
+func (h *Handler) NeedRepairForOrder(c *gin.Context) {
+	orderId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	var input struct {
+		Price int `json:"price" binding:"required"`
+	}
+
+	if err = c.ShouldBindJSON(&input); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	order, err := h.services.Order.GetOrder(orderId)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	if order.Status != model.Returned {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "can't need repair if order wasn't returned")
+		return
+	}
+
+	if err = h.services.Order.NeedRepairForOrder(orderId, input.Price); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: nil,
+	})
+}
