@@ -1,12 +1,15 @@
 package routing
 
 import (
+	"fmt"
 	"github.com/procat-hq/procat-backend/internal/app/model"
 	"math"
 )
 
-func GetRoute(response model.Api2GisResponse) (model.RoutingResult, error) {
-
+func GetRoute(response model.Api2GisResponse, waitingHours []model.WaitingHoursForRouting) (model.RoutingResult, error) {
+	if len(response.Routes) == 0 {
+		return model.RoutingResult{}, fmt.Errorf("no deliveries to sort")
+	}
 	pointMap := make(map[int]bool)
 	for _, route := range response.Routes {
 		pointMap[route.SourceID] = true
@@ -24,9 +27,11 @@ func GetRoute(response model.Api2GisResponse) (model.RoutingResult, error) {
 	}
 	for _, route := range response.Routes {
 		distanceMatrix[route.SourceID][route.TargetID] = route.Distance
-		durationMatrix[route.SourceID][route.TargetID] = route.Duration
+		durationMatrix[route.SourceID][route.TargetID] = route.Duration + 12*3600
 	}
 	result := solveTSP(distanceMatrix, durationMatrix)
+	//fmt.Println(waitingHours)
+	//fmt.Println(durationMatrix)
 
 	return result, nil
 }
@@ -75,5 +80,19 @@ func solveTSP(distanceMatrix [][]int, durationMatrix [][]int) model.RoutingResul
 		index = optimalRoute[i]
 	}
 	result.Duration = duration
+	//fmt.Println(optimalRoute)
+	//fmt.Println(countDuration(optimalRoute, durationMatrix))
 	return result
+}
+
+func countDuration(optimalRoute []int, durationMatrix [][]int) []int {
+	durationRoute := make([]int, 0)
+	durationRoute = append(durationRoute, 0)
+	for i, point := range optimalRoute {
+		if i != 0 {
+			durationRoute = append(durationRoute,
+				durationRoute[i-1]+durationMatrix[optimalRoute[i-1]][point]+15*60)
+		}
+	}
+	return durationRoute
 }

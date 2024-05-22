@@ -126,3 +126,9 @@ type Payment struct {
 	Price     int       `json:"price" db:"price"`
 	CreatedAt time.Time `json:"createdAt" db:"created_at"`
 }
+
+type WaitingHoursForRouting struct {
+	Id    int
+	Start int
+	End   int
+}

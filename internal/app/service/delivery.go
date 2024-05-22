@@ -15,30 +15,42 @@ func NewDeliveryService(repo repository.Delivery) *DeliveryService {
 	return &DeliveryService{repo: repo}
 }
 
-func (s *DeliveryService) GetDeliveriesForDeliveryman(userId int) (*model.MapRequest, map[model.LatLon]model.Point, error) {
+func (s *DeliveryService) GetDeliveriesForDeliveryman(userId int, storeId int) (*model.MapRequest,
+	map[model.LatLon]model.Point, []model.WaitingHoursForRouting, error) {
 	deliverymanId, err := s.repo.GetDeliverymanId(userId)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
-
 	deliveries, err := s.repo.GetDeliveriesOrdersForDeliveryman(deliverymanId)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
+	}
+	store, err := s.repo.GetStore(storeId)
+	if err != nil {
+		return nil, nil, nil, err
 	}
 	var sources []int
 	var targets []int
 	var points []model.LatLon
+	var waitingHours []model.WaitingHoursForRouting
+	waitingHours = append(waitingHours, model.WaitingHoursForRouting{})
+	sources = append(sources, 0)
+	targets = append(targets, 0)
+	points = append(points, model.LatLon{
+		Latitude:  store.Latitude,
+		Longitude: store.Longitude,
+	})
 	mapDeliveriesId := make(map[model.LatLon]model.Point)
 	for i, delivery := range deliveries {
-		sources = append(sources, i)
-		targets = append(targets, i)
+		sources = append(sources, i+1)
+		targets = append(targets, i+1)
 		lat, err := strconv.ParseFloat(delivery.Latitude, 64)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
 		lon, err := strconv.ParseFloat(delivery.Longitude, 64)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
 		point := model.LatLon{
 			Latitude:  lat,
@@ -51,6 +63,10 @@ func (s *DeliveryService) GetDeliveriesForDeliveryman(userId int) (*model.MapReq
 			Longitude:  lon,
 			Address:    delivery.Address,
 		}
+		waitingHours = append(waitingHours, model.WaitingHoursForRouting{
+			Id:    i + 1,
+			Start: delivery.TimeStart.Hour() * 3600,
+			End:   delivery.TimeEnd.Hour() * 3600})
 	}
 	req := &model.MapRequest{
 		Points:  points,
@@ -58,7 +74,7 @@ func (s *DeliveryService) GetDeliveriesForDeliveryman(userId int) (*model.MapReq
 		Targets: targets,
 	}
 
-	return req, mapDeliveriesId, nil
+	return req, mapDeliveriesId, waitingHours, nil
 }
 
 func (s *DeliveryService) GetAllDeliveries(statuses []string, limit string, page string, idStr string) ([]model.DeliveryWithOrder, int, error) {
@@ -106,12 +122,13 @@ func (s *DeliveryService) ChangeDeliveryStatus(idStr string, newStatus string) e
 }
 
 func (s *DeliveryService) CreateRoute(requestBody model.MapRequest, responseFromApi model.Api2GisResponse,
-	mapDeliveriesPoint map[model.LatLon]model.Point, userId int) ([]model.Point, error) {
+	mapDeliveriesPoint map[model.LatLon]model.Point,
+	userId int, waitingHours []model.WaitingHoursForRouting) ([]model.Point, error) {
 	deliverymanId, err := s.repo.GetDeliverymanId(userId)
 	if err != nil {
 		return nil, err
 	}
-	result, err := routing.GetRoute(responseFromApi)
+	result, err := routing.GetRoute(responseFromApi, waitingHours)
 	if err != nil {
 		return nil, err
 	}
@@ -119,8 +136,8 @@ func (s *DeliveryService) CreateRoute(requestBody model.MapRequest, responseFrom
 	for _, i := range result.OptimalRoute {
 		response = append(response, mapDeliveriesPoint[requestBody.Points[i]])
 	}
-	err = s.repo.InsertRoute(response, deliverymanId)
-	return response, nil
+	err = s.repo.InsertRoute(response[1:], deliverymanId)
+	return response[1:], nil
 }
 
 func (s *DeliveryService) CheckRoute(userId int) ([]model.Point, error) {

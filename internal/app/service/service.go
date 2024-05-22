@@ -40,13 +40,14 @@ type Deliveryman interface {
 }
 
 type Delivery interface {
-	GetDeliveriesForDeliveryman(userId int) (*model.MapRequest, map[model.LatLon]model.Point, error)
+	GetDeliveriesForDeliveryman(userId int, storeId int) (*model.MapRequest,
+		map[model.LatLon]model.Point, []model.WaitingHoursForRouting, error)
 	GetAllDeliveries(statuses []string, limit string, page string, idStr string) ([]model.DeliveryWithOrder, int, error)
 	GetDelivery(idStr string) (model.DeliveryWithOrder, error)
 	ChangeDeliveryStatus(id string, newStatus string) error
-	CreateRoute(requestBody model.MapRequest,
-		responseFromApi model.Api2GisResponse,
-		mapDeliveriesPoint map[model.LatLon]model.Point, userId int) ([]model.Point, error)
+	CreateRoute(requestBody model.MapRequest, responseFromApi model.Api2GisResponse,
+		mapDeliveriesPoint map[model.LatLon]model.Point,
+		userId int, waitingHours []model.WaitingHoursForRouting) ([]model.Point, error)
 	CheckRoute(userId int) ([]model.Point, error)
 }
 
