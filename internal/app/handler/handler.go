@@ -101,10 +101,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			orders.POST("", h.CreateOrder)
 			orders.PATCH("/cancel/:id", h.CancelOrder)
 			orders.PATCH("/extend/:id", h.ExtendOrder)
-			orders.PATCH("/return/:id", h.ReturnOrder)
-			orders.PATCH("/confirm-extension/:id", h.CheckRole("admin"), h.ConfirmOrderExtension)
+			orders.POST("/return/:id", h.ReturnOrder)
+			orders.POST("/confirm-extension/:id", h.CheckRole("admin"), h.ConfirmOrderExtension)
 			orders.PATCH("/status/:id", h.CheckRole("admin"), h.ChangeOrderStatus)
-			orders.PATCH("/need-repair/:id", h.CheckRole("admin"), h.NeedRepairForOrder)
+			orders.POST("/need-repair/:id", h.CheckRole("admin"), h.NeedRepairForOrder)
 
 			payment := orders.Group("/payment")
 			{
