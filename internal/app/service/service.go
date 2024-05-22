@@ -4,6 +4,7 @@ import (
 	"github.com/procat-hq/procat-backend/internal/app/model"
 	"github.com/procat-hq/procat-backend/internal/app/repository"
 	"mime/multipart"
+	"time"
 )
 
 type User interface {
@@ -70,12 +71,21 @@ type Order interface {
 	ChangeOrderStatus(orderId int, status string) error
 	GetPaymentsForOrder(orderId int) ([]model.Payment, error)
 	ChangePaymentStatus(paymentId, paid int, method string) error
+	ExtendOrder(orderId int, rentalPeriodEnd time.Time) error
+	ConfirmOrderExtension(order model.Order) error
 }
 
 type Subscription interface {
+	GetUserSubscriptions(userId int, limit, page string) (int, []model.Subscription, error)
+	CreateSubscription(userId, itemId int) error
+	DeleteSubscription(userId, subId int) error
 }
 
 type Notification interface {
+	GetUsersNotification(userId int) ([]model.Notification, error)
+	CreateNotification(userId int, title, description string) (int, error)
+	ReadAndGetNotification(userId int, notificationId int) (model.Notification, error)
+	DeleteNotification(notificationId int) error
 }
 
 type Category interface {
@@ -126,14 +136,16 @@ type Service struct {
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
-		User:        NewUserService(repos.User),
-		Item:        NewItemService(repos.Item),
-		Admin:       NewAdminService(repos.Admin),
-		Delivery:    NewDeliveryService(repos.Delivery),
-		Deliveryman: NewDeliverymanService(repos.Deliveryman),
-		Cart:        NewCartService(repos.Cart),
-		Order:       NewOrderService(repos.Order),
-		Store:       NewStoreService(repos.Store),
-		Category:    NewCategoryService(repos.Category),
+		User:         NewUserService(repos.User),
+		Item:         NewItemService(repos.Item),
+		Admin:        NewAdminService(repos.Admin),
+		Delivery:     NewDeliveryService(repos.Delivery),
+		Deliveryman:  NewDeliverymanService(repos.Deliveryman),
+		Cart:         NewCartService(repos.Cart),
+		Order:        NewOrderService(repos.Order),
+		Store:        NewStoreService(repos.Store),
+		Category:     NewCategoryService(repos.Category),
+		Notification: NewNotificationService(repos.Notification),
+		Subscription: NewSubscriptionService(repos.Subscription),
 	}
 }

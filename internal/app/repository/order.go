@@ -183,7 +183,8 @@ func (r *OrderPostgres) CreateOrder(status string, deposit bool, rpStart, rpEnd 
 	defer tx.Rollback()
 
 	var isOkCartItems int
-	queryCheckCartStock := fmt.Sprintf(`SELECT MIN(CAST(in_stock_number - items_number >= 0 AS INTEGER)) FROM %s i
+	queryCheckCartStock := fmt.Sprintf(`SELECT COALESCE(MIN(CAST(in_stock_number - items_number >= 0 AS INTEGER)), 0)
+										       FROM %s i
 												JOIN %s c ON i.item_id = c.item_id WHERE c.cart_id=$1`, itemsStoresTable, cartsItemsTable)
 
 	err = tx.Get(&isOkCartItems, queryCheckCartStock, cartId)
@@ -262,14 +263,21 @@ func (r *OrderPostgres) CreateOrder(status string, deposit bool, rpStart, rpEnd 
 }
 
 func (r *OrderPostgres) GetTotalCartPrices(cartId int) (int, int, error) {
-	query := fmt.Sprintf(`SELECT SUM(i.price * c.items_number) as price, SUM(i.price_deposit * c.items_number) as price_deposit FROM %s c
+	query := fmt.Sprintf(`SELECT COALESCE(SUM(i.price * c.items_number), 0) as price,
+       							COALESCE(SUM(i.price_deposit * c.items_number), 0) as price_deposit FROM %s c
 								LEFT JOIN %s i ON c.item_id = i.id WHERE c.cart_id=$1`, cartsItemsTable, itemsTable)
 	var res struct {
 		Price        int `db:"price"`
 		PriceDeposit int `db:"price_deposit"`
 	}
 	err := r.db.Get(&res, query, cartId)
-	return res.Price, res.PriceDeposit, err
+	if err != nil {
+		return 0, 0, err
+	}
+	if res.Price == 0 && res.PriceDeposit == 0 {
+		return 0, 0, errors.New("empty cart")
+	}
+	return res.Price, res.PriceDeposit, nil
 }
 
 func (r *OrderPostgres) GetUsersCartId(userId int) (int, error) {
@@ -312,6 +320,8 @@ func (r *OrderPostgres) ChangePaymentStatus(paymentId, paid int, method string) 
 
 	queryUpdateOrderStatus := fmt.Sprintf(`UPDATE %s SET status = $1 WHERE id = $2`, ordersTable)
 
+	queryPaymentsCount := fmt.Sprintf(`SELECT COUNT(*) FROM %s WHERE order_id=$1`, paymentsTable)
+
 	var money struct {
 		Paid    int `db:"paid"`
 		Price   int `db:"price"`
@@ -322,10 +332,111 @@ func (r *OrderPostgres) ChangePaymentStatus(paymentId, paid int, method string) 
 		return err
 	}
 	if money.Paid >= money.Price {
-		_, err = r.db.Exec(queryUpdateOrderStatus, model.Accepted, money.OrderId)
+		var count int
+		err = r.db.Get(&count, queryPaymentsCount, money.OrderId)
 		if err != nil {
 			return err
 		}
+		if count > 1 {
+			_, err = r.db.Exec(queryUpdateOrderStatus, model.Extended, money.OrderId)
+		} else if count == 1 {
+			_, err = r.db.Exec(queryUpdateOrderStatus, model.Accepted, money.OrderId)
+		}
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (r *OrderPostgres) ExtendOrder(orderId int, rentalPeriodEnd time.Time) error {
+	query := fmt.Sprintf(`INSERT INTO %s (rental_period_end, order_id) VALUES ($1, $2)`, ordersExtensionTable)
+	queryStatus := fmt.Sprintf(`UPDATE %s SET status=$1 WHERE id=$2`, ordersTable)
+
+	tx, err := r.db.Beginx()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	_, err = tx.Exec(query, rentalPeriodEnd, orderId)
+	if err != nil {
+		return err
+	}
+	_, err = tx.Exec(queryStatus, model.ExtensionRequest, orderId)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
+}
+
+func (r *OrderPostgres) GetRentalPeriodEndFromExtension(orderId int) (time.Time, error) {
+	query := fmt.Sprintf(`SELECT rental_period_end FROM %s WHERE order_id=$1`, ordersExtensionTable)
+	var rentalPeriodEnd time.Time
+	err := r.db.Get(&rentalPeriodEnd, query, orderId)
+	return rentalPeriodEnd, err
+}
+
+func (r *OrderPostgres) ConfirmOrderExtension(orderId int, rentalPeriodEnd time.Time, rentalPeriodDays int,
+	status string, deposit bool) error {
+
+	queryUpdateOrder := fmt.Sprintf(`UPDATE %s SET status=$1, rental_period_end=$2,
+              							    total_price = total_price + $3, deposit=COALESCE(deposit, 0) + $4
+          									WHERE id=$5`, ordersTable)
+
+	queryDeleteOrdersExtension := fmt.Sprintf(`DELETE FROM %s WHERE order_id=$1`, ordersExtensionTable)
+
+	queryGetOrderItemPriceAndDeposit := fmt.Sprintf(`SELECT SUM(i.price * o.items_number) as price,
+       														SUM(i.price_deposit * o.items_number) as price_deposit
+															FROM %s o
+															LEFT JOIN %s i ON o.item_id = i.id WHERE o.order_id=$1`,
+		ordersItemsTable, itemsTable)
+
+	queryAddPayment := fmt.Sprintf(`INSERT INTO %s (price, order_id) VALUES ($1, $2)`, paymentsTable)
+
+	tx, err := r.db.Beginx()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	var prices struct {
+		Price        int `db:"price"`
+		PriceDeposit int `db:"price_deposit"`
+	}
+	err = tx.Get(&prices, queryGetOrderItemPriceAndDeposit, orderId)
+	if err != nil {
+		return err
+	}
+
+	totalPrice := prices.Price * rentalPeriodDays
+	depositPrice := func() int {
+		if deposit {
+			return prices.PriceDeposit
+		}
+		return 0
+	}()
+
+	_, err = tx.Exec(queryUpdateOrder, status, rentalPeriodEnd, totalPrice, depositPrice, orderId)
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Exec(queryDeleteOrdersExtension, orderId)
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Exec(queryAddPayment, totalPrice+depositPrice, orderId)
+	if err != nil {
+		return err
+	}
+
+	if err = tx.Commit(); err != nil {
+		return err
 	}
 
 	return nil

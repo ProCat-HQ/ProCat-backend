@@ -8,14 +8,24 @@ import (
 	"strconv"
 )
 
-func (h *Handler) GetAllNotifications(c *gin.Context) {
+func (h *Handler) GetAllSubscriptions(c *gin.Context) {
+	limit := c.Query("limit")
+	if limit == "" {
+		limit = "10"
+	}
+
+	page := c.Query("page")
+	if page == "" {
+		page = "0"
+	}
+
 	userData, err := h.GetUserContext(c)
 	if err != nil {
 		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	notifications, err := h.services.Notification.GetUsersNotification(userData.UserId)
+	count, rows, err := h.services.Subscription.GetUserSubscriptions(userData.UserId, limit, page)
 	if err != nil {
 		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -25,26 +35,25 @@ func (h *Handler) GetAllNotifications(c *gin.Context) {
 		Status:  http.StatusOK,
 		Message: "ok",
 		Payload: gin.H{
-			"notifications": notifications,
+			"count": count,
+			"rows":  rows,
 		},
 	})
 }
 
-func (h *Handler) SendNotification(c *gin.Context) {
-	userId, err := strconv.Atoi(c.Param("id"))
+func (h *Handler) SubscribeToItem(c *gin.Context) {
+	itemIdInt, err := strconv.Atoi(c.Query("itemId"))
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	userData, err := h.GetUserContext(c)
 	if err != nil {
 		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	var input model.NotificationCreate
-	if err = c.ShouldBindJSON(&input); err != nil {
-		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	id, err := h.services.Notification.CreateNotification(userId, input.Title, input.Description)
-	if err != nil {
+	if err = h.services.Subscription.CreateSubscription(userData.UserId, itemIdInt); err != nil {
 		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -52,14 +61,12 @@ func (h *Handler) SendNotification(c *gin.Context) {
 	c.JSON(http.StatusOK, model.Response{
 		Status:  http.StatusOK,
 		Message: "ok",
-		Payload: gin.H{
-			"id": id,
-		},
+		Payload: nil,
 	})
 }
 
-func (h *Handler) ViewNotification(c *gin.Context) {
-	notificationId, err := strconv.Atoi(c.Param("id"))
+func (h *Handler) DeleteItemFromSubscriptions(c *gin.Context) {
+	subIdInt, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -71,27 +78,7 @@ func (h *Handler) ViewNotification(c *gin.Context) {
 		return
 	}
 
-	notification, err := h.services.Notification.ReadAndGetNotification(userData.UserId, notificationId)
-	if err != nil {
-		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	c.JSON(http.StatusOK, model.Response{
-		Status:  http.StatusOK,
-		Message: "ok",
-		Payload: notification,
-	})
-}
-
-func (h *Handler) DeleteNotification(c *gin.Context) {
-	notificationId, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	if err = h.services.Notification.DeleteNotification(notificationId); err != nil {
+	if err = h.services.Subscription.DeleteSubscription(userData.UserId, subIdInt); err != nil {
 		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}

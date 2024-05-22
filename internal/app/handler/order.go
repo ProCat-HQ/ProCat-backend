@@ -209,7 +209,23 @@ func (h *Handler) CancelOrder(c *gin.Context) {
 		return
 	}
 
-	err = h.services.Order.ChangeOrderStatus(orderId, model.AwaitingRejection)
+	payments, err := h.services.Order.GetPaymentsForOrder(orderId)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	paidSum := 0
+	for _, payment := range payments {
+		paidSum += payment.Paid
+	}
+	var newStatus string
+	if paidSum > 0 {
+		newStatus = model.AwaitingMoneyBack
+	} else {
+		newStatus = model.AwaitingRejection
+	}
+
+	err = h.services.Order.ChangeOrderStatus(orderId, newStatus)
 	if err != nil {
 		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -317,6 +333,91 @@ func (h *Handler) ChangePaymentStatus(c *gin.Context) {
 
 	err = h.services.Order.ChangePaymentStatus(paymentId, req.Paid, req.Method)
 	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: nil,
+	})
+}
+
+func (h *Handler) ExtendOrder(c *gin.Context) {
+	orderId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	var input struct {
+		RentalPeriodEnd string `json:"rentalPeriodEnd" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&input); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	rentalPeriodEnd, err := time.Parse(time.DateTime, input.RentalPeriodEnd)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	userData, err := h.GetUserContext(c)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	order, err := h.services.Order.GetOrder(orderId)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if userData.UserId != order.UserId {
+		custom_errors.NewErrorResponse(c, http.StatusForbidden, "Forbidden")
+		return
+	}
+
+	if order.RentalPeriodEnd.After(rentalPeriodEnd) {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "new rental end time must be greater than old")
+		return
+	}
+
+	if err = h.services.Order.ExtendOrder(orderId, rentalPeriodEnd); err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "ok",
+		Payload: nil,
+	})
+}
+
+func (h *Handler) ConfirmOrderExtension(c *gin.Context) {
+	orderId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	order, err := h.services.Order.GetOrder(orderId)
+	if err != nil {
+		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if order.Status != model.ExtensionRequest {
+		custom_errors.NewErrorResponse(c, http.StatusBadRequest, "can't extend order without user request")
+		return
+	}
+
+	if err = h.services.Order.ConfirmOrderExtension(order); err != nil {
 		custom_errors.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}

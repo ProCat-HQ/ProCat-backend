@@ -50,6 +50,8 @@ services:
       - procat-server
     ports:
       - "${PROMETHEUS_BIND_ADDR}:9090"
+    volumes:
+      - prometheus_storage:/prometheus
     networks:
       - appnet
 
@@ -72,6 +74,7 @@ services:
 volumes:
   procat_db_tmp:
   procat_assets:
+  prometheus_storage:
   grafana_storage:
 
 networks:

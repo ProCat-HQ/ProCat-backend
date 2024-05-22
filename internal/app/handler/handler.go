@@ -27,7 +27,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	m := ginmetrics.GetMonitor()
 	m.SetMetricPath("/metrics")
-	m.SetSlowTime(10)
+	m.SetSlowTime(5)
 	m.Use(router)
 
 	users := router.Group("/users")
@@ -81,7 +81,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		admin := users.Group("/admin", h.UserIdentify, h.CheckRole("admin"))
 		{
-			admin.POST("/cluster", h.Cluster) // TODO
+			admin.POST("/cluster", h.Cluster)
 			admin.GET("/deliveries-to-sort", h.GetAllDeliveriesToSort)
 			admin.PATCH("/change-delivery", h.ChangeDeliveryData)
 		}
@@ -99,6 +99,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			orders.GET("/:id", h.GetOrder)
 			orders.POST("", h.CreateOrder)
 			orders.PATCH("/cancel/:id", h.CancelOrder)
+			orders.PATCH("/extend/:id", h.ExtendOrder)
+			orders.PATCH("/confirm-extension/:id", h.CheckRole("admin"), h.ConfirmOrderExtension)
 			orders.PATCH("/status/:id", h.CheckRole("admin"), h.ChangeOrderStatus)
 
 			payment := orders.Group("/payment")
@@ -110,17 +112,17 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		subscriptions := users.Group("/subscriptions", h.UserIdentify)
 		{
-			subscriptions.GET("", h.GetAllSubscriptions)                // TODO
-			subscriptions.POST("", h.SubscribeToItem)                   // TODO
-			subscriptions.DELETE("/:id", h.DeleteItemFromSubscriptions) // TODO
+			subscriptions.GET("", h.GetAllSubscriptions)
+			subscriptions.POST("", h.SubscribeToItem)
+			subscriptions.DELETE("/:id", h.DeleteItemFromSubscriptions)
 		}
 
 		notifications := users.Group("/notifications", h.UserIdentify)
 		{
-			notifications.GET("", h.GetAllNotifications)                             // TODO
-			notifications.POST("/:id", h.CheckRole("admin"), h.SendNotification)     // TODO
-			notifications.PATCH("/:id", h.ViewNotification)                          // TODO
-			notifications.DELETE("/:id", h.CheckRole("admin"), h.DeleteNotification) // TODO
+			notifications.GET("", h.GetAllNotifications)
+			notifications.POST("/:id", h.CheckRole("admin"), h.SendNotification)
+			notifications.PATCH("/:id", h.ViewNotification)
+			notifications.DELETE("/:id", h.CheckRole("admin"), h.DeleteNotification)
 		}
 
 	}

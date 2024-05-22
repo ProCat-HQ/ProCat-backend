@@ -59,6 +59,14 @@ CREATE TABLE IF NOT EXISTS orders
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS orders_extension
+(
+    id SERIAL PRIMARY KEY,
+    rental_period_end   TIMESTAMP   NOT NULL,
+    order_id INTEGER UNIQUE NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS deliveries
 (
     id             SERIAL PRIMARY KEY,
@@ -197,7 +205,7 @@ CREATE TABLE IF NOT EXISTS subscriptions_items
 (
     id              SERIAL PRIMARY KEY,
     subscription_id INTEGER NOT NULL,
-    item_id         INTEGER,
+    item_id         INTEGER NOT NULL,
     FOREIGN KEY (subscription_id) REFERENCES subscriptions (id) ON DELETE CASCADE,
     FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE
 );

@@ -45,9 +45,9 @@ INSERT INTO stores (name, address, working_hours_start, working_hours_end)
 VALUES ('1', '1', '8:00', '20:00');
 
 INSERT INTO item_stores (in_stock_number, store_id, item_id)
-VALUES (2, 1, 1),
-       (0, 1, 2),
-       (1, 1, 3);
+VALUES (20, 1, 1),
+       (10, 1, 2),
+       (15, 1, 3);
 
 INSERT INTO orders (id, status, total_price, deposit, rental_period_start, rental_period_end, address, latitude,
                     longitude, company_name, user_id)

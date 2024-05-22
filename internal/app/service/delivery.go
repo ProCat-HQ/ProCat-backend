@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"github.com/procat-hq/procat-backend/internal/app/model"
 	"github.com/procat-hq/procat-backend/internal/app/repository"
 	"github.com/procat-hq/procat-backend/internal/routing"
@@ -114,6 +115,11 @@ func (s *DeliveryService) ChangeDeliveryStatus(idStr string, newStatus string) e
 	if err != nil {
 		return err
 	}
+
+	if newStatus != model.Rent && newStatus != model.Returned {
+		return errors.New("deliveryman can only set statuses: " + model.Rent + " or " + model.Returned)
+	}
+
 	err = s.repo.ChangeDeliveryStatus(id, newStatus)
 	if err != nil {
 		return err
