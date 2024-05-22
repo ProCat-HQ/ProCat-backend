@@ -1372,7 +1372,7 @@ paths:
                   example: SOME COMP INC.
                 deliveryMethod:
                   type: string
-                  example: by car
+                  example: car
                 deliveryTimeStart:
                   type: string
                   example: 2023-10-18 18:00:00
@@ -1587,6 +1587,45 @@ paths:
               schema:
                 $ref: '#/components/schemas/StatusCode200'
 
+  /users/orders/return/{orderId}:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 54
+    post:
+      deprecated: false
+      tags:
+        - order
+      summary: return order with problem or not and with certain delivery method
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                problem:
+                  type: boolean
+                  example: true
+                deliveryMethod:
+                  type: string
+                  example: pickUp
+                deliveryTimeStart:
+                  type: string
+                  example: 2023-10-18 18:00:00
+                deliveryTimeEnd:
+                  type: string
+                  example: 2023-10-18 20:00:00
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusCode200'
+
   /users/orders/confirm-extension/{orderId}:
     parameters:
       - name: orderId
@@ -1600,6 +1639,36 @@ paths:
       tags:
         - order
       summary: (ADMIN!!! WARNING - api calls here) confirms extension, changes order data and create new payment
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusCode200'
+
+  /users/orders/need-repair/{orderId}:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 54
+    post:
+      deprecated: false
+      tags:
+        - order
+      summary: (ADMIN!!!) in case the user broke the tool
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                price:
+                  type: integer
+                  example: 1000
       responses:
         200:
           description: successful operation

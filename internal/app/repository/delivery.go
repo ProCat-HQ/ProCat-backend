@@ -131,6 +131,39 @@ func (r *DeliveryPostgres) ChangeDeliveryStatus(id int, newStatus string) error 
 	if err != nil {
 		return err
 	}
+	if newStatus == model.Returned {
+		tx, err := r.db.Beginx()
+		if err != nil {
+			return err
+		}
+		defer tx.Rollback()
+
+		queryGetOrderId := fmt.Sprintf("SELECT order_id FROM %s WHERE id = $1", deliveriesTable)
+		var orderId int
+		err = tx.Get(&orderId, queryGetOrderId, id)
+		if err != nil {
+			return err
+		}
+
+		defaultStoreId := 1
+		queryUpdateStock := fmt.Sprintf(`UPDATE %s i SET in_stock_number = i.in_stock_number + o.items_number
+												FROM %s o WHERE o.order_id=$1 AND i.store_id=$2 AND o.item_id=i.item_id`,
+			itemsStoresTable, ordersItemsTable)
+
+		queryUpdateInStockBoolItem := fmt.Sprintf(`UPDATE %s it SET is_in_stock = i.in_stock_number > 0
+														  FROM %s i WHERE it.id = i.item_id AND store_id=$1`,
+			itemsTable, itemsStoresTable)
+
+		_, err = tx.Exec(queryUpdateStock, orderId, defaultStoreId)
+		if err != nil {
+			return err
+		}
+		_, err = tx.Exec(queryUpdateInStockBoolItem, defaultStoreId)
+		if err != nil {
+			return err
+		}
+		return tx.Commit()
+	}
 	return nil
 }
 

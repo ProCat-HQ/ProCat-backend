@@ -82,6 +82,8 @@ type Order interface {
 	ExtendOrder(orderId int, rentalPeriodEnd time.Time) error
 	GetRentalPeriodEndFromExtension(orderId int) (time.Time, error)
 	ConfirmOrderExtension(orderId int, rentalPeriodEnd time.Time, rentalPeriodDays int, status string, deposit bool) error
+	ReturnOrder(orderId int, timeStart, timeEnd time.Time, newStatus, deliveryMethod string) error
+	NeedRepairForOrder(orderId, price int) error
 }
 
 type Subscription interface {
