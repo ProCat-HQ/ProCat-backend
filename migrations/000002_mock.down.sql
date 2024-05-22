@@ -26,6 +26,7 @@ DELETE FROM coordinates;
 DELETE FROM routes;
 
 DELETE FROM orders;
+DELETE FROM orders_extension;
 DELETE FROM verifications;
 DELETE FROM deliverymen;
 DELETE FROM refresh_sessions;
