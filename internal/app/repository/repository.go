@@ -34,7 +34,7 @@ type Verification interface {
 
 type Deliveryman interface {
 	GetAllDeliverymen(limit int, offset int) ([]model.DeliveryManInfoDB, int, error)
-	GetDeliveryman(userId int) (model.DeliveryManInfoCreate, error)
+	GetDeliveryman(userId int) (model.DeliveryManInfoWithId, error)
 	CreateDeliveryman(newDeliveryman model.DeliveryManInfoCreate, userId int) (int, error)
 	ChangeDeliverymanData(newData model.DeliveryManInfoCreate, deliverymanId int) error
 	DeleteDeliveryman(deliverymanId int) error
@@ -48,6 +48,7 @@ type Delivery interface {
 	ChangeDeliveryStatus(id int, newStatus string) error
 	GetRoute(deliverymanId int) ([]model.Point, error)
 	InsertRoute(route []model.Point, deliverymanId int) error
+	GetStore(storeId int) (model.Point, error)
 }
 
 type Admin interface {

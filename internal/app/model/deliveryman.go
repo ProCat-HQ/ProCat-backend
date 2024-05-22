@@ -29,6 +29,14 @@ type DeliveryManInfoCreate struct {
 	CarId             string `json:"carId" db:"car_id"`
 }
 
+type DeliveryManInfoWithId struct {
+	Id                int    `json:"id" db:"id"`
+	CarCapacity       string `json:"carCapacity" db:"car_capacity"`
+	WorkingHoursStart string `json:"workingHoursStart" db:"working_hours_start"`
+	WorkingHoursEnd   string `json:"workingHoursEnd" db:"working_hours_end"`
+	CarId             string `json:"carId" db:"car_id"`
+}
+
 type DeliveriesForDeliveryMan struct {
 	DeliverymanId int     `json:"deliverymanId"`
 	Deliveries    []Point `json:"deliveries"`
