@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/procat-hq/procat-backend/internal/app/model"
+	"time"
 )
 
 type DeliveryPostgres struct {
@@ -23,6 +24,18 @@ func (r *DeliveryPostgres) GetDeliverymanId(userId int) (int, error) {
 		return 0, err
 	}
 	return id, nil
+}
+
+func (r *DeliveryPostgres) GetWorkingHours(deliverymanId int) (int, error) {
+	var start time.Time
+	query := fmt.Sprintf(`SELECT working_hours_start
+								FROM %s 
+								WHERE id = $1`, deliverymenTable)
+	err := r.db.Get(&start, query, deliverymanId)
+	if err != nil {
+		return 0, err
+	}
+	return start.Hour(), nil
 }
 
 func (r *DeliveryPostgres) GetDeliveriesOrdersForDeliveryman(deliverymanId int) ([]model.DeliveryAndOrder, error) {
@@ -192,10 +205,11 @@ func (r *DeliveryPostgres) GetRoute(deliverymanId int) ([]model.Point, error) {
 	if err != nil {
 		return nil, err
 	}
-	queryDeleteRoute := fmt.Sprintf(`DELETE FROM routes where id = $1`)
 	queryChangeStatus := fmt.Sprintf(`UPDATE %s AS o SET status=$1
-											FROM %s AS d WHERE o.id = d.order_id
-											AND d.deliveryman_id = $2`, ordersTable, deliveriesTable)
+											FROM %s AS d JOIN %s c on d.id = c.delivery_id
+											WHERE o.id = d.order_id AND d.deliveryman_id = $2`,
+		ordersTable, deliveriesTable, coordinatesTable)
+	queryDeleteRoute := fmt.Sprintf(`DELETE FROM routes where id = $1`)
 	if len(statuses) != count {
 		_, err = tx.Exec(queryDeleteRoute, routeId)
 		if err != nil {
