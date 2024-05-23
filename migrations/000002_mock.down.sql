@@ -21,12 +21,12 @@ DELETE FROM items;
 DELETE FROM categories;
 
 DELETE FROM payments;
-DELETE FROM deliveries;
 DELETE FROM coordinates;
 DELETE FROM routes;
+DELETE FROM deliveries;
 
-DELETE FROM orders;
 DELETE FROM orders_extension;
+DELETE FROM orders;
 DELETE FROM verifications;
 DELETE FROM deliverymen;
 DELETE FROM refresh_sessions;
