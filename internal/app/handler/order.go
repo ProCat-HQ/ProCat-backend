@@ -106,7 +106,7 @@ func (h *Handler) GetOrder(c *gin.Context) {
 		return
 	}
 
-	if userData.UserId != order.UserId && rolePriority < 4 {
+	if userData.UserId != order.UserId && rolePriority < 2 {
 		custom_errors.NewErrorResponse(c, http.StatusForbidden, "Forbidden")
 		return
 	}
